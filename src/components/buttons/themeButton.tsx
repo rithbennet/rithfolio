@@ -2,7 +2,7 @@
 import React from "react";
 import { useTheme } from "next-themes";
 
-const themeButton = () => {
+const ThemeButton = () => {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -15,4 +15,4 @@ const themeButton = () => {
   );
 };
 
-export default themeButton;
+export default ThemeButton;
