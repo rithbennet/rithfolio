@@ -25,9 +25,9 @@ const projects: Project[] = [
     title: "AchievTrack",
     description:
       "Achievement and goal tracking application developed with TypeScript. Developed for a SK Saujana Utama.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/achievTrack.png",
     tags: ["TypeScript", "Full-stack", "Next.js", "Tailwind CSS", "Prisma"],
-    demoUrl: "#",
+    demoUrl: "https://achiev-track.vercel.app/signIn",
     githubUrl: "https://github.com/rithbennet/AchievTrack",
   },
   {
@@ -35,7 +35,7 @@ const projects: Project[] = [
     title: "PDF Converter",
     description:
       "A full-stack PDF converter application built with Go backend and React frontend.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/pdf-tool.png",
     tags: ["Go", "React", "TypeScript", "Full-stack"],
     demoUrl: "#",
     githubUrl: "https://github.com/rithbennet/pdf-converter",
@@ -45,7 +45,7 @@ const projects: Project[] = [
     title: "Go Weather App",
     description:
       "Weather application with Go backend and TypeScript frontend for real-time weather data.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/go-weather.png",
     tags: ["Go", "TypeScript", "React", "API Integration", "Full-stack"],
     demoUrl: "#",
     githubUrl: "https://github.com/rithbennet/go-weather-app",
@@ -55,7 +55,7 @@ const projects: Project[] = [
     title: "GameRent",
     description:
       "Game rental system built with Spring Boot featuring user authentication and rental management.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/gamerent.png?w=1920&q=75",
     tags: ["Java", "Spring Boot", "Full-stack"],
     demoUrl: "#",
     githubUrl: "https://github.com/rithbennet/GameRent",
@@ -65,7 +65,7 @@ const projects: Project[] = [
     title: "CalTrack",
     description:
       "Mobile application for tracking calories and nutrition built with Flutter.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/CalTrack.png",
     tags: ["Flutter", "Dart", "Mobile App"],
     demoUrl: "#",
     githubUrl: "https://github.com/rithbennet/CalTrack",
@@ -75,7 +75,7 @@ const projects: Project[] = [
     title: "HMM-LSTM",
     description:
       "Financial backtesting model implementing Hidden Markov Model and LSTM algorithms in Python.",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/HMM_LSTM.png",
     tags: [
       "Python",
       "Machine Learning",
@@ -144,7 +144,12 @@ export function ProjectsSection() {
                 src={project.image || "/placeholder.svg"}
                 alt={project.title}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                quality={80}
+                loading="lazy"
                 className="object-cover"
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjY2NjY2NjIi8+PC9zdmc+"
               />
             </div>
             <CardContent className="flex flex-1 flex-col p-2.5 sm:p-3 md:p-4">

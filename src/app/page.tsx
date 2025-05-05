@@ -36,7 +36,7 @@ export default function Home() {
           <div className="flex justify-center pt-4 md:justify-end md:pt-0">
             <div className="relative h-48 w-48 overflow-hidden rounded-2xl sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-72 lg:w-72">
               <Image
-                src="/placeholder.svg?height=320&width=320"
+                src="/pfp.jpg"
                 alt="Profile"
                 fill
                 className="object-cover"
