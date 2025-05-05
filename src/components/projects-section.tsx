@@ -24,7 +24,7 @@ const projects: Project[] = [
     id: 4,
     title: "AchievTrack",
     description:
-      "Achievement and goal tracking application developed with TypeScript.",
+      "Achievement and goal tracking application developed with TypeScript. Developed for a SK Saujana Utama.",
     image: "/placeholder.svg?height=400&width=600",
     tags: ["TypeScript", "Full-stack", "Next.js", "Tailwind CSS", "Prisma"],
     demoUrl: "#",
@@ -138,7 +138,7 @@ export function ProjectsSection() {
 
       <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-2">
         {filteredProjects.map((project) => (
-          <Card key={project.id} className="overflow-hidden">
+          <Card key={project.id} className="flex flex-col overflow-hidden">
             <div className="relative h-32 sm:h-36 md:h-40">
               <Image
                 src={project.image || "/placeholder.svg"}
@@ -147,7 +147,7 @@ export function ProjectsSection() {
                 className="object-cover"
               />
             </div>
-            <CardContent className="p-2.5 sm:p-3 md:p-4">
+            <CardContent className="flex flex-1 flex-col p-2.5 sm:p-3 md:p-4">
               <h3 className="mb-1 text-base font-bold sm:text-lg md:text-xl">
                 {project.title}
               </h3>
