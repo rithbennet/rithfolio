@@ -18,11 +18,13 @@ export default function Home() {
             <p className="mb-2 text-base sm:text-lg md:mb-3">
               22-year-old full stack software developer from Kuala Lumpur 🇲🇾
             </p>
+            <p className="text-foreground/80 mb-2 max-w-2xl text-sm sm:text-base md:mb-3">
+              I’m a full-stack web developer with a passion for exploring new
+              technologies!
+            </p>
             <p className="text-foreground/80 mb-4 max-w-2xl text-sm sm:text-base md:mb-6">
-              I like to develop full stack web apps and trying out new tech!
-              <br />
-              I do weightlfting and photography in my free time too!
-              <br />
+              Outside of coding, I stay active with weightlifting and express my
+              creativity through photography📸
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
