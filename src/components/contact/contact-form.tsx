@@ -13,6 +13,7 @@ export function ContactForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -24,19 +25,39 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // In a real application, you would send the form data to your backend or a form service
-    console.log("Form submitted:", formData);
+      const data = await response.json();
 
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", subject: "", message: "" });
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
 
-    // Reset submission status after 5 seconds
-    setTimeout(() => setSubmitted(false), 5000);
+      // Success
+      setSubmitted(true);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+
+      // Reset submission status after 5 seconds
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError(
+        typeof err === "object" && err !== null && "message" in err
+          ? (err as Error).message
+          : "An unexpected error occurred"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -53,6 +74,12 @@ export function ContactForm() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/50 dark:text-red-200">
+                {error}
+              </div>
+            )}
+
             <div>
               <label htmlFor="name" className="mb-1 block text-sm font-medium">
                 Name
