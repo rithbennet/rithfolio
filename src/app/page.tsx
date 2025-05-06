@@ -19,7 +19,10 @@ export default function Home() {
               22-year-old full stack software developer from Kuala Lumpur 🇲🇾
             </p>
             <p className="text-foreground/80 mb-4 max-w-2xl text-sm sm:text-base md:mb-6">
-              I like to developing full stack web apps and trying out new tech!
+              I like to develop full stack web apps and trying out new tech!
+              <br />
+              I do weightlfting and photography in my free time too!
+              <br />
             </p>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
