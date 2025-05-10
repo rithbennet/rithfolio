@@ -31,9 +31,12 @@ export default function Home() {
               <Button
                 variant="outline"
                 className="h-8 gap-1.5 text-xs sm:h-9 sm:gap-2 sm:text-sm"
+                asChild
               >
-                <IoDocumentTextOutline className="h-3 w-3 sm:h-4 sm:w-4" />
-                Resume
+                <a href="/resume.pdf" download>
+                  <IoDocumentTextOutline className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Resume
+                </a>
               </Button>
               <SocialLinks />
             </div>
