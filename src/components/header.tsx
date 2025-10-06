@@ -24,6 +24,9 @@ const Header = () => {
           >
             contact
           </Link>
+          <Link href="/blogs" className="hover:text-primary transition-colors">
+            blogs
+          </Link>
         </nav>
 
         {/* Empty div for desktop layout balance - only on desktop */}
