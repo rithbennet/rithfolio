@@ -1,0 +1,56 @@
+
+> rithfolio@0.1.0 build /Users/rith/Documents/PROJECTS/rithfolio
+> contentlayer build && next build
+
+Generated 2 documents in .contentlayer
+TypeError: The "code" argument must be of type number. Received an instance of Object
+    at process.set [as exitCode] (node:internal/bootstrap/node:122:9)
+    at Cli.runExit (/Users/rith/Documents/PROJECTS/rithfolio/node_modules/.pnpm/clipanion@3.2.1_typanion@3.14.0/node_modules/clipanion/lib/advanced/Cli.js:232:26)
+    at run (file:///Users/rith/Documents/PROJECTS/rithfolio/node_modules/.pnpm/@contentlayer+cli@0.3.4_esbuild@0.18.20/node_modules/@contentlayer/cli/src/index.ts:39:3)
+    at main (/Users/rith/Documents/PROJECTS/rithfolio/node_modules/.pnpm/contentlayer@0.3.4_esbuild@0.18.20/node_modules/contentlayer/bin/cli.cjs:5:3) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+   ▲ Next.js 15.3.6
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+Generated 2 documents in .contentlayer
+ ✓ Compiled successfully in 3.0s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/19) ...
+   Generating static pages (4/19) 
+   Generating static pages (9/19) 
+   Generating static pages (14/19) 
+ ✓ Generating static pages (19/19)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                      195 B         124 kB
+├ ○ /_not-found                            978 B         103 kB
+├ ƒ /api/contact                           144 B         102 kB
+├ ○ /blog                                  666 B         112 kB
+├ ● /blog/[slug]                         3.68 kB         115 kB
+├   ├ /blog/hello-world
+├   └ /blog/why-typescript
+├ ● /blog/tag/[tag]                        171 B         106 kB
+├   ├ /blog/tag/nextjs
+├   ├ /blog/tag/mdx
+├   ├ /blog/tag/contentlayer
+├   └ [+2 more paths]
+├ ○ /contact                             1.96 kB         116 kB
+├ ○ /projects                              176 B         124 kB
+├ ○ /robots.txt                            144 B         102 kB
+├ ○ /sitemap.xml                           144 B         102 kB
+└ ○ /skills                                144 B         102 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/38c0dee1-da39d7250af49edc.js  53.2 kB
+  ├ chunks/476-a024cdbfa3ddac8c.js       47.2 kB
+  └ other shared chunks (total)          1.95 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

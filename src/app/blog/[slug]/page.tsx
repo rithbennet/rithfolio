@@ -1,4 +1,4 @@
-import { allPosts } from "contentlayer/generated";
+import { allPosts } from ".contentlayer/generated";
 import { notFound } from "next/navigation";
 import Comments from "../components/Comments";
 import { format, parseISO } from "date-fns";
@@ -126,3 +126,5 @@ export default async function PostPage({
     </article>
   );
 }
+
+export const dynamic = "force-static";
