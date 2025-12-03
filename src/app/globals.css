@@ -166,3 +166,52 @@
     @apply hover:text-accent transition-colors duration-200;
   }
 }
+
+/* Rehype Pretty Code styles */
+@layer components {
+  /* Code title above blocks */
+  [data-rehype-pretty-code-title] {
+    @apply -mb-px rounded-t-lg border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300;
+  }
+
+  /* Code container */
+  pre[data-theme] {
+    @apply overflow-x-auto rounded-lg border border-neutral-200 bg-white p-4 text-sm dark:border-neutral-800 dark:bg-neutral-950;
+  }
+
+  /* Handle CSS variables for dual themes */
+  code[data-theme*=" "],
+  code[data-theme*=" "] span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+
+  .dark code[data-theme*=" "],
+  .dark code[data-theme*=" "] span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
+
+  html.dark pre[data-theme="light"],
+  html:not(.dark) pre[data-theme="dark"] {
+    display: none;
+  }
+
+  /* Line highlighting */
+  pre [data-line] {
+    @apply px-2;
+  }
+  pre [data-highlighted-line] {
+    @apply bg-neutral-100 dark:bg-neutral-900;
+  }
+
+  /* Word highlighting */
+  pre [data-word] {
+    @apply rounded-sm bg-neutral-200/50 px-1 dark:bg-neutral-700/50;
+  }
+
+  /* Remove unwanted top margin when title is present */
+  [data-rehype-pretty-code-title] + pre {
+    @apply rounded-t-none;
+  }
+}

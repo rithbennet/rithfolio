@@ -1,0 +1,61 @@
+---
+title: "Add a Typed MDX Blog to Your Next.js Portfolio (Contentlayer)"
+date: "2025-01-01"
+description: "Turn your existing Next.js portfolio into a fast, SEO-friendly blog with Contentlayer and MDX."
+tags: ["Next.js", "MDX", "Contentlayer", "SEO", "TypeScript"]
+published: true
+coverImageSrc: ./cover.png
+---
+
+Welcome to the blog! This is a seed post to verify listing, reading time, tags, and comments.
+
+## Why Contentlayer?
+
+Contentlayer is a content SDK that transforms your content into type-safe JSON data. It works seamlessly with Next.js and provides:
+
+- **Type safety** - Full TypeScript support with auto-generated types
+- **MDX support** - Write content in MDX with custom components
+- **Computed fields** - Automatically calculate reading time, slugs, etc.
+- **Hot reload** - See changes instantly during development
+
+## Getting Started
+
+First, install the necessary dependencies:
+
+```bash
+pnpm add contentlayer next-contentlayer reading-time
+```
+
+Then configure your content schema in `contentlayer.config.ts`:
+
+```typescript
+export const Post = defineDocumentType(() => ({
+  name: "Post",
+  filePathPattern: `posts/**/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: { type: "string", required: true },
+    date: { type: "date", required: true },
+    description: { type: "string", required: true },
+  },
+}));
+```
+
+## Features Included
+
+This blog setup includes:
+
+1. **Auto reading time** - Calculated automatically from content
+2. **Tags with filter pages** - Navigate to `/blog/tag/[tag]` to filter
+3. **Giscus comments** - GitHub Discussions-powered comments
+4. **Full SEO** - Metadata, canonical URLs, sitemap, robots.txt, JSON-LD
+5. **Local search scaffold** - Simple search ready for enhancement
+
+## Next Steps
+
+- Add more posts in `content/posts/`
+- Customize the MDX components
+- Set up Giscus for comments
+- Deploy and verify SEO
+
+Happy blogging! 🚀

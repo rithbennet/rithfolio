@@ -24,8 +24,8 @@ const Header = () => {
           >
             contact
           </Link>
-          <Link href="/blogs" className="hover:text-primary transition-colors">
-            blogs
+          <Link href="/blog" className="hover:text-primary transition-colors">
+            blog
           </Link>
         </nav>
 
