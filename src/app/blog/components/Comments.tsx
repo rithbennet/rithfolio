@@ -10,10 +10,10 @@ export default function Comments() {
     <div className="mt-16 border-t border-neutral-200 pt-8 dark:border-neutral-800">
       <Giscus
         id="comments"
-        repo="rithbennet/rithfolio" // TODO: Update with your repo
-        repoId={process.env.NEXT_PUBLIC_GISCUS_REPO_ID || ""}
-        category="General" // TODO: Update with your category
-        categoryId={process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || ""}
+        repo="rithbennet/rithfolio"
+        repoId="R_kgDOOiS53g"
+        category="General"
+        categoryId="DIC_kwDOOiS53s4CzWsj"
         mapping="pathname"
         reactionsEnabled="1"
         emitMetadata="0"
@@ -21,6 +21,7 @@ export default function Comments() {
         theme={resolvedTheme === "dark" ? "dark" : "light"}
         lang="en"
         loading="lazy"
+        data-input-position="top"
       />
     </div>
   );
