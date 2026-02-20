@@ -1,0 +1,46 @@
+---
+// SkillsSection — pure Astro component (no interactivity needed)
+import { Icon } from "astro-icon/components";
+
+const skills = [
+  { name: "React", icon: "simple-icons:react" },
+  { name: "Next.js", icon: "simple-icons:nextdotjs" },
+  { name: "Tailwind CSS", icon: "simple-icons:tailwindcss" },
+  { name: "TypeScript", icon: "simple-icons:typescript" },
+  { name: "Spring Boot", icon: "simple-icons:springboot" },
+  { name: "Go", icon: "simple-icons:go" },
+  { name: "Python", icon: "simple-icons:python" },
+  { name: "Java", icon: "simple-icons:openjdk" },
+  { name: "Gin", icon: "simple-icons:gin" },
+  { name: "PostgreSQL", icon: "simple-icons:postgresql" },
+  { name: "Prisma", icon: "simple-icons:prisma" },
+  { name: "Git", icon: "simple-icons:git" },
+];
+---
+
+<section id="skills" class="py-5 sm:py-6 md:py-8">
+  <h2
+    class="mb-5 text-center text-xl font-bold sm:mb-6 sm:text-2xl md:mb-8 md:text-3xl"
+  >
+    Technical Skills
+  </h2>
+  <div
+    class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-6"
+  >
+    {
+      skills.map((skill) => (
+        <div class="bg-card text-card-foreground border-border/50 hover:border-primary/50 flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-colors">
+          <div class="flex flex-col items-center justify-center p-2 sm:p-3 md:p-4">
+            <Icon
+              name={skill.icon}
+              class="text-foreground mb-1.5 h-5 w-5 sm:mb-2 sm:h-6 sm:w-6 md:mb-3 md:h-8 md:w-8"
+            />
+            <h3 class="text-center text-xs font-medium sm:text-sm md:text-base">
+              {skill.name}
+            </h3>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>

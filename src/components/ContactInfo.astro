@@ -1,0 +1,41 @@
+---
+import SocialLinks from "./SocialLinks.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<div
+  class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border p-4 py-6 shadow-sm sm:p-6"
+>
+  <h2 class="mb-4 text-xl font-semibold">Contact Information</h2>
+
+  <div class="space-y-4">
+    <div class="flex items-start">
+      <Icon name="lucide:phone" class="text-primary mr-3 h-5 w-5" />
+      <div>
+        <h3 class="font-medium">Phone</h3>
+        <p class="text-muted-foreground">+6012-781 8524</p>
+      </div>
+    </div>
+
+    <div class="flex items-start">
+      <Icon name="lucide:mail" class="text-primary mr-3 h-5 w-5" />
+      <div>
+        <h3 class="font-medium">Email</h3>
+        <p class="text-muted-foreground">harith.bennett@gmail.com</p>
+      </div>
+    </div>
+
+    <div class="flex items-start">
+      <Icon name="lucide:map-pin" class="text-primary mr-3 h-5 w-5" />
+      <div>
+        <h3 class="font-medium">Location</h3>
+        <p class="text-muted-foreground">Kuala Lumpur, Malaysia</p>
+      </div>
+    </div>
+
+    <div class="pt-4">
+      <h3 class="mb-2 font-medium">Connect with me</h3>
+      <SocialLinks />
+    </div>
+  </div>
+</div>

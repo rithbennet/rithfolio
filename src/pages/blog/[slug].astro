@@ -1,0 +1,172 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Comments from "../../components/Comments";
+import { getCollection, render } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { format } from "date-fns";
+import { slugify } from "../../lib/utils";
+import readingTime from "reading-time";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => data.published);
+  return posts.map((post) => {
+    const slug = post.id.replace(/\/index$/, "");
+    return { params: { slug }, props: { post } };
+  });
+}
+
+const { post } = Astro.props;
+const slug = post.id.replace(/\/index$/, "");
+const { Content } = await render(post);
+
+const baseUrl = (
+  import.meta.env.SITE_URL ||
+  Astro.site?.toString() ||
+  "https://rith.dev"
+).replace(/\/$/, "");
+
+// Computed fields
+function getCoverImage(coverImageSrc: string | undefined, s: string) {
+  if (!coverImageSrc) return undefined;
+  if (coverImageSrc.startsWith("./") || !coverImageSrc.startsWith("/")) {
+    const filename = coverImageSrc.replace("./", "");
+    return `/content/blogs/${s}/${filename}`;
+  }
+  return coverImageSrc;
+}
+
+const coverImage = getCoverImage(post.data.coverImageSrc, slug);
+const rt = post.body ? readingTime(post.body).text : "1 min read";
+
+const ogImage = coverImage
+  ? `${baseUrl}${coverImage}`
+  : `${baseUrl}/api/og?title=${encodeURIComponent(post.data.title)}`;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  datePublished: post.data.date.toISOString(),
+  description: post.data.description,
+  image: ogImage,
+  url: `${baseUrl}/blog/${slug}`,
+  author: { "@type": "Person", name: "Harith" },
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  canonical={`${baseUrl}/blog/${slug}`}
+  ogTitle={post.data.title}
+  ogDescription={post.data.description}
+  ogType="article"
+  ogUrl={`${baseUrl}/blog/${slug}`}
+  ogImage={ogImage}
+  twitterCard="summary_large_image"
+  twitterTitle={post.data.title}
+  twitterDescription={post.data.description}
+  twitterImage={ogImage}
+  jsonLd={structuredData}
+>
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <header class="mb-10">
+      <h1
+        class="mb-4 text-4xl font-extrabold tracking-tight text-neutral-900 sm:text-5xl dark:text-neutral-100"
+      >
+        {post.data.title}
+      </h1>
+
+      <div
+        class="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400"
+      >
+        <div class="flex items-center gap-2">
+          <time datetime={post.data.date.toISOString()}>
+            {format(post.data.date, "MMMM d, yyyy")}
+          </time>
+          <span>&bull;</span>
+          <span>{rt}</span>
+        </div>
+
+        {
+          post.data.tags && post.data.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {post.data.tags.map((tag: string) => (
+                <a
+                  href={`/blog/tag/${slugify(tag)}`}
+                  class="rounded-md bg-neutral-100 px-2 py-0.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      {
+        coverImage && (
+          <div class="relative mb-8 aspect-video w-full overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+            <img
+              src={coverImage}
+              alt={post.data.title}
+              class="absolute inset-0 h-full w-full object-cover"
+              loading="eager"
+            />
+          </div>
+        )
+      }
+    </header>
+
+    <div class="prose prose-neutral dark:prose-invert max-w-none">
+      <Content />
+    </div>
+
+    <hr class="my-12 border-neutral-200 dark:border-neutral-800" />
+
+    <Comments client:visible />
+  </article>
+</BaseLayout>
+
+<template id="copy-icon-template">
+  <Icon name="lucide:copy" class="h-4 w-4" />
+</template>
+
+<template id="check-icon-template">
+  <Icon name="lucide:check" class="h-4 w-4 text-green-500" />
+</template>
+
+<!-- Code block copy button script -->
+<script>
+  const copyIcon =
+    document.getElementById("copy-icon-template")?.innerHTML || "Copy";
+  const checkIcon =
+    document.getElementById("check-icon-template")?.innerHTML || "✓";
+
+  document
+    .querySelectorAll("[data-rehype-pretty-code-figure]")
+    .forEach((figure) => {
+      figure.classList.add("group", "relative", "my-6");
+
+      const btnWrap = document.createElement("div");
+      btnWrap.className = "absolute top-2 right-2 z-10";
+
+      const btn = document.createElement("button");
+      btn.className =
+        "flex h-8 w-8 items-center justify-center rounded-md bg-white/80 text-neutral-600 opacity-0 shadow-sm transition-all group-hover:opacity-100 hover:bg-white hover:text-neutral-900 focus:opacity-100 dark:bg-neutral-800/80 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100";
+      btn.ariaLabel = "Copy code";
+
+      btn.innerHTML = copyIcon;
+      btn.addEventListener("click", async () => {
+        const pre =
+          figure.querySelector('pre:not([style*="display: none"])') ||
+          figure.querySelector("pre");
+        await navigator.clipboard.writeText(pre?.textContent || "");
+        btn.innerHTML = checkIcon;
+        setTimeout(() => (btn.innerHTML = copyIcon), 2000);
+      });
+
+      btnWrap.appendChild(btn);
+      figure.appendChild(btnWrap);
+    });
+</script>

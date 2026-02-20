@@ -1,0 +1,125 @@
+---
+import "../styles/globals.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogType?: string;
+  ogUrl?: string;
+  ogImage?: string;
+  twitterCard?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description = "Harith's personal portfolio and blog",
+  canonical,
+  ogTitle,
+  ogDescription,
+  ogType = "website",
+  ogUrl,
+  ogImage,
+  twitterCard = "summary_large_image",
+  twitterTitle,
+  twitterDescription,
+  twitterImage,
+  jsonLd,
+} = Astro.props;
+
+const resolvedTitle = title ? `${title} | Rithfolio` : "Rithfolio";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Primary Meta Tags -->
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={ogTitle || resolvedTitle} />
+    <meta property="og:description" content={ogDescription || description} />
+    <meta property="og:type" content={ogType} />
+    {ogUrl && <meta property="og:url" content={ogUrl} />}
+    <meta property="og:site_name" content="Rithfolio" />
+    <meta property="og:locale" content="en_US" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content={twitterCard} />
+    <meta
+      name="twitter:title"
+      content={twitterTitle || ogTitle || resolvedTitle}
+    />
+    <meta
+      name="twitter:description"
+      content={twitterDescription || ogDescription || description}
+    />
+    {
+      (twitterImage || ogImage) && (
+        <meta name="twitter:image" content={twitterImage || ogImage} />
+      )
+    }
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow" />
+    <meta
+      name="googlebot"
+      content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"
+    />
+
+    <!-- JSON-LD Structured Data -->
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      )
+    }
+
+    <!-- Theme: prevent flash of wrong theme -->
+    <script is:inline>
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (
+          theme === "dark" ||
+          (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body class="text-sm sm:text-base">
+    <Header />
+    <main
+      class="bg-background text-foreground mx-auto min-h-screen max-w-4xl px-4 pt-[56px] transition-colors duration-300 sm:pt-[64px] md:pt-[72px]"
+    >
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

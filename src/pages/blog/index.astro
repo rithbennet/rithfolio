@@ -1,0 +1,149 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LocalSearch from "../../components/LocalSearch";
+import { getCollection } from "astro:content";
+import { format } from "date-fns";
+import { slugify } from "../../lib/utils";
+
+const baseUrl = (
+  import.meta.env.SITE_URL ||
+  Astro.site?.toString() ||
+  "https://rith.dev"
+).replace(/\/$/, "");
+
+const allPosts = await getCollection("posts", ({ data }) => data.published);
+const posts = allPosts.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Derive tag cloud
+const tagCounts = new Map<string, number>();
+posts.forEach((p) =>
+  (p.data.tags ?? []).forEach((t: string) =>
+    tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)
+  )
+);
+
+// Compute helper fields per-post
+function getSlug(post: (typeof posts)[0]) {
+  return post.id.replace(/\/index$/, "");
+}
+
+function getCoverImage(coverImageSrc: string | undefined, slug: string) {
+  if (!coverImageSrc) return undefined;
+  if (coverImageSrc.startsWith("./") || !coverImageSrc.startsWith("/")) {
+    const filename = coverImageSrc.replace("./", "");
+    return `/content/blogs/${slug}/${filename}`;
+  }
+  return coverImageSrc;
+}
+
+function getReadingTime(body: string | undefined) {
+  if (!body) return "1 min read";
+  const words = body.split(/\s+/).filter(Boolean).length;
+  const minutes = Math.ceil(words / 200);
+  return `${minutes} min read`;
+}
+---
+
+<BaseLayout
+  title="Blog"
+  description="Engineering thoughts, tutorials, and insights."
+  canonical={`${baseUrl}/blog`}
+  ogTitle="Blog | Rithfolio"
+  ogDescription="Engineering thoughts, tutorials, and insights."
+  ogUrl={`${baseUrl}/blog`}
+>
+  <div class="mx-auto max-w-3xl px-4 py-10">
+    <h1 class="mb-8 text-3xl font-bold">Blog</h1>
+
+    <LocalSearch
+      client:load
+      posts={posts.map((p) => ({
+        title: p.data.title,
+        description: p.data.description,
+        url: `/blog/${getSlug(p)}`,
+      }))}
+    />
+
+    {
+      tagCounts.size > 0 && (
+        <div class="mb-6 flex flex-wrap gap-2 text-sm">
+          {[...tagCounts.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([tag, count]) => (
+              <a
+                href={`/blog/tag/${slugify(tag)}`}
+                class="rounded border border-neutral-300 px-2 py-1 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900"
+              >
+                #{tag} ({count})
+              </a>
+            ))}
+        </div>
+      )
+    }
+
+    {
+      posts.length === 0 ? (
+        <p class="text-neutral-600 dark:text-neutral-400">
+          No posts yet. Check back soon!
+        </p>
+      ) : (
+        <div class="space-y-8">
+          {posts.map((post) => {
+            const slug = getSlug(post);
+            const coverImage = getCoverImage(post.data.coverImageSrc, slug);
+            const url = `/blog/${slug}`;
+            const readingTime = getReadingTime(post.body);
+            return (
+              <article class="group relative flex flex-col gap-4 sm:flex-row">
+                {coverImage && (
+                  <a
+                    href={url}
+                    class="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 sm:h-32 sm:w-48 dark:border-neutral-800 dark:bg-neutral-800"
+                  >
+                    <img
+                      src={coverImage}
+                      alt={post.data.title}
+                      loading="lazy"
+                      class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </a>
+                )}
+                <div class="flex flex-1 flex-col justify-center">
+                  <a href={url} class="block">
+                    <h2 class="group-hover:text-primary dark:group-hover:text-primary-foreground text-xl font-semibold text-neutral-900 transition-colors dark:text-neutral-100">
+                      {post.data.title}
+                    </h2>
+                  </a>
+                  <div class="mt-2 flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
+                    <time datetime={post.data.date.toISOString()}>
+                      {format(post.data.date, "LLLL d, yyyy")}
+                    </time>
+                    <span>&bull;</span>
+                    <span>{readingTime}</span>
+                  </div>
+                  <p class="mt-2 line-clamp-2 text-neutral-600 dark:text-neutral-400">
+                    {post.data.description}
+                  </p>
+                  {post.data.tags && post.data.tags.length > 0 && (
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      {post.data.tags.map((tag: string) => (
+                        <a
+                          href={`/blog/tag/${slugify(tag)}`}
+                          class="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                        >
+                          #{tag}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,30 @@
+---
+import ThemeToggle from "./ThemeToggle";
+---
+
+<header
+  class="bg-background/20 fixed top-0 right-0 left-0 z-50 w-full px-4 py-3 backdrop-blur-lg transition-colors duration-300"
+>
+  <div
+    class="container mx-auto flex max-w-3xl items-center justify-between px-4"
+  >
+    <nav
+      class="flex space-x-2 text-xs sm:space-x-3 sm:text-sm md:space-x-6 md:text-base"
+    >
+      <a href="/" class="hover:text-primary transition-colors">home</a>
+      <a href="/projects" class="hover:text-primary transition-colors"
+        >projects</a
+      >
+      <a href="/skills" class="hover:text-primary transition-colors">skills</a>
+      <a href="/contact" class="hover:text-primary transition-colors">contact</a
+      >
+      <a href="/blog" class="hover:text-primary transition-colors">blog</a>
+    </nav>
+
+    <div class="hidden md:block"></div>
+
+    <div class="flex items-center">
+      <ThemeToggle client:load />
+    </div>
+  </div>
+</header>

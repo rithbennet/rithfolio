@@ -1,8 +1,4 @@
-"use client";
-
 import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { ExternalLink, Github } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -140,16 +136,11 @@ export function ProjectsSection() {
         {filteredProjects.map((project) => (
           <Card key={project.id} className="flex flex-col overflow-hidden">
             <div className="relative h-32 sm:h-36 md:h-40">
-              <Image
+              <img
                 src={project.image || "/placeholder.svg"}
                 alt={project.title}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                quality={80}
                 loading="lazy"
-                className="object-cover"
-                placeholder="blur"
-                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjY2NjY2NjIi8+PC9zdmc+"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
             <CardContent className="flex flex-1 flex-col p-2.5 sm:p-3 md:p-4">
@@ -172,7 +163,7 @@ export function ProjectsSection() {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between p-2.5 pt-0 sm:p-3 md:p-4">
-              <Link
+              <a
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -185,8 +176,8 @@ export function ProjectsSection() {
                   <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
                   Demo
                 </Button>
-              </Link>
-              <Link
+              </a>
+              <a
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -199,7 +190,7 @@ export function ProjectsSection() {
                   <Github className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
                   Code
                 </Button>
-              </Link>
+              </a>
             </CardFooter>
           </Card>
         ))}

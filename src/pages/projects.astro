@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { ProjectsSection } from "../components/projects-section";
+
+const baseUrl = (
+  import.meta.env.SITE_URL ||
+  Astro.site?.toString() ||
+  "https://rith.dev"
+).replace(/\/$/, "");
+---
+
+<BaseLayout
+  title="Projects & Leadership"
+  description="Showcase of my technical and management projects, highlighting Scrum and Agile methodologies"
+  canonical={`${baseUrl}/projects`}
+  ogTitle="Projects & Leadership | Rithfolio"
+  ogDescription="Showcase of my technical and management projects, highlighting Scrum and Agile methodologies"
+  ogUrl={`${baseUrl}/projects`}
+>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="mb-6 text-3xl font-bold md:text-4xl lg:text-5xl">
+      Projects & Leadership
+    </h1>
+
+    <div class="mb-8 space-y-4">
+      <p class="text-muted-foreground text-lg">
+        My portfolio showcases both technical expertise and leadership
+        capabilities across diverse projects.
+      </p>
+
+      <div class="border-border/50 bg-card rounded-lg border p-4 shadow-sm">
+        <h2 class="mb-2 text-xl font-medium">Management Highlights</h2>
+        <ul class="text-muted-foreground ml-5 list-disc space-y-2 text-sm">
+          <li>
+            <strong>AchievTrack:</strong> Led a team of 5 developers as Scrum Master,
+            implementing daily stand-ups, sprint planning, and retrospectives that
+            improved team velocity by 30%.
+          </li>
+          <li>
+            <strong>GameRent:</strong> Managed project timelines and resource allocation
+            using Agile methodologies, resulting in on-time delivery despite shifting
+            requirements.
+          </li>
+          <li>
+            <strong>CalTrack:</strong> Leading a team of 4 developers in developing
+            a mobile application to track calories for users acting as Scrum Master
+            and Product Owner. Implemented Agile practices to ensure effective communication
+            and collaboration within the team.
+          </li>
+        </ul>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="border-border/50 bg-card rounded-lg border p-4 shadow-sm">
+          <h3 class="text-lg font-medium">Technical Projects</h3>
+          <p class="text-muted-foreground text-sm">
+            Full-stack applications showcasing expertise in multiple programming
+            languages and frameworks.
+          </p>
+        </div>
+        <div class="border-border/50 bg-card rounded-lg border p-4 shadow-sm">
+          <h3 class="text-lg font-medium">Leadership Experience</h3>
+          <p class="text-muted-foreground text-sm">
+            Team management and coordination using industry-standard approaches
+            like Scrum and Agile.
+          </p>
+        </div>
+        <div class="border-border/50 bg-card rounded-lg border p-4 shadow-sm">
+          <h3 class="text-lg font-medium">Measurable Outcomes</h3>
+          <p class="text-muted-foreground text-sm">
+            Projects delivered on time with documented improvements in quality,
+            performance, and user satisfaction.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <ProjectsSection client:load />
+  </main>
+</BaseLayout>

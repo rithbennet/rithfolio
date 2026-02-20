@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { format } from "date-fns";
+import { slugify } from "../../../lib/utils";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => data.published);
+
+  // Collect all unique tag slugs
+  const tagSet = new Set<string>();
+  posts.forEach((p) =>
+    (p.data.tags ?? []).forEach((t: string) => tagSet.add(slugify(t)))
+  );
+
+  return Array.from(tagSet).map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const baseUrl = (
+  import.meta.env.SITE_URL ||
+  Astro.site?.toString() ||
+  "https://rith.dev"
+).replace(/\/$/, "");
+
+const allPosts = await getCollection("posts", ({ data }) => data.published);
+const posts = allPosts
+  .filter((p) => (p.data.tags ?? []).some((t: string) => slugify(t) === tag))
+  .sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  );
+
+function getSlug(post: (typeof posts)[0]) {
+  return post.id.replace(/\/index$/, "");
+}
+
+function getReadingTime(body: string | undefined) {
+  if (!body) return "1 min read";
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return `${Math.ceil(words / 200)} min read`;
+}
+---
+
+<BaseLayout
+  title={`#${tag} posts`}
+  description={`Articles tagged with ${tag}`}
+  canonical={`${baseUrl}/blog/tag/${tag}`}
+>
+  <div class="mx-auto max-w-2xl px-4 py-10">
+    {
+      posts.length === 0 ? (
+        <>
+          <h1 class="mb-2 text-3xl font-bold">#{tag}</h1>
+          <p class="text-neutral-600 dark:text-neutral-400">No posts yet.</p>
+          <p class="mt-4">
+            <a href="/blog" class="hover:text-primary underline">
+              &larr; Back to blog
+            </a>
+          </p>
+        </>
+      ) : (
+        <>
+          <div class="mb-8">
+            <a
+              href="/blog"
+              class="mb-4 inline-block text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+            >
+              &larr; Back to blog
+            </a>
+            <h1 class="text-3xl font-bold">#{tag}</h1>
+            <p class="mt-1 text-neutral-600 dark:text-neutral-400">
+              {posts.length} {posts.length === 1 ? "post" : "posts"}
+            </p>
+          </div>
+          <div class="space-y-8">
+            {posts.map((post) => {
+              const slug = getSlug(post);
+              const url = `/blog/${slug}`;
+              return (
+                <article class="group">
+                  <a href={url}>
+                    <h2 class="text-xl font-semibold group-hover:underline">
+                      {post.data.title}
+                    </h2>
+                  </a>
+                  <div class="mt-1 flex gap-2 text-sm text-neutral-500">
+                    <time datetime={post.data.date.toISOString()}>
+                      {format(post.data.date, "LLLL d, yyyy")}
+                    </time>
+                    <span>&bull;</span>
+                    <span>{getReadingTime(post.body)}</span>
+                  </div>
+                  <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+                    {post.data.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </>
+      )
+    }
+  </div>
+</BaseLayout>

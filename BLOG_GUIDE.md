@@ -9,6 +9,26 @@ This guide explains how to create and manage blog posts for rith.dev.
 3. Add your images to the same folder
 4. Run `pnpm dev` to see your post
 
+## Quality Checks (Biome + Astro)
+
+Before publishing a post, run:
+
+```bash
+pnpm lint
+```
+
+This runs:
+
+- `biome check .` for linting/style issues
+- `astro check` for Astro and TypeScript diagnostics
+
+To auto-fix lint/style issues:
+
+```bash
+pnpm lint:fix
+pnpm format
+```
+
 ## File Structure
 
 ```
@@ -320,7 +340,7 @@ More content...
 
 1. Check frontmatter syntax (proper YAML)
 2. Ensure all required fields are present
-3. Run `pnpm contentlayer build` to see detailed errors
+3. Run `pnpm lint` for detailed diagnostics
 
 ---
 

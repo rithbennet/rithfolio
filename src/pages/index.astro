@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Button } from "../components/ui/button";
+import { ProjectsSection } from "../components/projects-section";
+import SkillsSection from "../components/SkillsSection.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import { Icon } from "astro-icon/components";
+
+const baseUrl = (
+  import.meta.env.SITE_URL ||
+  Astro.site?.toString() ||
+  "https://rith.dev"
+).replace(/\/$/, "");
+---
+
+<BaseLayout
+  ogTitle="Rithfolio"
+  ogDescription="Harith's personal portfolio and blog"
+  ogUrl={baseUrl}
+>
+  <div class="min-h-screen">
+    <main class="container mx-auto">
+      <section
+        class="flex flex-col items-center justify-center gap-4 py-6 md:flex-row md:justify-between md:gap-6 md:py-16 lg:py-24"
+      >
+        <div class="w-full md:w-1/2 lg:w-3/5">
+          <h1
+            class="mb-3 text-3xl font-bold sm:text-4xl md:mb-4 md:text-5xl lg:text-6xl"
+          >
+            hi there <span class="animate-wave inline-block">👋</span>
+          </h1>
+          <p class="mb-2 text-base sm:text-lg md:mb-3">
+            22-year-old full stack software developer from Kuala Lumpur 🇲🇾
+          </p>
+          <p
+            class="text-foreground/80 mb-2 max-w-2xl text-sm sm:text-base md:mb-3"
+          >
+            I'm a full-stack web developer with a passion for exploring new
+            technologies!
+          </p>
+          <p
+            class="text-foreground/80 mb-4 max-w-2xl text-sm sm:text-base md:mb-6"
+          >
+            Outside of coding, I stay active with weightlifting and express my
+            creativity through photography📸
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              className="h-8 gap-1.5 text-xs sm:h-9 sm:gap-2 sm:text-sm"
+              asChild
+            >
+              <a href="/resume.pdf" download>
+                <Icon name="lucide:file-text" class="h-3 w-3 sm:h-4 sm:w-4" />
+                Resume
+              </a>
+            </Button>
+            <SocialLinks />
+          </div>
+        </div>
+        <div class="flex justify-center pt-4 md:justify-end md:pt-0">
+          <div
+            class="relative h-48 w-48 overflow-hidden rounded-2xl sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-72 lg:w-72"
+          >
+            <img
+              src="/pfp.jpg"
+              alt="Profile"
+              class="h-full w-full object-cover"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </section>
+
+      <SkillsSection />
+
+      <ProjectsSection client:load />
+    </main>
+  </div>
+</BaseLayout>

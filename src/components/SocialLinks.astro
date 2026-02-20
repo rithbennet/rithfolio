@@ -1,0 +1,32 @@
+---
+// SocialLinks — pure Astro, no JS needed
+import { Icon } from "astro-icon/components";
+---
+
+<div class="flex items-center space-x-4">
+  <a
+    href="https://www.linkedin.com/in/harith-bennet/"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-foreground/80 hover:text-foreground transition-colors"
+  >
+    <Icon name="lucide:linkedin" class="h-5 w-5" />
+    <span class="sr-only">LinkedIn</span>
+  </a>
+  <a
+    href="https://github.com/rithbennet"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-foreground/80 hover:text-foreground transition-colors"
+  >
+    <Icon name="lucide:github" class="h-5 w-5" />
+    <span class="sr-only">GitHub</span>
+  </a>
+  <a
+    href="mailto:harith.bennett@gmail.com"
+    class="text-foreground/80 hover:text-foreground transition-colors"
+  >
+    <Icon name="lucide:mail" class="h-5 w-5" />
+    <span class="sr-only">Email</span>
+  </a>
+</div>
