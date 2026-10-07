@@ -1,0 +1,184 @@
+---
+// A dashed, hand-drawn path with milestones. Marks are placed along the path in the browser;
+// the same milestones are in a visually hidden list for screen readers and no-JS.
+interface Props {
+  title?: string;
+  caption?: string;
+  marks: { at: number; label: string }[];
+  end: string;
+}
+const { title = "How I got here", caption, marks, end } = Astro.props;
+---
+
+<section class="journey" aria-labelledby="journey-h">
+  <div class="journey-head">
+    <h2 class="h3" id="journey-h">{title}</h2>
+    {caption && <span>{caption}</span>}
+  </div>
+  <svg viewBox="0 0 672 280" aria-hidden="true" data-journey={JSON.stringify(marks)} data-end={end}>
+    <path class="path" d="M28 176 C 110 66, 190 240, 290 150 S 450 36, 540 126 S 604 240, 628 170"></path>
+    <g class="marks"></g>
+    <circle class="dot" r="4.5">
+      <animateMotion dur="11s" repeatCount="indefinite" path="M28 176 C 110 66, 190 240, 290 150 S 450 36, 540 126 S 604 240, 628 170"></animateMotion>
+    </circle>
+  </svg>
+  <ol class="milestones">
+    {marks.map((m) => <li>{m.label}</li>)}
+    <li>{end}</li>
+  </ol>
+</section>
+
+<script>
+  const NS = "http://www.w3.org/2000/svg";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  type Spot = [dx: number, dy: number, anchor: "start" | "end"];
+
+  function layout(svg: SVGSVGElement) {
+    const path = svg.querySelector<SVGPathElement>(".path")!;
+    const g = svg.querySelector<SVGGElement>(".marks")!;
+    const width = svg.viewBox.baseVal.width;
+    const len = path.getTotalLength();
+    const marks: { at: number; label: string }[] = JSON.parse(svg.dataset.journey!);
+    g.innerHTML = "";
+    const placed: DOMRect[] = [];
+    const clear = (b: DOMRect) =>
+      b.x >= 0 &&
+      b.x + b.width <= width &&
+      placed.every((p) => b.x > p.x + p.width + 6 || b.x + b.width + 6 < p.x || b.y > p.y + p.height || b.y + b.height < p.y);
+
+    const draw = (d: string, cls: string) => {
+      const el = document.createElementNS(NS, "path");
+      el.setAttribute("class", cls);
+      el.setAttribute("d", d);
+      g.appendChild(el);
+    };
+    const label = (text: string, x: number, y: number, cls: string, spots: Spot[]) => {
+      const el = document.createElementNS(NS, "text");
+      el.setAttribute("class", cls);
+      el.textContent = text;
+      g.appendChild(el);
+      const put = ([dx, dy, anchor]: Spot) => {
+        el.setAttribute("x", String(x + dx));
+        el.setAttribute("y", String(y + dy));
+        el.setAttribute("text-anchor", anchor);
+        return el.getBBox();
+      };
+      for (const spot of spots) {
+        const box = put(spot);
+        if (clear(box)) return void placed.push(box);
+      }
+      placed.push(put(spots[0])); // nothing fits: fall back to the preferred spot
+    };
+
+    const points = marks.map(({ at }) => path.getPointAtLength(len * at));
+    points.forEach(({ x, y }) => draw(`M${x - 4} ${y - 4} L${x + 4} ${y + 4} M${x + 4} ${y - 4} L${x - 4} ${y + 4}`, "x"));
+    const end = path.getPointAtLength(len);
+    draw(`M${end.x} ${end.y} V${end.y - 34}`, "pole");
+    draw(`M${end.x} ${end.y - 34} l20 6 -20 7 Z`, "flag");
+
+    const above: Spot = [8, -14, "start"], below: Spot = [8, 28, "start"];
+    const aboveL: Spot = [-8, -14, "end"], belowL: Spot = [-8, 28, "end"];
+    marks.forEach(({ label: text }, i) => {
+      const { x, y } = points[i];
+      label(text, x, y, "lbl", i % 2 ? [below, above, belowL, aboveL] : [above, below, aboveL, belowL]);
+    });
+    label(svg.dataset.end!, end.x, end.y, "lbl now", [[-10, -40, "end"], [-12, 30, "end"], [-26, 6, "end"], [-10, -64, "end"]]);
+  }
+
+  for (const svg of document.querySelectorAll<SVGSVGElement>("svg[data-journey]")) {
+    // measure once the handwriting font is in, otherwise the boxes are the fallback font's
+    document.fonts.ready.then(() => layout(svg));
+    if (reduce) svg.pauseAnimations();
+  }
+</script>
+
+<style>
+  .journey {
+    margin-top: 80px;
+  }
+  .journey-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .journey-head span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 8px;
+    overflow: visible;
+  }
+  .path {
+    fill: none;
+    stroke: var(--chart-1);
+    stroke-width: 1.7;
+    stroke-dasharray: 7 7;
+    stroke-linecap: round;
+  }
+  .dot {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 5px var(--accent));
+  }
+  svg :global(.x) {
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  svg :global(.pole) {
+    stroke: var(--ink);
+    stroke-width: 1.4;
+  }
+  svg :global(.flag) {
+    fill: var(--accent);
+  }
+  svg :global(.lbl) {
+    font: 16px var(--font-hand);
+    fill: var(--body);
+    /* a paper-coloured halo keeps labels readable where the dashed path runs behind them */
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+  svg :global(.lbl.now) {
+    fill: var(--accent-text);
+  }
+  /* the milestones as text: screen readers always, sighted readers on small screens */
+  .milestones {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  @media (max-width: 560px) {
+    svg :global(.lbl) {
+      display: none;
+    }
+    .milestones {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      margin: 4px 0 0;
+      padding-left: 1.4em;
+      font: 19px/1.45 var(--font-hand);
+      color: var(--body);
+    }
+    .milestones li::marker {
+      color: var(--accent);
+      font: 11px var(--font-mono);
+    }
+    .milestones li:last-child {
+      color: var(--accent-text);
+    }
+  }
+</style>

@@ -1,0 +1,310 @@
+---
+// Copy is drafted from docs/bio.md. Facts still marked ⚠️ there are deliberately left out.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DeskObject from "../components/site/DeskObject.astro";
+import Sprite from "../components/site/Sprite.astro";
+import Journey from "../components/site/Journey.astro";
+import { site } from "../data/site";
+
+const updated = "Oct 7, 2026";
+const journey = [
+  { at: 0.03, label: "15 · Linux on dad's laptop" },
+  { at: 0.2, label: "Office PCs → gaming rigs" },
+  { at: 0.36, label: "UTM · tech foundation" },
+  { at: 0.52, label: "Year 2 · the camera guy" },
+  { at: 0.69, label: "Year 3 · hackathons" },
+  { at: 0.8, label: "Asterisk Digital" },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="Harith: a founder and tech nerd in Kuala Lumpur. From a 500 MB laptop and burned Linux CDs, to the camera guy at UTM, to building DagangNow."
+  canonical={`${site.url}/about`}
+  ogUrl={`${site.url}/about`}
+>
+  <article class="page col">
+    <div class="vignette">
+      <DeskObject name="laptop" label="Dad's old laptop, 500 MB of RAM" class="v-laptop" />
+      <DeskObject name="cd" label="A burned Linux CD" class="v-cd" />
+      <p class="v-note" aria-hidden="true">where it<br />all started →</p>
+    </div>
+
+    <p class="eyebrow">About</p>
+    <h1 class="h1">Hi, I'm Harith.</h1>
+    <p class="updated">Updated {updated}</p>
+
+    <blockquote class="pull">
+      My first computer was my dad's old laptop with <span class="circled">500 MB of RAM<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M9 23C5 10 38 2 68 4c27 2 33 20 15 29-19 9-62 7-73-4-5-6 6-15 22-19"></path></svg></span>.
+    </blockquote>
+
+    <div class="prose">
+      <p class="dropcap">
+        I'm a founder and tech nerd from Kuala Lumpur. These days I run <a href="/work">DagangNow</a>, an agentic commerce
+        platform for Malaysian sellers. Before that I was the camera guy at uni, and before that I was a kid trying to get
+        YouTube to load on a laptop that had no business running it.
+      </p>
+
+      <h2>Where it started</h2>
+      <p>
+        I was fifteen and my parents were strict, so no phone. What I did have was access to my dad's old gear, and he had a
+        lot of it. One piece was an old VAIO with 500 MB of RAM. I wanted the internet badly, mostly for YouTube and games,
+        so I had to get creative.
+      </p>
+      <p>
+        I learned how to install Linux. I borrowed my cousin's CD drive, burned distros onto CDs and kept trying until one
+        of them worked. I wouldn't call it hacking. It was modding an old machine back to life so I could use it, and it's
+        how I got into tech at all.
+      </p>
+      <p>
+        Games pulled me further in. I'd rip open compact HP office desktops and try to fit graphics cards inside so they
+        could pass as gaming PCs. Once I had a bit of money, it went into microphones and audio gear. I've always liked the
+        small, gritty details of how things work.
+      </p>
+
+      <h2>Uni, and the camera</h2>
+      <p>
+        At UTM I couldn't decide between electrical and software engineering, so I took the tech foundation first. I picked
+        software engineering because I wanted to be able to work remotely, and figured I could teach myself the electrical
+        side. I'll be honest: for the first couple of years I wasn't paying much attention.
+      </p>
+      <p>
+        Then, in my second year, I got obsessed with photography. My mentor, Fika Azman, is a professional photographer, and
+        I nerded out about cameras the same way I had about computers. I started a club, SSC UTMKL (the Sakura Sakura Club),
+        and became the go-to cameraman. People knew me as the camera guy and came to me for studio shoots.
+      </p>
+      <p>
+        That same year a lecturer wanted to build a studio and brought me in. I was the first person to help. I had no
+        experience, just a lot of hunger to learn. For over a year I shot studio, outdoor, cosplay and product work, ran
+        one-on-one sessions, and held studio sessions for juniors. I'm still digging those photos up for the
+        <a href="/gallery">gallery</a>.
+      </p>
+
+      <h2>Back to tech</h2>
+      <p>
+        In third year I decided it was time to change. I started joining hackathons and lost a lot of them, because I didn't
+        really know how to code yet. Building apps for them is what got me learning Next.js, and I've been diving into tech
+        ever since.
+      </p>
+      <p>
+        My internship at Asterisk Digital is where I went properly deep. I was put on a mobile team using React Native and
+        Expo, and I loved going into the libraries: Zustand, React Hook Form, state management and how it all fits together.
+      </p>
+      <p>
+        I moved across projects after that. I built a mobile app and then a prototype, set up EC2 instances and cloud
+        infrastructure on AWS, and was then placed with a gas-company client as a full-stack engineer doing mostly data
+        engineering: QuickSight, Glue jobs, PySpark and a lot of SQL. While I was there, I helped build and prototype an AI
+        tool for the whole department.
+      </p>
+
+      <h2>Now</h2>
+      <p>
+        Now I'm building my own thing. DagangNow is an agentic commerce platform for Malaysian SMEs. Sellers who live on
+        Shopee, TikTok and WhatsApp get a store of their own, with an AI WhatsApp assistant, a catalogue AI agents can read,
+        and orders, shipping and affiliates in one place. The tagline says it best: your AI-powered eCommerce store, live in
+        minutes.
+      </p>
+    </div>
+
+    <dl class="now">
+      <div><dt>Building</dt><dd><b>DagangNow</b>, as CEO of Daganoss Digital</dd></div>
+      <div><dt>Writing</dt><dd>A <a href="/blog">diary</a>, and the AI reports it argues with</dd></div>
+      <div><dt>Shooting</dt><dd>Sony A7R III. Studio, cosplay, product, outdoor</dd></div>
+      <div><dt>Lifting</dt><dd>Bench at 70 kg, and climbing</dd></div>
+    </dl>
+
+    <Journey caption="From a 500 MB laptop to a startup." marks={journey} end="Now, building DagangNow" />
+
+    <section class="away" aria-labelledby="away-h">
+      <h2 class="h3" id="away-h">Away from work</h2>
+      <div class="away-desk">
+        <DeskObject name="plate" label="A 20 kg bumper plate" class="a-plate" />
+        <DeskObject name="camera" label="A Sony A7R III" class="a-camera" />
+        <DeskObject name="mic" label="A studio condenser microphone" class="a-mic" />
+      </div>
+      <div class="prose">
+        <p>
+          I still lift. My bench is at 70 kg and I'd like that number to keep going up. The A7R III still comes with me most
+          places. And I still can't leave a piece of hardware alone if it has screws in it.
+        </p>
+      </div>
+    </section>
+
+    <footer class="signoff">
+      <p class="still">Still tinkering.</p>
+      <p class="sig">Harith<Sprite pose="idle" class="sig-sprite" /></p>
+      <p class="sig-date">October 2026</p>
+      <p class="links">
+        Read the <a href="/blog">diary</a>, look through my <a href="/work">work</a>, or
+        <a href={`mailto:${site.email}`}>email me</a>.
+      </p>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-top: 96px;
+  }
+  .vignette {
+    position: relative;
+    height: 320px;
+    margin-bottom: 40px;
+  }
+  .vignette :global(.v-laptop) {
+    width: min(360px, 70%);
+    top: 6px;
+    left: 50%;
+    margin-left: -215px;
+    --r: -3deg;
+  }
+  .vignette :global(.v-cd) {
+    width: min(150px, 30%);
+    top: 128px;
+    left: 50%;
+    margin-left: 118px;
+    --r: 14deg;
+  }
+  .v-note {
+    position: absolute;
+    top: 34px;
+    left: 0;
+    margin: 0;
+    font: 24px/1.05 var(--font-hand);
+    color: var(--body);
+    rotate: -6deg;
+  }
+  .h1 {
+    margin-top: 8px;
+  }
+  .pull {
+    position: relative;
+    margin: 56px 0 52px;
+    font: italic 400 calc(clamp(22px, 2.6vw, 30px) * var(--display-scale) * 1.1) / 1.25 var(--font-display);
+    text-align: center;
+    color: var(--ink);
+  }
+  .circled {
+    position: relative;
+    white-space: nowrap;
+    color: var(--accent-text);
+  }
+  .circled svg {
+    position: absolute;
+    left: -9%;
+    top: -26%;
+    width: 118%;
+    height: 152%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .circled path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .now {
+    margin: 36px 0 0;
+  }
+  .now div {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 16px;
+    padding: 13px 0;
+    border-top: 1px dashed var(--rule);
+  }
+  .now div:last-child {
+    border-bottom: 1px dashed var(--rule);
+  }
+  .now dt {
+    font: 10px/2 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .now dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .now dd b {
+    color: var(--ink);
+    font-weight: 650;
+  }
+  .now a {
+    color: var(--ink);
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .away {
+    margin-top: 80px;
+  }
+  .away-desk {
+    position: relative;
+    height: 230px;
+    margin: 18px 0 8px;
+  }
+  .away-desk :global(.a-plate) { width: 170px; top: 20px; left: 2%; --r: 12deg; }
+  .away-desk :global(.a-camera) { width: 220px; top: 36px; left: 36%; --r: -5deg; }
+  .away-desk :global(.a-mic) { width: 78px; top: 0; right: 8%; --r: 16deg; }
+  .signoff {
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 1px dashed var(--rule);
+  }
+  .still {
+    margin: 0;
+    font-size: 15px;
+    color: var(--body);
+  }
+  .sig {
+    margin: 14px 0 0;
+    font: 600 48px/0.8 var(--font-hand);
+    color: var(--ink);
+  }
+  .sig :global(.sig-sprite) {
+    margin-left: 14px;
+    vertical-align: -4px;
+  }
+  .sig-date {
+    margin: 6px 0 0;
+    font: 18px var(--font-hand);
+    color: var(--muted);
+  }
+  .links {
+    margin: 26px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .links a {
+    color: var(--ink);
+    text-decoration-color: var(--accent);
+    text-underline-offset: 3px;
+  }
+  @media (max-width: 720px) {
+    .v-note {
+      display: none;
+    }
+    .vignette :global(.v-laptop) {
+      margin-left: -170px;
+    }
+    .vignette :global(.v-cd) {
+      margin-left: 70px;
+    }
+    .away-desk :global(.a-plate) {
+      width: 118px;
+    }
+    .away-desk :global(.a-camera) {
+      left: 36%;
+      width: 150px;
+    }
+    .away-desk :global(.a-mic) {
+      width: 58px;
+      right: 2%;
+    }
+  }
+</style>

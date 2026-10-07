@@ -1,0 +1,53 @@
+---
+import { site, socials } from "../../data/site";
+
+interface Props {
+  bare?: boolean;
+}
+const { bare = false } = Astro.props;
+---
+
+<footer class:list={["site-footer", { bare }]}>
+  <p>
+    Or email <a href={`mailto:${site.email}`}>{site.email}</a>. I'm also on
+    {socials.map((s, i) => (<>{i > 0 && (i === socials.length - 1 ? " and " : ", ")}<a href={s.href} rel="me noopener" target="_blank">{s.label}</a></>))}.
+  </p>
+  <p>© {new Date().getFullYear()} {site.fullName} · <a href="/rss.xml">RSS</a></p>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    width: var(--wide);
+    margin: 0 auto;
+    padding: 22px 0 28px;
+    border-top: 1px dashed var(--rule);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .site-footer.bare {
+    border-top: 0;
+  }
+  .site-footer p {
+    margin: 0;
+  }
+  .site-footer a {
+    color: var(--body);
+    text-decoration-color: color-mix(in oklab, var(--muted) 60%, transparent);
+    text-underline-offset: 2px;
+  }
+  .site-footer a:hover {
+    color: var(--accent-text);
+  }
+  @media (max-width: 720px) {
+    .site-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+  }
+</style>

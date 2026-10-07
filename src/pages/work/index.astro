@@ -1,0 +1,148 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DeskObject from "../../components/site/DeskObject.astro";
+import { getCollection } from "astro:content";
+import { site } from "../../data/site";
+
+const all = (await getCollection("work", ({ data }) => data.published)).sort((a, b) => a.data.order - b.data.order);
+const featured = all.find((w) => w.data.featured);
+const experience = all.filter((w) => !w.data.featured && (w.data.kind === "role" || w.data.kind === "community"));
+const projects = all.filter((w) => w.data.kind === "project");
+const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+---
+
+<BaseLayout
+  title="Work"
+  description="What Harith has built: DagangNow, an internship at Asterisk Digital, a campus photo studio, and side projects."
+  canonical={`${site.url}/work`}
+  ogUrl={`${site.url}/work`}
+>
+  <div class="page col">
+    <p class="eyebrow">Work</p>
+    <h1 class="h1">Things I've built</h1>
+
+    {
+      featured && (
+        <section class="featured" aria-labelledby="featured-h">
+          <div class="art">
+            <DeskObject name="phone" label="DagangNow on a phone" class="f-phone" />
+            <p class="art-caption">
+              <strong>{featured.data.title}</strong>
+              <small>Building now</small>
+            </p>
+          </div>
+          <div>
+            <p class="eyebrow">{featured.data.role}</p>
+            <h2 class="h3" id="featured-h">Your AI-powered eCommerce store, live in minutes</h2>
+            <p class="lead">{featured.data.summary}</p>
+            {featured.data.link && (
+              <a class="pill" href={featured.data.link} target="_blank" rel="noopener">
+                {host(featured.data.link)} <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="block" aria-labelledby="exp-h">
+      <h2 class="h3" id="exp-h">Experience</h2>
+      <ul class="rows">
+        {
+          experience.map((w) => (
+            <li class="row">
+              <span class="row-name">
+                {w.data.title}
+                {w.data.role && <span class="role"> · {w.data.role}</span>}
+                <span class="row-note">{w.data.summary}</span>
+              </span>
+              <span class="row-cat">{w.data.category}</span>
+              <span class="row-year">{w.data.period}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="proj-h">
+      <h2 class="h3" id="proj-h">Side projects</h2>
+      <ul class="rows">
+        {
+          projects.map((w) => (
+            <li>
+              <a class="row" href={w.data.repo ?? w.data.link} target="_blank" rel="noopener">
+                <span class="row-name">
+                  {w.data.title}
+                  <span class="row-note">{w.data.summary}</span>
+                </span>
+                <span class="row-cat">{w.data.category}</span>
+                <span class="row-year">Code ↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .featured {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 44px;
+    align-items: center;
+    margin-top: 56px;
+  }
+  .art {
+    position: relative;
+  }
+  .art :global(.f-phone) {
+    position: relative;
+    width: 150px;
+    margin: 0 auto;
+    --r: -4deg;
+  }
+  .art-caption {
+    margin: 22px 0 0;
+    text-align: center;
+  }
+  .art-caption strong {
+    display: block;
+    font: 600 36px/1 var(--font-hand);
+    color: var(--ink);
+  }
+  .art-caption small {
+    font-size: 12px;
+    font-weight: 520;
+    color: var(--muted);
+  }
+  .featured .h3 {
+    margin: 8px 0 12px;
+  }
+  .lead {
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .block {
+    margin-top: 72px;
+  }
+  .block .h3 {
+    margin-bottom: 14px;
+  }
+  .role {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .row-name {
+    max-width: 30rem;
+  }
+  @media (max-width: 720px) {
+    .featured {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
+</style>

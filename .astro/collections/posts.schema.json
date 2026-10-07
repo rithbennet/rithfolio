@@ -40,6 +40,16 @@
           "type": "boolean",
           "default": true
         },
+        "location": {
+          "type": "string"
+        },
+        "reports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
         "$schema": {
           "type": "string"
         }

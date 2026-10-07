@@ -71,6 +71,18 @@ published: true # Set to false to hide from listing
 | `tags`        | ✅       | Array of lowercase tags for categorization       |
 | `image`       | ❌       | Relative path to cover image                     |
 | `published`   | ❌       | Set to `false` to hide post (defaults to `true`) |
+| `location`    | ❌       | Where you wrote it, shown in the entry header (e.g. `Kuala Lumpur`) |
+| `reports`     | ❌       | Ids of AI reports this entry discusses, e.g. `[sub-agent-fanning]` |
+
+## Referencing AI reports
+
+The blog is a diary, and some entries discuss AI reports.
+
+1. **Add the report.** Copy the self-contained HTML to `public/reports/<id>/index.html`, then add `content/reports/<id>.md` with `title`, `date`, `kind`, `model`, `readingTime`, `summary` and up to four `highlights`. It then appears on `/blog#reports` and is served at `/reports/<id>/`.
+2. **Reference it from an entry.** List the id under `reports:` in the entry's frontmatter. The report appears as a clipping under "Discussed in this entry", and the report's clipping shows "Referenced in" with a link back.
+3. **Embed it mid-entry (optional).** In MDX, write `<Report id="<id>" compact />` wherever you want the clipping.
+
+Read reports for internal details before publishing. They're published as is.
 
 ## Writing Content
 

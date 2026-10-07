@@ -1,0 +1,71 @@
+{
+  "$ref": "#/definitions/reports",
+  "definitions": {
+    "reports": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "integer",
+              "format": "unix-time"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "default": "Report"
+        },
+        "model": {
+          "type": "string"
+        },
+        "readingTime": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "published": {
+          "type": "boolean",
+          "default": true
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "date",
+        "model",
+        "summary"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,0 +1,77 @@
+{
+  "$ref": "#/definitions/gallery",
+  "definitions": {
+    "gallery": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "place": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "order": {
+          "type": "number",
+          "default": 100
+        },
+        "photos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "alt": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              },
+              "ratio": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "src",
+              "alt"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "standIn": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "dusk",
+              "hills",
+              "night",
+              "studio",
+              "sea"
+            ]
+          },
+          "default": []
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "place",
+        "period",
+        "summary"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

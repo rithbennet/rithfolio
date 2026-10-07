@@ -1,0 +1,171 @@
+---
+// An AI report shown as a taped paper clipping: stamp, model, date, summary, key numbers,
+// a link to the full self-contained report, and the diary entries that discuss it.
+import { getCollection, getEntry } from "astro:content";
+import { format } from "date-fns";
+
+interface Props {
+  id: string;
+  /** hide the "referenced in" line (e.g. inside the entry that references it) */
+  compact?: boolean;
+}
+const { id, compact = false } = Astro.props;
+const report = await getEntry("reports", id);
+if (!report) throw new Error(`Unknown report "${id}". Add content/reports/${id}.md`);
+
+const posts = await getCollection("posts", ({ data }) => data.published && data.reports.includes(id));
+const referenced = posts
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map((p) => ({ title: p.data.title, href: `/blog/${p.id.replace(/\/index$/, "")}` }));
+const href = `/reports/${id}/`;
+---
+
+<figure class="clip" aria-label={`AI report: ${report.data.title}`}>
+  <span class="tape" aria-hidden="true"></span>
+  <div class="clip-head">
+    <span class="stamp">AI report</span>
+    <span class="clip-meta">
+      {report.data.kind} · {report.data.model} · {format(report.data.date, "d MMM yyyy")}
+      {report.data.readingTime && ` · ${report.data.readingTime}`}
+    </span>
+  </div>
+  <h3 class="clip-title"><a href={href}>{report.data.title}</a></h3>
+  <p class="clip-summary">{report.data.summary}</p>
+  {
+    report.data.highlights.length > 0 && (
+      <ul class="clip-stats">
+        {report.data.highlights.map((h) => (
+          <li>{h}</li>
+        ))}
+      </ul>
+    )
+  }
+  <footer class="clip-foot">
+    <a class="clip-open" href={href}>Read the full report <span aria-hidden="true">↗</span></a>
+    {
+      !compact && referenced.length > 0 && (
+        <span>
+          Referenced in{" "}
+          {referenced.map((r, i) => (
+            <>
+              {i > 0 && ", "}
+              <a href={r.href}>{r.title}</a>
+            </>
+          ))}
+        </span>
+      )
+    }
+  </footer>
+</figure>
+
+<style>
+  .clip {
+    position: relative;
+    margin: 36px 0;
+    padding: 30px 30px 22px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px 5px 8px 6px;
+    box-shadow: var(--paper-shadow);
+    rotate: -0.4deg;
+  }
+  .tape {
+    position: absolute;
+    top: -14px;
+    left: 46%;
+    width: 112px;
+    height: 28px;
+    background: var(--tape);
+    rotate: -3deg;
+    clip-path: polygon(2% 10%, 98% 0, 96% 90%, 3% 100%);
+  }
+  .clip-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+  }
+  .stamp {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1.5px solid var(--accent);
+    color: var(--accent-text);
+    font: 9px/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    rotate: -2deg;
+  }
+  .clip-meta {
+    font: 9px/1.5 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .clip-title {
+    margin: 14px 0 8px;
+    font: var(--display-weight) calc(28px * var(--display-scale)) / 1.12 var(--font-display);
+    letter-spacing: var(--display-tracking);
+  }
+  .clip-title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .clip-title a:hover {
+    color: var(--accent-text);
+  }
+  .clip-summary {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--body);
+    text-align: left;
+  }
+  .clip-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+  }
+  .clip-stats li {
+    margin: 0;
+    padding: 9px 10px;
+    border-top: 2px solid var(--chart-1);
+    background: color-mix(in oklab, var(--ink) 3%, transparent);
+    font: 11.5px/1.4 var(--font-mono);
+    color: var(--ink);
+  }
+  .clip-stats li:nth-child(2) {
+    border-color: var(--chart-2);
+  }
+  .clip-stats li:nth-child(3) {
+    border-color: var(--chart-3);
+  }
+  .clip-stats li:nth-child(4) {
+    border-color: var(--chart-4);
+  }
+  .clip-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .clip-foot a {
+    color: var(--ink);
+    text-decoration-color: var(--accent);
+    text-underline-offset: 3px;
+  }
+  .clip-open {
+    font-weight: 600;
+  }
+  @media (max-width: 560px) {
+    .clip {
+      padding: 26px 18px 18px;
+    }
+  }
+</style>

@@ -1,81 +1,203 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Button } from "../components/ui/button";
-import { ProjectsSection } from "../components/projects-section";
-import SkillsSection from "../components/SkillsSection.astro";
-import SocialLinks from "../components/SocialLinks.astro";
-import { Icon } from "astro-icon/components";
+import DeskObject from "../components/site/DeskObject.astro";
+import Sprite from "../components/site/Sprite.astro";
+import StickyNote from "../components/site/StickyNote.astro";
+import { getCollection } from "astro:content";
+import { format } from "date-fns";
+import { site } from "../data/site";
 
-const baseUrl = (
-  import.meta.env.SITE_URL ||
-  Astro.site?.toString() ||
-  "https://rith.dev"
-).replace(/\/$/, "");
+const [latestPost] = (await getCollection("posts", ({ data }) => data.published)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const [latestReport] = (await getCollection("reports", ({ data }) => data.published)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: site.fullName,
+  url: site.url,
+  jobTitle: "CEO, DagangNow",
+  address: { "@type": "PostalAddress", addressLocality: "Kuala Lumpur", addressCountry: "MY" },
+  sameAs: ["https://github.com/rithbennet", "https://www.linkedin.com/in/harith-bennet/"],
+};
 ---
 
-<BaseLayout
-  ogTitle="Rithfolio"
-  ogDescription="Harith's personal portfolio and blog"
-  ogUrl={baseUrl}
->
-  <div class="min-h-screen">
-    <main class="container mx-auto">
-      <section
-        class="flex flex-col items-center justify-center gap-4 py-6 md:flex-row md:justify-between md:gap-6 md:py-16 lg:py-24"
-      >
-        <div class="w-full md:w-1/2 lg:w-3/5">
-          <h1
-            class="mb-3 text-3xl font-bold sm:text-4xl md:mb-4 md:text-5xl lg:text-6xl"
-          >
-            hi there <span class="animate-wave inline-block">👋</span>
-          </h1>
-          <p class="mb-2 text-base sm:text-lg md:mb-3">
-            22-year-old full stack software developer from Kuala Lumpur 🇲🇾
-          </p>
-          <p
-            class="text-foreground/80 mb-2 max-w-2xl text-sm sm:text-base md:mb-3"
-          >
-            I'm a full-stack web developer with a passion for exploring new
-            technologies!
-          </p>
-          <p
-            class="text-foreground/80 mb-4 max-w-2xl text-sm sm:text-base md:mb-6"
-          >
-            Outside of coding, I stay active with weightlifting and express my
-            creativity through photography📸
-          </p>
+<BaseLayout canonical={site.url} ogUrl={site.url} jsonLd={jsonLd} bare>
+  <section class="hero" aria-label="Introduction">
+    <!-- Harith's things. Drawn stand-ins until the photo cut-outs are shot (docs/design/shot-list.md). -->
+    <DeskObject name="polaroid" label="A print of the KL skyline after rain" class="o-polaroid" enter={[-40, -30, 0.06]} />
+    <DeskObject name="camera" label="A Sony A7R III" class="o-camera" enter={[-38, -12, 0.4]} />
+    <DeskObject name="tag" label="A 'Hello, my name is Harith' sticker" class="o-tag" enter={[18, -38, 0.12]} />
+    <DeskObject name="plate" label="A 20 kg bumper plate" class="o-plate" enter={[34, -34, 0.18]} />
+    <DeskObject name="gpu" label="A graphics card from the office-PC gaming days" class="o-gpu" enter={[-42, 34, 0.34]} />
+    <DeskObject name="mic" label="A studio condenser microphone" class="o-mic" enter={[-22, 40, 0.28]} />
+    <DeskObject name="badge" label="A hackathon participant badge" class="o-badge" enter={[4, 44, 0.46]} />
+    <DeskObject name="phone" label="A phone showing a DagangNow store" class="o-phone" enter={[48, 32, 0.22]} />
 
-          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-            <Button
-              variant="outline"
-              className="h-8 gap-1.5 text-xs sm:h-9 sm:gap-2 sm:text-sm"
-              asChild
-            >
-              <a href="/resume.pdf" download>
-                <Icon name="lucide:file-text" class="h-3 w-3 sm:h-4 sm:w-4" />
-                Resume
-              </a>
-            </Button>
-            <SocialLinks />
-          </div>
-        </div>
-        <div class="flex justify-center pt-4 md:justify-end md:pt-0">
-          <div
-            class="relative h-48 w-48 overflow-hidden rounded-2xl sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-72 lg:w-72"
-          >
-            <img
-              src="/pfp.jpg"
-              alt="Profile"
-              class="h-full w-full object-cover"
-              loading="eager"
-            />
-          </div>
-        </div>
-      </section>
+    <div class="hero-copy" data-hero-copy>
+      <h1>
+        <span>Hi, I'm Harith<Sprite pose="wave" class="hero-sprite" />, a founder and <em class="hl">tech nerd</em></span>
+        <span>building DagangNow in Kuala Lumpur.</span>
+      </h1>
+      <p class="status">Currently in 📍 Kuala Lumpur. CEO of <b>DagangNow</b>. Still the camera guy.</p>
+      <p class="hero-links">
+        <a class="underline-link" href="/about">More about me</a>
+        <span aria-hidden="true">·</span>
+        <a class="underline-link" href="#contact">Email me</a>
+      </p>
+    </div>
+    <p class="hint" data-hero-copy>Drag the objects around</p>
+  </section>
 
-      <SkillsSection />
+  <section class="latest col" aria-label="Latest">
+    <p class="eyebrow">Lately</p>
+    <ul class="rows">
+      {
+        latestPost && (
+          <li>
+            <a class="row" href={`/blog/${latestPost.id.replace(/\/index$/, "")}`}>
+              <span class="row-name">{latestPost.data.title}</span>
+              <span class="row-cat">Diary</span>
+              <span class="row-year">{format(latestPost.data.date, "d MMM")}</span>
+            </a>
+          </li>
+        )
+      }
+      {
+        latestReport && (
+          <li>
+            <a class="row" href={`/reports/${latestReport.id}/`}>
+              <span class="row-name">{latestReport.data.title}</span>
+              <span class="row-cat">AI report</span>
+              <span class="row-year">{format(latestReport.data.date, "d MMM")}</span>
+            </a>
+          </li>
+        )
+      }
+    </ul>
+  </section>
 
-      <ProjectsSection client:load />
-    </main>
-  </div>
+  <StickyNote />
 </BaseLayout>
+
+<script>
+  // the intro fades up while the objects land
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll<HTMLElement>("[data-hero-copy]").forEach((el, i) => {
+      el.animate([{ opacity: 0, transform: "translateY(22px)" }, { opacity: 1, transform: "none" }], {
+        duration: 680,
+        delay: i ? 1050 : 380,
+        easing: "cubic-bezier(.22, 1, .36, 1)",
+        fill: "backwards",
+      });
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+    min-height: max(100svh, 760px);
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 44%, var(--lamp), transparent 34rem);
+  }
+  .hero-copy {
+    position: relative;
+    z-index: 6;
+    width: min(900px, 72vw, calc(100vw - 36px));
+    text-align: center;
+    pointer-events: none;
+  }
+  .hero-copy :global(a),
+  .hero-copy :global(.sprite) {
+    pointer-events: auto;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: calc(clamp(34px, 2.9vw, 44px) * var(--display-scale) * 1.12);
+    line-height: 1.1;
+    letter-spacing: var(--display-tracking);
+  }
+  h1 > span {
+    display: block;
+  }
+  h1 :global(.hero-sprite) {
+    margin: -14px 2px 0 6px;
+  }
+  .status {
+    margin: 18px auto 0;
+    max-width: 560px;
+    font-size: clamp(12.5px, 1vw, 14px);
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .status b {
+    color: var(--ink);
+    font-weight: 650;
+  }
+  .hero-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 16px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .hint {
+    position: absolute;
+    right: 28px;
+    bottom: 20px;
+    z-index: 7;
+    margin: 0;
+    font: 10px/1.5 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* where each object sits on the desk */
+  .hero :global(.o-polaroid) { width: clamp(120px, 11vw, 175px); top: 9%; left: 3%; --r: -9deg; }
+  .hero :global(.o-camera)   { width: clamp(170px, 15vw, 245px); top: 23%; left: 15%; --r: -6deg; }
+  .hero :global(.o-tag)      { width: clamp(160px, 14vw, 220px); top: 12%; right: 23%; --r: 7deg; }
+  .hero :global(.o-plate)    { width: clamp(150px, 13vw, 210px); top: 6%; right: 3%; --r: 18deg; }
+  .hero :global(.o-gpu)      { width: clamp(220px, 20vw, 320px); bottom: 5%; left: -3%; --r: -8deg; }
+  .hero :global(.o-mic)      { width: clamp(70px, 6.2vw, 100px); bottom: 4%; left: 27%; --r: -14deg; }
+  .hero :global(.o-badge)    { width: clamp(96px, 8vw, 130px); bottom: 2%; left: 47%; --r: 10deg; }
+  .hero :global(.o-phone)    { width: clamp(110px, 9.5vw, 150px); bottom: -2%; right: 14%; --r: 9deg; }
+
+  .latest {
+    padding: 70px 0 10px;
+  }
+  .latest .rows {
+    margin-top: 14px;
+  }
+
+  @media (max-width: 720px) {
+    h1 > span {
+      display: inline;
+    }
+    .hero :global(.o-polaroid),
+    .hero :global(.o-mic),
+    .hero :global(.o-badge) {
+      display: none;
+    }
+    .hero :global(.o-camera) { width: 30vw; top: 13%; left: 4%; }
+    .hero :global(.o-tag)    { width: 34vw; top: 15%; right: 6%; }
+    .hero :global(.o-plate)  { width: 26vw; top: auto; bottom: 18%; right: 4%; }
+    .hero :global(.o-gpu)    { width: 46vw; bottom: 3%; left: -10%; }
+    .hero :global(.o-phone)  { width: 22vw; bottom: 2%; right: 30%; }
+    .hint {
+      display: none;
+    }
+  }
+</style>

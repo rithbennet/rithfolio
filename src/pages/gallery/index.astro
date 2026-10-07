@@ -1,0 +1,122 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { scenes } from "../../lib/scenes";
+import { site } from "../../data/site";
+
+const collections = (await getCollection("gallery")).sort((a, b) => a.data.order - b.data.order);
+const ratios = ["4/5", "3/2", "1/1", "3/4"];
+const hasStandIns = collections.some((c) => c.data.photos.length === 0);
+---
+
+<BaseLayout
+  title="Gallery"
+  description="Photo stories by Harith: studio days at UTM KL, walks around Kuala Lumpur, and the outdoors."
+  canonical={`${site.url}/gallery`}
+  ogUrl={`${site.url}/gallery`}
+>
+  <div class="page wide">
+    <header class="col head">
+      <p class="eyebrow">Gallery</p>
+      <h1 class="h1">Photo stories</h1>
+      <p class="intro">
+        I was the camera guy at uni and I still carry the A7R III most places. These are small collections rather than a
+        camera roll.
+      </p>
+      {hasStandIns && <p class="standin">The tiles below are stand-ins until the real rolls are scanned and sorted.</p>}
+    </header>
+
+    {
+      collections.map((c) => {
+        const tiles = c.data.photos.length
+          ? c.data.photos.slice(0, 4).map((p, i) => ({ kind: "photo" as const, ...p, ratio: p.ratio ?? ratios[i % 4] }))
+          : c.data.standIn.map((s, i) => ({ kind: "standin" as const, scene: s, ratio: ratios[i % 4] }));
+        return (
+          <section class="story" aria-labelledby={`g-${c.id}`}>
+            <div class="story-head">
+              <h2 class="h3" id={`g-${c.id}`}>
+                <a href={`/gallery/${c.id}`}>{c.data.title}</a>
+              </h2>
+              <p class="meta">
+                {c.data.place} · {c.data.period}
+              </p>
+            </div>
+            <p class="summary">{c.data.summary}</p>
+            <div class="tiles">
+              {tiles.map((t, i) =>
+                t.kind === "photo" ? (
+                  <img class="tile" style={`aspect-ratio:${t.ratio}`} src={t.src} alt={t.alt} loading="lazy" />
+                ) : (
+                  <div class="tile" style={`aspect-ratio:${t.ratio}`} aria-hidden="true" set:html={scenes[t.scene](`${c.id}${i}`)} />
+                ),
+              )}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    width: auto;
+    max-width: 42rem;
+    margin: 0;
+  }
+  .intro {
+    margin: 16px 0 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--body);
+  }
+  .standin {
+    margin: 10px 0 0;
+    font: 10px/1.6 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--eyebrow);
+  }
+  .story {
+    margin-top: 72px;
+  }
+  .story-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .story-head a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .story-head a:hover {
+    color: var(--accent-text);
+  }
+  .summary {
+    margin: 12px 0 20px;
+    font-size: 14px;
+    color: var(--body);
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    align-items: start;
+    gap: 18px;
+  }
+  .tile {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 3px;
+    object-fit: cover;
+  }
+  .tile :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

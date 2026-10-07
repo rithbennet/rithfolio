@@ -1,149 +1,146 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import LocalSearch from "../../components/LocalSearch";
+import ReportClipping from "../../components/site/ReportClipping.astro";
 import { getCollection } from "astro:content";
 import { format } from "date-fns";
-import { slugify } from "../../lib/utils";
+import { site } from "../../data/site";
 
-const baseUrl = (
-  import.meta.env.SITE_URL ||
-  Astro.site?.toString() ||
-  "https://rith.dev"
-).replace(/\/$/, "");
-
-const allPosts = await getCollection("posts", ({ data }) => data.published);
-const posts = allPosts.sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+const posts = (await getCollection("posts", ({ data }) => data.published)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
-
-// Derive tag cloud
-const tagCounts = new Map<string, number>();
-posts.forEach((p) =>
-  (p.data.tags ?? []).forEach((t: string) =>
-    tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)
-  )
+const reports = (await getCollection("reports", ({ data }) => data.published)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
-
-// Compute helper fields per-post
-function getSlug(post: (typeof posts)[0]) {
-  return post.id.replace(/\/index$/, "");
-}
-
-function getCoverImage(coverImageSrc: string | undefined, slug: string) {
-  if (!coverImageSrc) return undefined;
-  if (coverImageSrc.startsWith("./") || !coverImageSrc.startsWith("/")) {
-    const filename = coverImageSrc.replace("./", "");
-    return `/content/blogs/${slug}/${filename}`;
-  }
-  return coverImageSrc;
-}
-
-function getReadingTime(body: string | undefined) {
-  if (!body) return "1 min read";
-  const words = body.split(/\s+/).filter(Boolean).length;
-  const minutes = Math.ceil(words / 200);
-  return `${minutes} min read`;
-}
+const slug = (id: string) => id.replace(/\/index$/, "");
+const [latest, ...rest] = posts;
 ---
 
 <BaseLayout
   title="Blog"
-  description="Engineering thoughts, tutorials, and insights."
-  canonical={`${baseUrl}/blog`}
-  ogTitle="Blog | Rithfolio"
-  ogDescription="Engineering thoughts, tutorials, and insights."
-  ogUrl={`${baseUrl}/blog`}
+  description="Harith's diary: building DagangNow, engineering notes, and the AI reports it argues with."
+  canonical={`${site.url}/blog`}
+  ogUrl={`${site.url}/blog`}
 >
-  <div class="mx-auto max-w-3xl px-4 py-10">
-    <h1 class="mb-8 text-3xl font-bold">Blog</h1>
-
-    <LocalSearch
-      client:load
-      posts={posts.map((p) => ({
-        title: p.data.title,
-        description: p.data.description,
-        url: `/blog/${getSlug(p)}`,
-      }))}
-    />
+  <div class="page col">
+    <p class="eyebrow">Diary</p>
+    <h1 class="h1">Notes, mostly honest.</h1>
+    <p class="intro">
+      A diary of building things. Some entries discuss <a href="#reports">AI reports</a>: long, data-heavy write-ups an
+      agent produces, which I then read, argue with, and write about here.
+    </p>
 
     {
-      tagCounts.size > 0 && (
-        <div class="mb-6 flex flex-wrap gap-2 text-sm">
-          {[...tagCounts.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .map(([tag, count]) => (
-              <a
-                href={`/blog/tag/${slugify(tag)}`}
-                class="rounded border border-neutral-300 px-2 py-1 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900"
-              >
-                #{tag} ({count})
-              </a>
-            ))}
-        </div>
+      latest && (
+        <article class="latest">
+          <p class="meta">
+            {format(latest.data.date, "d MMM yyyy")}
+            {latest.data.location && ` · ${latest.data.location}`}
+          </p>
+          <h2 class="h2 latest-title">
+            <a href={`/blog/${slug(latest.id)}`}>{latest.data.title}</a>
+          </h2>
+          <p class="lead">{latest.data.description}</p>
+          <a class="pill" href={`/blog/${slug(latest.id)}`}>
+            Continue reading <span aria-hidden="true">→</span>
+          </a>
+        </article>
       )
     }
 
     {
-      posts.length === 0 ? (
-        <p class="text-neutral-600 dark:text-neutral-400">
-          No posts yet. Check back soon!
-        </p>
-      ) : (
-        <div class="space-y-8">
-          {posts.map((post) => {
-            const slug = getSlug(post);
-            const coverImage = getCoverImage(post.data.coverImageSrc, slug);
-            const url = `/blog/${slug}`;
-            const readingTime = getReadingTime(post.body);
-            return (
-              <article class="group relative flex flex-col gap-4 sm:flex-row">
-                {coverImage && (
-                  <a
-                    href={url}
-                    class="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 sm:h-32 sm:w-48 dark:border-neutral-800 dark:bg-neutral-800"
-                  >
-                    <img
-                      src={coverImage}
-                      alt={post.data.title}
-                      loading="lazy"
-                      class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </a>
-                )}
-                <div class="flex flex-1 flex-col justify-center">
-                  <a href={url} class="block">
-                    <h2 class="group-hover:text-primary dark:group-hover:text-primary-foreground text-xl font-semibold text-neutral-900 transition-colors dark:text-neutral-100">
-                      {post.data.title}
-                    </h2>
-                  </a>
-                  <div class="mt-2 flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-                    <time datetime={post.data.date.toISOString()}>
-                      {format(post.data.date, "LLLL d, yyyy")}
-                    </time>
-                    <span>&bull;</span>
-                    <span>{readingTime}</span>
-                  </div>
-                  <p class="mt-2 line-clamp-2 text-neutral-600 dark:text-neutral-400">
-                    {post.data.description}
-                  </p>
-                  {post.data.tags && post.data.tags.length > 0 && (
-                    <div class="mt-3 flex flex-wrap gap-2">
-                      {post.data.tags.map((tag: string) => (
-                        <a
-                          href={`/blog/tag/${slugify(tag)}`}
-                          class="rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                        >
-                          #{tag}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
+      rest.length > 0 && (
+        <section class="block" aria-labelledby="all-h">
+          <h2 class="h3" id="all-h">All entries</h2>
+          <ul class="rows">
+            {rest.map((p) => (
+              <li>
+                <a class="row entry" href={`/blog/${slug(p.id)}`}>
+                  <time datetime={p.data.date.toISOString()}>{format(p.data.date, "d MMM yy")}</time>
+                  <span class="row-name">{p.data.title}</span>
+                  <span class="row-cat">
+                    {p.data.reports.length > 0
+                      ? `${p.data.reports.length} report${p.data.reports.length > 1 ? "s" : ""}`
+                      : (p.data.tags[0] ?? "")}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      reports.length > 0 && (
+        <section class="block" id="reports" aria-labelledby="reports-h">
+          <p class="eyebrow">AI reports</p>
+          <h2 class="h3" id="reports-h">Reports the diary argues with</h2>
+          <p class="note">
+            Written by an AI agent, published as they came out. The stamp says which model wrote each one.
+          </p>
+          {reports.map((r) => (
+            <ReportClipping id={r.id} />
+          ))}
+        </section>
       )
     }
   </div>
 </BaseLayout>
+
+<style>
+  .intro {
+    max-width: 34rem;
+    margin: 16px 0 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--body);
+  }
+  .intro a {
+    color: var(--ink);
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .latest {
+    margin-top: 64px;
+  }
+  .latest-title {
+    margin: 8px 0 14px;
+    font-size: calc(clamp(30px, 3vw, 40px) * var(--display-scale) * 1.1);
+    line-height: 1.08;
+  }
+  .latest-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .latest-title a:hover {
+    color: var(--accent-text);
+  }
+  .lead {
+    max-width: 36rem;
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .block {
+    margin-top: 72px;
+  }
+  .block .h3 {
+    margin: 4px 0 14px;
+  }
+  .row.entry {
+    grid-template-columns: 84px 1fr auto;
+  }
+  .row.entry time {
+    font: 10px var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .note {
+    margin: -4px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+</style>

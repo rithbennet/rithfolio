@@ -7,20 +7,20 @@ export default function Comments() {
   useEffect(() => {
     const update = () => {
       setTheme(
-        document.documentElement.classList.contains("dark") ? "dark" : "light"
+        document.documentElement.dataset.theme === "dark" ? "dark" : "light"
       );
     };
     update();
     const observer = new MutationObserver(update);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class"],
+      attributeFilter: ["data-theme"],
     });
     return () => observer.disconnect();
   }, []);
 
   return (
-    <div className="mt-16 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+    <div className="mt-16 border-t border-dashed border-rule pt-8">
       <Giscus
         id="comments"
         repo="rithbennet/rithfolio"

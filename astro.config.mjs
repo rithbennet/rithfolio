@@ -3,7 +3,6 @@ import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import vercel from "@astrojs/vercel";
-import icon from "astro-icon";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -33,7 +32,14 @@ export default defineConfig({
     site: process.env.SITE_URL || "https://rith.dev",
     output: "static",
     adapter: vercel(),
-    integrations: [react(), mdx(), sitemap(), icon()],
+    integrations: [react(), mdx(), sitemap()],
+    // old routes from the previous site
+    redirects: {
+        "/projects": "/work",
+        "/skills": "/about",
+        "/contact": "/#contact",
+        "/reports": "/blog#reports",
+    },
     vite: {
         plugins: [tailwindcss()],
     },

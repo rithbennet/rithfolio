@@ -1,0 +1,146 @@
+---
+// Pixel Harith. Placeholder art (14×18 grid) until a proper sprite is drawn from photos.
+// "wave" plays a few frames on load and on hover; "idle" blinks now and then. Click squishes.
+interface Props {
+  pose?: "wave" | "idle";
+  label?: string;
+  class?: string;
+}
+const { pose = "idle", label, class: className } = Astro.props;
+
+const COLORS: Record<string, string> = {
+  H: "#2b1d15", // hair
+  S: "#c68b62", // skin
+  E: "#1b1b1b", // eyes
+  M: "#9a5440", // mouth
+  W: "var(--accent)", // shirt follows the accent
+  P: "#2f3340", // trousers
+  B: "#1b1b1b", // shoes
+};
+const IDLE = [
+  "....HHHHHH....", "...HHHHHHHH...", "..HHHHHHHHHH..", "..HHSSSSSSHH..", "..HSSSSSSSSH..", "..HSESSSSESH..",
+  "...SSSSSSSS...", "...SSSMMSSS...", "....SSSSSS....", "...WWWWWWWW...", "..WWWWWWWWWW..", ".SWWWWWWWWWWS.",
+  ".SWWWWWWWWWWS.", "..WWWWWWWWWW..", "...PPPPPPPP...", "...PPP..PPP...", "...PPP..PPP...", "..BBBB..BBBB..",
+];
+const BLINK = IDLE.map((row, i) => (i === 5 ? "..HSSSSSSSSH.." : row));
+const WAVE = [
+  "....HHHHHH....", "...HHHHHHHH...", "..HHHHHHHHHH.S", "..HHSSSSSSHH.S", "..HSSSSSSSSH.S", "..HSESSSSESH.W",
+  "...SSSSSSSS..W", "...SSSMMSSS.WW", "....SSSSSS.WW.", "...WWWWWWWWW..", "..WWWWWWWWWW..", ".SWWWWWWWWWW..",
+  ".SWWWWWWWWWW..", "..WWWWWWWWWW..", "...PPPPPPPP...", "...PPP..PPP...", "...PPP..PPP...", "..BBBB..BBBB..",
+];
+const frames = pose === "wave" ? [IDLE, WAVE] : [IDLE, BLINK];
+const svg = `<svg viewBox="0 0 14 18" shape-rendering="crispEdges" aria-hidden="true">${frames
+  .map(
+    (rows, i) =>
+      `<g class="f f${i}">${rows
+        .map((r, y) =>
+          [...r]
+            .map((c, x) => (c === "." ? "" : `<rect x="${x}" y="${y}" width="1.04" height="1.04" style="fill:${COLORS[c]}"/>`))
+            .join(""),
+        )
+        .join("")}</g>`,
+  )
+  .join("")}</svg>`;
+---
+
+<span
+  class:list={["sprite", className]}
+  data-pose={pose}
+  role="img"
+  aria-label={label ?? (pose === "wave" ? "Pixel Harith waving hello" : "Pixel Harith")}
+  tabindex="0"
+  set:html={svg}
+/>
+
+<script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const restart = (el: HTMLElement, cls: string) => {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  };
+  for (const el of document.querySelectorAll<HTMLElement>(".sprite")) {
+    const wave = el.dataset.pose === "wave";
+    const play = () => !reduce && wave && restart(el, "is-playing");
+    if (wave) setTimeout(play, 1400);
+    el.addEventListener("mouseenter", play);
+    el.addEventListener("click", () => {
+      if (!reduce) restart(el, "is-squished");
+      play();
+    });
+    el.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      if (!reduce) restart(el, "is-squished");
+      play();
+    });
+  }
+</script>
+
+<style is:global>
+  .sprite {
+    display: inline-block;
+    width: 39px;
+    height: 50px;
+    transform-origin: center bottom;
+    cursor: pointer;
+    vertical-align: -6px;
+    filter: drop-shadow(1.4px 0 0 var(--sprite-outline)) drop-shadow(-1.4px 0 0 var(--sprite-outline))
+      drop-shadow(0 1.4px 0 var(--sprite-outline)) drop-shadow(0 -1.4px 0 var(--sprite-outline));
+  }
+  .sprite svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .sprite .f1 {
+    opacity: 0;
+  }
+  .sprite.is-playing .f0 {
+    animation: sprite-a 0.9s steps(1, end) 4;
+  }
+  .sprite.is-playing .f1 {
+    animation: sprite-b 0.9s steps(1, end) 4;
+  }
+  .sprite[data-pose="idle"] .f0 {
+    animation: sprite-blink-a 4.2s steps(1, end) infinite;
+  }
+  .sprite[data-pose="idle"] .f1 {
+    animation: sprite-blink-b 4.2s steps(1, end) infinite;
+  }
+  .sprite.is-squished {
+    animation: sprite-squish 0.3s ease-out;
+  }
+  @keyframes sprite-a {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes sprite-b {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes sprite-blink-a {
+    0% { opacity: 1; }
+    94% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes sprite-blink-b {
+    0% { opacity: 0; }
+    94% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes sprite-squish {
+    0% { transform: scale(1, 1); }
+    30% { transform: scale(1.06, 0.94); }
+    60% { transform: scale(0.97, 1.03); }
+    100% { transform: scale(1, 1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sprite .f0,
+    .sprite .f1 {
+      animation: none !important;
+    }
+  }
+</style>

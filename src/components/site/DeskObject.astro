@@ -1,0 +1,128 @@
+---
+// One object on the "desk": a photo cut-out (src) or, until Harith's photos exist, a drawn stand-in.
+// Drag with a pointer or nudge with arrow keys. Entrance animation only when data-enter is set and motion is allowed.
+import { deskObjects, type DeskObjectName } from "../../lib/desk-objects";
+
+interface Props {
+  name: DeskObjectName;
+  label: string;
+  /** transparent PNG/WebP of the real object; replaces the drawing */
+  src?: string;
+  class?: string;
+  /** [x vw, y vh, delay] the object flies in from */
+  enter?: [number, number, number];
+  draggable?: boolean;
+  /** white paper-cut border around the cut-out */
+  edge?: boolean;
+}
+
+const { name, label, src, class: className, enter, draggable = true, edge = true } = Astro.props;
+const uid = `${name}-${Math.random().toString(36).slice(2, 7)}`;
+const drawing = src ? "" : deskObjects[name](uid);
+---
+
+<div
+  class:list={["obj", className, { "obj--edge": edge, "obj--drag": draggable }]}
+  role="img"
+  aria-label={draggable ? `${label}. Draggable decoration` : label}
+  tabindex={draggable ? 0 : undefined}
+  data-drag={draggable ? "" : undefined}
+  data-enter={enter?.join(",")}
+>
+  {src ? <img src={src} alt="" draggable="false" loading="lazy" decoding="async" /> : <Fragment set:html={drawing} />}
+</div>
+
+<script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let topZ = 10;
+
+  for (const el of document.querySelectorAll<HTMLElement>(".obj[data-drag]")) {
+    let start: { x: number; y: number } | null = null;
+    let offset = { x: 0, y: 0 };
+    const move = () => (el.style.translate = `${offset.x}px ${offset.y}px`);
+
+    el.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      start = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+      el.setPointerCapture(e.pointerId);
+      el.style.zIndex = String(++topZ);
+      el.classList.add("is-dragging");
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (!start) return;
+      offset = { x: e.clientX - start.x, y: e.clientY - start.y };
+      move();
+    });
+    const end = () => {
+      start = null;
+      el.classList.remove("is-dragging");
+    };
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+
+    // keyboard users can nudge objects too
+    el.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 40 : 12;
+      const delta = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+      if (!delta) return;
+      e.preventDefault();
+      offset = { x: offset.x + delta[0], y: offset.y + delta[1] };
+      el.style.zIndex = String(++topZ);
+      move();
+    });
+  }
+
+  // objects fly in from off-screen, staggered; reduced motion shows them at rest
+  if (!reduce) {
+    for (const el of document.querySelectorAll<HTMLElement>(".obj[data-enter]")) {
+      const [x, y, delay] = el.dataset.enter!.split(",").map(Number);
+      el.animate(
+        [
+          { opacity: 0, transform: `translate(${x}vw, ${y}vh) scale(.78)` },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 1300, delay: delay * 1350, easing: "cubic-bezier(.2, 1.15, .32, 1)", fill: "backwards" },
+      );
+    }
+  }
+</script>
+
+<style is:global>
+  .obj {
+    position: absolute;
+    z-index: 5;
+    rotate: var(--r, 0deg);
+    filter: var(--edge, drop-shadow(0 0 0 transparent)) var(--obj-shadow);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: scale 0.18s var(--ease-hover), filter 0.25s;
+  }
+  .obj--edge {
+    --edge: drop-shadow(3px 0 0 var(--paper)) drop-shadow(-3px 0 0 var(--paper)) drop-shadow(0 3px 0 var(--paper))
+      drop-shadow(0 -3px 0 var(--paper)) drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.25));
+  }
+  .obj--drag {
+    cursor: grab;
+    touch-action: none;
+  }
+  .obj > svg,
+  .obj > img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+  .obj--drag:hover {
+    scale: 1.025;
+    filter: var(--edge, drop-shadow(0 0 0 transparent)) var(--obj-shadow-hover);
+  }
+  .obj.is-dragging {
+    cursor: grabbing;
+    scale: 0.98;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .obj--drag:hover {
+      scale: 1;
+    }
+  }
+</style>
