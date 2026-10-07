@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 .contentlayer/
+
+# third-party reference screenshots (local only, not ours to publish)
+docs/design/refs/
+
+# raw photo drop for the gallery (originals stay local)
+photos-inbox/
+
+# local path for scripts/sync-docs.sh (machine-specific)
+.drive-dir

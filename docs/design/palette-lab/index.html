@@ -1,0 +1,1616 @@
+<!doctype html>
+<html lang="en" data-mode="light" data-motion="on">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Palette lab · rith.dev redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link id="font-css" rel="stylesheet" />
+<style>
+/* ───────────────────────── tokens (colours are injected by the palette script) */
+:root {
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Manrope", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --hand: "Caveat", cursive;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-hover: cubic-bezier(.2, .8, .2, 1);
+  --eyebrow: color-mix(in oklab, var(--accent-text) 45%, var(--muted));
+  --tag: var(--accent);
+
+  /* light-mode effects */
+  --lamp: rgba(255, 255, 255, .58);
+  --obj-filter: drop-shadow(0 18px 18px rgba(56, 45, 34, .17));
+  --obj-filter-hover: drop-shadow(0 27px 26px rgba(55, 45, 34, .22));
+  --paper-shadow: 0 16px 34px rgba(31, 29, 25, .11);
+  --note-shadow: 1px 14px 24px rgba(69, 56, 38, .18);
+  --tape: rgba(222, 207, 172, .78);
+  --grain-blend: multiply;
+  --grain-opacity: .22;
+  --squiggle-color: var(--accent-soft);
+  --sprite-outline: #1d1b18;
+}
+html[data-mode="dark"] {
+  color-scheme: dark;
+  --lamp: rgba(255, 236, 205, .045);
+  --obj-filter: drop-shadow(0 20px 24px rgba(0, 0, 0, .62)) brightness(.92) saturate(.95);
+  --obj-filter-hover: drop-shadow(0 28px 30px rgba(0, 0, 0, .7)) brightness(.95);
+  --paper-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+  --note-shadow: 1px 16px 30px rgba(0, 0, 0, .5);
+  --tape: rgba(150, 138, 112, .45);
+  --grain-blend: soft-light;
+  --grain-opacity: .55;
+  --squiggle-color: var(--accent);
+  --sprite-outline: color-mix(in oklab, var(--ink) 80%, transparent);
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .35s var(--ease-out), color .35s var(--ease-out);
+  overflow-x: hidden;
+}
+::selection { background: var(--accent); color: var(--on-accent); }
+a { color: inherit; }
+
+/* paper grain */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  mix-blend-mode: var(--grain-blend);
+  opacity: var(--grain-opacity);
+  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+}
+
+/* ───────────────────────── header */
+.site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 24px 28px;
+}
+.mark { width: 40px; height: 40px; display: block; color: var(--accent); rotate: -3deg; transition: rotate .18s, scale .18s; }
+.mark:hover { rotate: 0deg; scale: 1.04; }
+.mark svg { width: 100%; height: 100%; display: block; }
+.nav { display: flex; gap: clamp(20px, 3vw, 40px); font-size: 14px; }
+.nav a { position: relative; text-decoration: none; color: var(--ink); transition: color .16s; }
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: -4px; right: -4px; bottom: -8px;
+  height: 8px;
+  background: var(--squiggle-color);
+  -webkit-mask: var(--squiggle) center / 100% 100% no-repeat;
+  mask: var(--squiggle) center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: scaleX(.35) rotate(-1deg);
+  transform-origin: 0;
+  transition: opacity .16s, transform .22s var(--ease-hover);
+}
+.nav a:hover, .nav a[aria-current="page"] { color: var(--accent-text); }
+.nav a:hover::after, .nav a[aria-current="page"]::after { opacity: .9; transform: scaleX(1) rotate(-1deg); }
+:root {
+  --squiggle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 9' preserveAspectRatio='none'%3E%3Cpath d='M2 5.5C14 2.3 24 7.1 37 4.3S61 3.1 72 5.2S96 6.6 118 3.4' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round'/%3E%3Cpath d='M6 6.6C25 5.2 45 6.8 62 5.6S93 4.9 113 5.8' fill='none' stroke='%23000' stroke-width='.75' stroke-linecap='round' opacity='.58'/%3E%3C/svg%3E");
+}
+.socials { justify-self: end; display: flex; gap: 9px; }
+.icon-btn {
+  width: 31px; height: 31px;
+  display: grid; place-items: center;
+  border: 0; background: none; padding: 0;
+  color: var(--ink); cursor: pointer;
+  transition: opacity .18s, transform .18s;
+}
+.icon-btn:hover { opacity: .72; transform: translateY(-2px); }
+.icon-btn svg { width: 16px; height: 16px; }
+
+/* ───────────────────────── hero / desk */
+.hero {
+  position: relative;
+  min-height: max(100svh, 760px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 44%, var(--lamp), transparent 34rem);
+}
+.hero-copy { position: relative; z-index: 6; width: min(900px, 72vw); text-align: center; pointer-events: none; }
+.hero-copy a, .hero-copy .sprite { pointer-events: auto; }
+.hero h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: calc(clamp(34px, 2.9vw, 44px) * var(--ds));
+  line-height: 1.08;
+}
+.hero h1 > span { display: block; }
+.hl { position: relative; z-index: 0; display: inline-block; padding-inline: .08em; font-style: normal; }
+.hl::before {
+  content: "";
+  position: absolute;
+  inset: 53% -.06em 4%;
+  z-index: -1;
+  border-radius: .15em;
+  background: var(--accent-soft);
+  transform: rotate(-1deg);
+}
+.status {
+  margin: 18px auto 0;
+  max-width: 590px;
+  font-size: clamp(12px, 1vw, 14px);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -.01em;
+  color: var(--muted);
+}
+.status b { color: var(--ink); font-weight: 650; }
+.email {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size .18s;
+}
+.email:hover { background-size: 100% 1px; }
+.hint {
+  position: absolute;
+  right: 28px; bottom: 20px;
+  z-index: 7;
+  font: 10px/1.5 var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.obj {
+  position: absolute;
+  z-index: 5;
+  rotate: var(--r, 0deg);
+  filter: var(--edge) var(--obj-filter);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: scale .18s var(--ease-hover), filter .25s;
+}
+.obj svg { display: block; width: 100%; height: auto; pointer-events: none; }
+.obj:hover { scale: 1.025; filter: var(--edge) var(--obj-filter-hover); }
+.obj.is-dragging { cursor: grabbing; scale: .98; }
+.obj:focus-visible { outline: 2px dashed var(--accent); outline-offset: 6px; }
+
+.o-polaroid { width: clamp(120px, 11vw, 175px); top: 9%;  left: 3%;   --r: -9deg; }
+.o-camera   { width: clamp(170px, 15vw, 245px); top: 23%; left: 15%;  --r: -6deg; }
+.o-tag      { width: clamp(160px, 14vw, 220px); top: 12%; right: 23%; --r: 7deg; }
+.o-diary    { width: clamp(120px, 11vw, 175px); top: 6%;  right: 4%;  --r: 13deg; }
+.o-gpu      { width: clamp(220px, 20vw, 320px); bottom: 5%; left: -3%; --r: -8deg; }
+.o-mic      { width: clamp(70px, 6.2vw, 100px); bottom: 4%; left: 27%; --r: -14deg; }
+.o-badge    { width: clamp(96px, 8vw, 130px);   bottom: 2%; left: 47%; --r: 10deg; }
+
+/* about: where it started */
+.vignette { position: relative; height: 320px; margin: 0 0 44px; }
+.v-laptop { width: min(360px, 70%); top: 6px; left: 50%; margin-left: -215px; --r: -3deg; }
+.v-cd     { width: min(150px, 30%); top: 128px; left: 50%; margin-left: 118px; --r: 14deg; }
+.v-note   { position: absolute; left: 0; top: 34px; margin: 0; font: calc(24px * var(--hs)) / 1.05 var(--hand); color: var(--body); rotate: -6deg; }
+.o-phone    { width: clamp(110px, 9.5vw, 150px); bottom: -2%; right: 7%; --r: 9deg; }
+
+/* ───────────────────────── pixel sprite */
+.sprite {
+  display: inline-block;
+  width: 39px; height: 50px;
+  margin: -14px 2px 0 6px;
+  vertical-align: -6px;
+  transform-origin: center bottom;
+  cursor: pointer;
+  filter:
+    drop-shadow(1.4px 0 0 var(--sprite-outline)) drop-shadow(-1.4px 0 0 var(--sprite-outline))
+    drop-shadow(0 1.4px 0 var(--sprite-outline)) drop-shadow(0 -1.4px 0 var(--sprite-outline));
+}
+.sprite svg { width: 100%; height: 100%; display: block; }
+.sprite .f1 { opacity: 0; }
+.sprite.is-playing .f0 { animation: frameA .9s steps(1, end) 4; }
+.sprite.is-playing .f1 { animation: frameB .9s steps(1, end) 4; }
+.sprite[data-pose="idle"] .f0 { animation: blinkA 4.2s steps(1, end) infinite; }
+.sprite[data-pose="idle"] .f1 { animation: blinkB 4.2s steps(1, end) infinite; }
+.sprite.is-squished { animation: squish .3s ease-out; }
+@keyframes frameA { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes frameB { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes blinkA { 0% { opacity: 1; } 94% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes blinkB { 0% { opacity: 0; } 94% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes squish {
+  0% { transform: scale(1, 1); } 30% { transform: scale(1.06, .94); }
+  60% { transform: scale(.97, 1.03); } 100% { transform: scale(1, 1); }
+}
+
+/* ───────────────────────── shared section type */
+.section { position: relative; padding: 120px 0; }
+.lamp { background: radial-gradient(circle at 50% 30%, var(--lamp), transparent 32rem); }
+.col { width: min(42rem, 100% - 48px); margin: 0 auto; }
+.wide { width: min(72rem, 100% - 48px); margin: 0 auto; }
+.eyebrow { margin: 0; font: 10px/1.5 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--eyebrow); }
+.h2 {
+  margin: 10px 0 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: calc(clamp(34px, 4vw, 54px) * var(--ds));
+  line-height: 1;
+}
+.updated { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.prose p { margin: 0 0 1.25em; font-size: 15px; line-height: 1.72; color: var(--body); text-align: justify; hyphens: auto; }
+.prose a, a.inline {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.prose a:hover { color: var(--accent-text); }
+.dropcap::first-letter {
+  float: left;
+  margin: 7px 6px 0 0;
+  font-family: var(--serif);
+  font-size: calc(50px * var(--ds));
+  line-height: .7;
+  color: var(--ink);
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 16px;
+  border: 1px solid var(--accent); border-radius: 999px;
+  color: var(--accent-text); text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  transition: background .16s, color .16s;
+}
+.pill:hover { background: var(--accent); color: var(--on-accent); }
+
+/* about */
+.pull {
+  position: relative;
+  margin: 56px 0;
+  font: italic 400 calc(clamp(22px, 2.6vw, 30px) * var(--ds)) / 1.18 var(--serif);
+  text-align: center;
+  color: var(--ink);
+}
+.pull::before, .pull::after { font-size: 68px; line-height: 0; color: color-mix(in oklab, var(--ink) 16%, transparent); position: relative; }
+.pull::before { content: "\201C"; top: 18px; margin-right: 4px; }
+.pull::after { content: "\201D"; top: 30px; margin-left: 2px; }
+.circled { position: relative; white-space: nowrap; color: var(--accent); }
+.circled svg { position: absolute; left: -12%; top: -22%; width: 124%; height: 144%; overflow: visible; pointer-events: none; }
+.circled path { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.now { margin: 40px 0 0; }
+.now div { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 13px 0; border-top: 1px dashed var(--rule); }
+.now div:last-child { border-bottom: 1px dashed var(--rule); }
+.now dt { font: 10px/2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.now dd { margin: 0; font-size: 14px; line-height: 1.6; color: var(--body); }
+.now dd b { color: var(--ink); font-weight: 650; }
+.journey { margin-top: 72px; }
+.journey-head { display: flex; justify-content: space-between; align-items: baseline; }
+.journey-head h3 { margin: 0; font: 400 calc(25px * var(--ds))/1 var(--serif); }
+.journey-head span { font-size: 12px; color: var(--muted); }
+.journey svg { width: 100%; height: auto; overflow: visible; margin-top: 8px; }
+.journey .path { fill: none; stroke: var(--chart-1); stroke-width: 1.7; stroke-dasharray: 7 7; stroke-linecap: round; }
+.journey .x { stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; }
+.journey .lbl { font: calc(15px * var(--hs)) var(--hand); fill: var(--muted); }
+.journey .lbl.now-lbl { fill: var(--accent-text); }
+.journey .flag { fill: var(--accent); }
+.journey .dot { fill: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
+
+/* work */
+.featured { display: grid; grid-template-columns: 220px 1fr; gap: 44px; align-items: center; margin-top: 48px; }
+.featured .art { rotate: -4deg; filter: var(--edge) var(--obj-filter); transition: transform .22s var(--ease-hover), filter .22s; }
+.featured .art:hover { transform: translateY(-8px) scale(1.012); filter: var(--edge) var(--obj-filter-hover); }
+.featured .art svg { display: block; width: 100%; height: auto; }
+.art-caption { margin-top: 18px; text-align: center; }
+.art-caption strong { display: block; font: 600 calc(clamp(30px, 2.6vw, 42px) * var(--hs)) / 1 var(--hand); color: var(--ink); }
+.art-caption small { font-size: 12px; font-weight: 520; color: var(--muted); }
+.featured h3 { margin: 8px 0 12px; font: 400 calc(32px * var(--ds))/1.05 var(--serif); }
+.featured p { margin: 0 0 20px; font-size: 15px; line-height: 1.7; color: var(--body); }
+.archive { margin-top: 64px; }
+.archive h3 { margin: 0 0 14px; font: 400 calc(clamp(26px, 2.7vw, 34px) * var(--ds)) / 1 var(--serif); }
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto 56px;
+  align-items: baseline;
+  gap: 16px;
+  padding: 17px 0;
+  border-top: 1px dashed var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+  transition: padding .15s, color .15s;
+}
+.row:last-child { border-bottom: 1px dashed var(--rule); }
+.row:hover { padding-inline: 8px; color: var(--accent-text); }
+.row-name { font-size: 15px; font-weight: 610; }
+.row-cat { font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.row-year { font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* diary + report clipping */
+.entry { margin-top: 48px; }
+.entry-meta { font: 10px/1.6 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.entry h3 { margin: 8px 0 16px; font: 400 calc(clamp(28px, 3vw, 36px) * var(--ds)) / 1.08 var(--serif); }
+.clip {
+  position: relative;
+  margin: 36px -18px;
+  padding: 30px 30px 22px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px 5px 8px 6px;
+  box-shadow: var(--paper-shadow);
+  rotate: -.4deg;
+}
+.clip .tape {
+  position: absolute;
+  top: -14px; left: 46%;
+  width: 112px; height: 28px;
+  background: var(--tape);
+  rotate: -3deg;
+  clip-path: polygon(2% 10%, 98% 0, 96% 90%, 3% 100%);
+}
+.clip-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.stamp {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  font: 500 9px/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  rotate: -2deg;
+}
+.clip-meta { font: 9px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.clip h4 { margin: 14px 0 6px; font: 400 calc(26px * var(--ds))/1.08 var(--serif); }
+.clip-summary { margin: 0 0 18px; font-size: 13.5px; line-height: 1.65; color: var(--body); }
+.fig-title { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.fig-desc { margin: 2px 0 12px; font-size: 12px; color: var(--muted); }
+.tabs { display: flex; gap: 18px; margin-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.tabs button {
+  padding: 6px 0;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: 500 12px var(--sans);
+  cursor: pointer;
+}
+.tabs button[aria-pressed="true"] { color: var(--chart-1); border-color: var(--chart-1); font-weight: 650; }
+.bar-row { padding: 7px 0; }
+.bar-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--ink); }
+.bar-top b { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.track { position: relative; height: 14px; margin-top: 5px; border-radius: 2px; background: color-mix(in oklab, var(--ink) 7%, transparent); }
+.fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; transition: width .5s var(--ease-out); }
+.callout { margin: 14px 0 0; padding-top: 10px; border-top: 1px dashed var(--rule); font-size: 12px; line-height: 1.6; color: var(--body); }
+.clip details { margin-top: 12px; font-size: 12px; }
+.clip summary { cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.clip table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 11px; }
+.clip th, .clip td { padding: 6px 8px; border: 1px solid var(--rule); text-align: left; }
+.clip th { background: color-mix(in oklab, var(--ink) 5%, transparent); font-weight: 650; }
+.clip td:last-child, .clip th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.clip footer { margin-top: 16px; font-size: 11.5px; color: var(--muted); }
+.clip footer a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 11px; color: var(--muted); }
+.legend i { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+.diary-list { margin-top: 56px; }
+.diary-list h3 { margin: 0 0 14px; font: 400 calc(25px * var(--ds))/1.1 var(--serif); }
+.drow {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-top: 1px dashed var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+  transition: padding .15s, color .15s;
+}
+.drow:last-child { border-bottom: 1px dashed var(--rule); }
+.drow:hover { padding-inline: 7px; color: var(--accent-text); }
+.drow time { font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.drow span { font-size: 14px; font-weight: 560; }
+.drow em { font: normal 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--eyebrow); }
+
+/* gallery */
+.gallery { columns: 3 260px; column-gap: 22px; margin-top: 48px; }
+.photo { break-inside: avoid; margin: 0 0 30px; }
+.photo .frame { overflow: hidden; border-radius: 3px; background: #ccc; }
+.photo .frame svg { display: block; width: 100%; height: 100%; }
+.photo figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 10px; }
+.photo figcaption strong { font: 600 calc(22px * var(--hs))/1 var(--hand); color: var(--ink); }
+.photo figcaption small { font: 9px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* contact */
+.contact { min-height: 860px; display: flex; flex-direction: column; text-align: center; padding-bottom: 36px; }
+.stitch { position: absolute; top: 35px; left: 2vw; right: 2vw; height: 18px; opacity: .5; }
+.stitch path { fill: none; stroke: var(--muted); stroke-width: 3; stroke-dasharray: 20 19; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.contact .h2 { font-size: calc(clamp(30px, 3vw, 43px) * var(--ds)); line-height: 1.03; }
+.note-wrap { position: relative; width: 300px; margin: 92px auto 0; }
+.note {
+  position: relative;
+  display: grid; place-items: center;
+  aspect-ratio: 1;
+  width: 300px;
+  background: linear-gradient(118deg, rgba(255, 255, 255, .14), transparent 32%), var(--note);
+  color: var(--note-ink);
+  box-shadow: var(--note-shadow);
+  rotate: -1.6deg;
+  text-decoration: none;
+  font: 600 calc(67px * var(--hs))/.72 var(--hand);
+  transition: transform .19s var(--ease-hover), box-shadow .19s;
+}
+.note:hover { transform: translateY(-7px) rotate(2.6deg); }
+.note::after {
+  content: "";
+  position: absolute; right: 13px; bottom: 11px;
+  width: 44px; height: 38px;
+  background: linear-gradient(135deg, transparent 48%, rgba(119, 93, 51, .14) 49%);
+}
+.note .u { position: relative; display: inline-block; }
+.note .u svg { position: absolute; left: -6%; bottom: -19px; width: 112%; height: 12px; overflow: visible; }
+.note .u path { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.annot { position: absolute; top: -66px; left: 262px; width: 160px; rotate: 8deg; text-align: left; }
+.annot span { font: calc(31px * var(--hs)) var(--hand); color: var(--ink); white-space: nowrap; }
+.annot svg { display: block; width: 110px; margin: 2px 0 0 -40px; overflow: visible; }
+.annot path { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.note-sprite { position: absolute; left: -64px; bottom: -6px; }
+.note-sprite .sprite { margin: 0; }
+.site-footer {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 30px;
+  width: min(72rem, 100% - 48px); margin: auto auto 0;
+  font-size: 10px; line-height: 1.6; color: var(--muted); text-align: left;
+}
+.site-footer a { color: var(--body); text-decoration-color: color-mix(in oklab, var(--muted) 60%, transparent); }
+
+/* ───────────────────────── type switcher hooks */
+:root {
+  --ds: 1; --dw: 400; --dt: -.02em; --dcase: none; --dstretch: 100%; --hs: 1;
+  --edge: drop-shadow(0 0 0 transparent);
+  --paper: #fdfcf8;
+}
+html[data-mode="dark"] { --paper: #e6e4dd; }
+.hero h1, .h2, .contact .h2, .journey-head h3, .featured h3, .archive h3, .entry h3, .clip h4, .diary-list h3 {
+  font-family: var(--serif);
+  font-weight: var(--dw);
+  letter-spacing: var(--dt);
+  text-transform: var(--dcase);
+  font-stretch: var(--dstretch);
+}
+.dropcap::first-letter { font-weight: var(--dw); font-stretch: var(--dstretch); }
+/* paper-cut edge: a white die-cut border hugging the object, like a sticker cut from a print */
+html[data-cutout="paper"] .obj, html[data-cutout="paper"] .featured .art {
+  --edge: drop-shadow(3px 0 0 var(--paper)) drop-shadow(-3px 0 0 var(--paper)) drop-shadow(0 3px 0 var(--paper))
+          drop-shadow(0 -3px 0 var(--paper)) drop-shadow(0 0 .5px rgba(0, 0, 0, .25));
+}
+
+/* ───────────────────────── motion off */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+html[data-motion="off"] .obj:hover, html[data-motion="off"] .featured .art:hover { scale: 1; transform: none; }
+
+/* ───────────────────────── responsive */
+@media (max-width: 720px) {
+  .site-header { grid-template-columns: auto 1fr; padding: 17px 18px; }
+  .nav { justify-self: end; gap: 16px; font-size: 12px; }
+  .socials { display: none; }
+  .hero-copy { width: calc(100% - 36px); }
+  .hero h1 > span { display: inline; }
+  .o-polaroid, .o-mic, .o-badge { display: none; }
+  .v-note { display: none; }
+  .v-laptop { margin-left: -170px; }
+  .v-cd { margin-left: 70px; }
+  .o-camera { width: 30vw; top: 13%; left: 4%; }
+  .o-tag { width: 34vw; top: 16%; right: 5%; }
+  .o-diary { display: none; }
+  .o-gpu { width: 46vw; bottom: 3%; left: -10%; }
+  .o-phone { width: 24vw; bottom: 4%; right: 8%; }
+  .featured { grid-template-columns: 1fr; }
+  .featured .art { width: 180px; margin: 0 auto; }
+  .clip { margin-inline: 0; padding: 26px 20px 18px; }
+  .annot { display: none; }
+  .note-sprite { left: -40px; }
+  .site-footer { flex-direction: column; align-items: flex-start; }
+}
+
+/* ───────────────────────── palette panel (not part of the design) */
+.lab {
+  position: fixed;
+  right: 16px; bottom: 16px;
+  z-index: 100;
+  width: 340px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 14px;
+  background: rgba(18, 18, 20, .93);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+  color: #ececec;
+  font: 12px/1.45 ui-sans-serif, system-ui, -apple-system, sans-serif;
+  scrollbar-width: thin;
+}
+.lab * { box-sizing: border-box; }
+.lab.is-collapsed { width: auto; padding: 0; overflow: hidden; }
+.lab.is-collapsed .lab-body { display: none; }
+.lab-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lab.is-collapsed .lab-top { padding: 9px 12px; }
+.lab h2 { margin: 0; font-size: 13px; font-weight: 650; letter-spacing: .01em; }
+.lab h2 small { color: #9a9a9a; font-weight: 450; }
+.lab button { font: inherit; color: inherit; cursor: pointer; }
+.lab .ghost { border: 0; background: none; color: #aaa; padding: 2px 4px; }
+.lab .ghost:hover { color: #fff; }
+.seg { display: flex; gap: 2px; margin-top: 10px; padding: 3px; border-radius: 9px; background: rgba(255, 255, 255, .06); }
+.seg button { flex: 1; padding: 6px 8px; border: 0; border-radius: 7px; background: none; color: #bbb; }
+.seg button[aria-pressed="true"] { background: rgba(255, 255, 255, .14); color: #fff; }
+.lab-label { margin: 14px 0 6px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8d8d8d; display: flex; justify-content: space-between; }
+.plist { display: grid; gap: 6px; }
+.pitem {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 9px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .03);
+  text-align: left;
+}
+.pitem:hover { background: rgba(255, 255, 255, .07); }
+.pitem[aria-pressed="true"] { border-color: rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .1); }
+.pitem .pname { font-weight: 650; font-size: 12.5px; }
+.pitem .ptag { margin-left: 6px; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: #9b9b9b; }
+.pitem .pblurb { display: block; margin-top: 2px; color: #a9a9a9; font-size: 11px; }
+.sw { display: flex; gap: 3px; margin-top: 7px; align-items: center; }
+.sw i { width: 18px; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); }
+.sw span { width: 34px; font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: .06em; }
+.fav { position: absolute; top: 6px; right: 6px; border: 0; background: none; font-size: 15px; line-height: 1; color: #666; padding: 4px; }
+.fav[aria-pressed="true"] { color: #ff6b7d; }
+.custom { display: flex; align-items: center; gap: 8px; }
+.custom input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid rgba(255, 255, 255, .2); border-radius: 6px; background: none; }
+.custom code { font: 11px ui-monospace, monospace; color: #ccc; }
+.tokens { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 8px; align-items: center; }
+.tokens .tk { display: flex; align-items: center; gap: 6px; color: #cfcfcf; }
+.tokens .tk i { width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15); }
+.tokens code { font: 10.5px ui-monospace, monospace; color: #9f9f9f; }
+.badge { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; }
+.badge.aaa { background: #1f5f3a; color: #b9f3cf; }
+.badge.aa { background: #2c4f2c; color: #cfe9b9; }
+.badge.lg { background: #5a4a1a; color: #f2df9c; }
+.badge.fail { background: #5e2222; color: #ffb9b9; }
+.lab .btn {
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .06);
+}
+.lab .btn:hover { background: rgba(255, 255, 255, .12); }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.lab .hintline { margin-top: 12px; color: #828282; font-size: 10.5px; }
+.lab kbd { padding: 0 4px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 4px; font: 10px ui-monospace, monospace; }
+.shortlist { margin-top: 8px; color: #cfcfcf; font-size: 11px; }
+.tlist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.titem {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 8px 10px 9px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .03);
+  text-align: left;
+}
+.titem:hover { background: rgba(255, 255, 255, .07); }
+.titem[aria-pressed="true"] { border-color: rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .1); }
+.titem .aa { font-size: 26px; line-height: 1; color: #fff; }
+.titem .tname { font-weight: 650; font-size: 11.5px; }
+.titem .tfonts { color: #9b9b9b; font-size: 10px; line-height: 1.35; }
+.tmix { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; margin-top: 10px; }
+.tmix label { display: grid; gap: 3px; color: #9b9b9b; font-size: 10px; letter-spacing: .04em; }
+.tmix select {
+  width: 100%; padding: 5px 6px;
+  border: 1px solid rgba(255, 255, 255, .16); border-radius: 7px;
+  background: #1d1d20; color: #eee; font: 11.5px ui-sans-serif, system-ui, sans-serif;
+}
+.tmix .tscale { grid-column: 1 / -1; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; }
+.tmix .tscale code { font: 10.5px ui-monospace, monospace; color: #ccc; }
+@media (max-width: 720px) { .lab { right: 8px; left: 8px; bottom: 8px; width: auto; max-height: 60vh; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="mark" href="#top" aria-label="Harith, home">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13 12v24M35 12v24M13 24.5c6-2.2 14-2.2 22 0" />
+    </svg>
+  </a>
+  <nav class="nav" aria-label="Primary">
+    <a href="#top" aria-current="page">About</a>
+    <a href="#work">Work</a>
+    <a href="#blog">Blog</a>
+    <a href="#gallery">Gallery</a>
+  </nav>
+  <div class="socials">
+    <a class="icon-btn" href="#" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a10.9 10.9 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+    <a class="icon-btn" href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z"/></svg></a>
+    <a class="icon-btn" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+    <button class="icon-btn" type="button" data-action="toggle-mode" aria-label="Toggle dark mode">
+      <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ───────── hero: the desk -->
+  <section class="hero" aria-label="Introduction">
+    <div class="obj o-polaroid" data-obj="polaroid" role="img" aria-label="A polaroid of the KL skyline, draggable decoration" tabindex="0" data-enter="-40,-30,.06"></div>
+    <div class="obj o-camera"   data-obj="camera"   role="img" aria-label="A Sony A7R III, draggable decoration" tabindex="0" data-enter="-38,-12,.4"></div>
+    <div class="obj o-tag"      data-obj="tag"      role="img" aria-label="Hello my name is Harith sticker, draggable decoration" tabindex="0" data-enter="18,-38,.12"></div>
+    <div class="obj o-diary"    data-obj="diary"    role="img" aria-label="A green notebook diary, draggable decoration" tabindex="0" data-enter="34,-34,.18"></div>
+    <div class="obj o-gpu"      data-obj="gpu"      role="img" aria-label="A graphics card from the office-PC gaming days, draggable decoration" tabindex="0" data-enter="-42,34,.34"></div>
+    <div class="obj o-mic"      data-obj="mic"      role="img" aria-label="A studio condenser microphone, draggable decoration" tabindex="0" data-enter="-22,40,.28"></div>
+    <div class="obj o-badge"    data-obj="badge"    role="img" aria-label="A hackathon participant badge, draggable decoration" tabindex="0" data-enter="4,44,.46"></div>
+    <div class="obj o-phone"    data-obj="phone"    role="img" aria-label="A phone showing a DagangNow store, draggable decoration" tabindex="0" data-enter="48,32,.22"></div>
+
+    <div class="hero-copy">
+      <h1>
+        <span>Hi, I'm Harith<span class="sprite" data-pose="wave" role="img" aria-label="Pixel Harith waving hello" tabindex="0"></span>, a founder and <em class="hl">tech nerd</em></span>
+        <span>building DagangNow in Kuala Lumpur.</span>
+      </h1>
+      <p class="status">Currently in 📍 Kuala Lumpur. CEO of <b>DagangNow</b>, an agentic commerce platform for Malaysian sellers. Still the camera guy.</p>
+      <a class="email" href="#contact">Email me</a>
+    </div>
+    <p class="hint">Drag the objects around</p>
+  </section>
+
+  <!-- ───────── about -->
+  <section class="section lamp" aria-labelledby="about-h">
+    <div class="col">
+      <div class="vignette">
+        <div class="obj v-laptop" data-obj="laptop" role="img" aria-label="Dad's old laptop with 500 MB of RAM, draggable decoration" tabindex="0"></div>
+        <div class="obj v-cd" data-obj="cd" role="img" aria-label="A burned Linux CD, draggable decoration" tabindex="0"></div>
+        <p class="v-note" aria-hidden="true">where it<br />all started →</p>
+      </div>
+      <p class="eyebrow">About</p>
+      <h2 class="h2" id="about-h">Hi, I'm Harith.</h2>
+      <p class="updated">Updated Oct 7, 2026</p>
+
+      <blockquote class="pull">My first computer was my dad's old laptop with <span class="circled">500 MB of RAM<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M9 23C5 10 38 2 68 4c27 2 33 20 15 29-19 9-62 7-73-4-5-6 6-15 22-19"/></svg></span>.</blockquote>
+
+      <div class="prose">
+        <p class="dropcap">I'm a tech nerd from Kuala Lumpur who likes the small, gritty details of how things work. Right now I'm building <a href="#work">DagangNow</a>, an agentic commerce platform for Malaysian sellers.</p>
+        <p>It started when I was fifteen. My parents were strict, so no phone, but my dad kept a lot of old gear, including a laptop with 500 MB of RAM. I wanted the internet badly enough to borrow my cousin's CD drive, burn Linux distros onto CDs and keep installing until one worked. After that I was opening up compact HP office PCs to squeeze graphics cards into them, and later spending whatever I saved on microphones and audio gear.</p>
+        <p>At uni I took the tech foundation instead of choosing between electrical and software engineering, then picked software because I wanted to work remotely. In my second year I became the camera guy: I learned from my mentor Fika Azman, started the Sakura Sakura Club, and helped a lecturer build a studio from nothing. In third year I swapped the camera for <a href="#blog">hackathons</a>, lost most of them, and learned Next.js along the way.</p>
+        <p>My internship at Asterisk Digital put me on a React Native team, then on AWS infrastructure, and then on data engineering for a gas company, where I helped prototype an AI tool for a whole department. Now I'm building my own thing.</p>
+      </div>
+
+      <dl class="now">
+        <div><dt>Building</dt><dd><b>DagangNow</b>: your AI-powered eCommerce store, live in minutes</dd></div>
+        <div><dt>Shooting</dt><dd>Sony A7R III. Studio, cosplay, product, outdoor</dd></div>
+        <div><dt>Tinkering</dt><dd>Old PCs, audio gear, anything with screws</dd></div>
+        <div><dt>Writing</dt><dd>A diary, and the AI reports it argues with</dd></div>
+      </dl>
+
+      <div class="journey">
+        <div class="journey-head"><h3>How I got here</h3><span>From a 500 MB laptop to a startup.</span></div>
+        <svg viewBox="0 0 672 230" aria-label="Timeline from first code to now">
+          <path id="journey-path" class="path" d="M28 150 C 110 70, 190 196, 290 128 S 450 38, 540 104 S 600 196, 628 140" />
+          <g id="journey-marks"></g>
+          <circle class="dot" r="4.5"><animateMotion dur="11s" repeatCount="indefinite"><mpath href="#journey-path" /></animateMotion></circle>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── work -->
+  <section class="section" id="work" aria-labelledby="work-h">
+    <div class="col">
+      <p class="eyebrow">Work</p>
+      <h2 class="h2" id="work-h">Things I've built</h2>
+
+      <div class="featured">
+        <div>
+          <div class="art" data-obj="phone"></div>
+          <div class="art-caption"><strong>DagangNow</strong><small>Building now</small></div>
+        </div>
+        <div>
+          <p class="eyebrow">CEO · Daganoss Digital</p>
+          <h3>Your AI-powered eCommerce store, live in minutes</h3>
+          <p>DagangNow gives sellers who live on Shopee, TikTok and WhatsApp a store of their own: an AI WhatsApp assistant, a catalogue AI agents can read, storefronts in Bahasa Malaysia, and orders, shipping and affiliates in one place.</p>
+          <a class="pill" href="#">Read the story <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <div class="archive">
+        <h3>Archive</h3>
+        <a class="row" href="#"><span class="row-name">Data platform and AI prototype</span><span class="row-cat">Data engineering</span><span class="row-year">Intern</span></a>
+        <a class="row" href="#"><span class="row-name">Cloud setup on AWS</span><span class="row-cat">Infrastructure</span><span class="row-year">Intern</span></a>
+        <a class="row" href="#"><span class="row-name">Prototype mobile app</span><span class="row-cat">React Native</span><span class="row-year">Intern</span></a>
+        <a class="row" href="#"><span class="row-name">SSC UTMKL studio</span><span class="row-cat">Photography</span><span class="row-year">Uni</span></a>
+        <a class="row" href="#"><span class="row-name">CalTrack</span><span class="row-cat">Calorie tracker</span><span class="row-year">2024</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── blog / diary -->
+  <section class="section lamp" id="blog" aria-labelledby="blog-h">
+    <div class="col">
+      <p class="eyebrow">Diary</p>
+      <h2 class="h2" id="blog-h">Notes, mostly honest.</h2>
+
+      <article class="entry">
+        <p class="entry-meta">Day 214 · 7 Oct 2026 · Kuala Lumpur</p>
+        <h3>Why checkout felt slow, and what the report found</h3>
+        <div class="prose">
+          <p>I asked an agent to dig into our checkout numbers after a seller in Kota Kinabalu messaged me about a spinning button. It came back with the report below. Most of it matched my gut. One part did not, and that's what this entry is about.</p>
+        </div>
+
+        <figure class="clip" aria-label="Embedded AI report">
+          <span class="tape" aria-hidden="true"></span>
+          <div class="clip-head">
+            <span class="stamp">AI report</span>
+            <span class="clip-meta">Claude Opus · 4 Oct 2026 · 9 min read</span>
+          </div>
+          <h4>Checkout latency across four regions</h4>
+          <p class="clip-summary">Time from tapping "Pay" to the confirmation screen, measured on 2,140 real orders over 14 days. Placeholder numbers.</p>
+          <p class="fig-title">Time to confirmation</p>
+          <p class="fig-desc">Seconds, lower is better.</p>
+          <div class="tabs" role="group" aria-label="Statistic">
+            <button type="button" aria-pressed="true" data-stat="p50">Median</button>
+            <button type="button" aria-pressed="false" data-stat="p95">95th percentile</button>
+          </div>
+          <div id="bars"></div>
+          <p class="callout">Sabah's p95 is driven by a third-party payment redirect, not our servers.</p>
+          <div class="legend" id="legend"></div>
+          <details>
+            <summary>View the data</summary>
+            <table id="data-table"></table>
+          </details>
+          <footer>Referenced in <a href="#">Day 214</a> and <a href="#">Day 216</a></footer>
+        </figure>
+
+        <a class="pill" href="#">Continue reading <span aria-hidden="true">→</span></a>
+      </article>
+
+      <div class="diary-list">
+        <h3>All entries</h3>
+        <a class="drow" href="#"><time>05 Oct</time><span>A seller cried on a call (the good kind)</span><em>Life</em></a>
+        <a class="drow" href="#"><time>02 Oct</time><span>Rewriting the onboarding for the fourth time</span><em>Build log · 1 report</em></a>
+        <a class="drow" href="#"><time>28 Sep</time><span>Deadlift PR, finally</span><em>Lifting</em></a>
+        <a class="drow" href="#"><time>24 Sep</time><span>Shooting a roll of Portra around Petaling Street</span><em>Photo</em></a>
+        <a class="drow" href="#"><time>19 Sep</time><span>What three AI agents disagreed about</span><em>Build log · 3 reports</em></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── gallery -->
+  <section class="section" id="gallery" aria-labelledby="gallery-h">
+    <div class="wide">
+      <div class="col" style="width:auto;margin:0">
+        <p class="eyebrow">Gallery</p>
+        <h2 class="h2" id="gallery-h">Recent rolls</h2>
+      </div>
+      <div class="gallery" id="gallery-grid"></div>
+    </div>
+  </section>
+
+  <!-- ───────── contact -->
+  <section class="section contact lamp" id="contact" aria-labelledby="contact-h">
+    <svg class="stitch" viewBox="0 0 1000 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 C 120 4, 240 14, 360 9 S 600 4, 720 10 S 900 13, 1000 8" /></svg>
+    <div class="col" style="text-align:center">
+      <p class="eyebrow">Have something in mind?</p>
+      <h2 class="h2" id="contact-h">I'm always up for a good idea,<br />a hard problem, or a strange little project.</h2>
+    </div>
+    <div class="note-wrap">
+      <div class="annot" aria-hidden="true">
+        <span>Write to me</span>
+        <svg viewBox="0 0 150 126"><path d="M130 6C113 51 92 70 57 91C45 98 34 103 17 105" /><path d="M33 88C27 96 21 103 16 106C25 106 34 109 42 116" /></svg>
+      </div>
+      <a class="note" href="#">
+        <span>Say<br /><span class="u">hello<svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 7 C22 2 38 9 55 5 S80 8 98 4" /></svg></span></span>
+      </a>
+      <div class="note-sprite"><span class="sprite" data-pose="idle" role="img" aria-label="Pixel Harith standing by" tabindex="0"></span></div>
+    </div>
+    <footer class="site-footer">
+      <p>Or email <a href="#">hello@rith.dev</a>. I'm also on <a href="#">GitHub</a>, <a href="#">LinkedIn</a> and <a href="#">Instagram</a>.</p>
+      <p>Draft copy from Harith's story · drawn stand-ins for photo cut-outs · © 2026 Harith</p>
+    </footer>
+  </section>
+</main>
+
+<!-- ───────── palette lab panel -->
+<aside class="lab" id="lab" aria-label="Palette lab">
+  <div class="lab-top">
+    <h2>Palette lab <small id="lab-current"></small></h2>
+    <button class="ghost" type="button" data-action="collapse" aria-label="Collapse panel">▾</button>
+  </div>
+  <div class="lab-body">
+    <div class="seg" role="group" aria-label="Mode">
+      <button type="button" data-mode="light">☀︎ Light</button>
+      <button type="button" data-mode="dark">☾ Dark</button>
+    </div>
+    <div class="lab-label"><span>Palettes</span><span>♥ to shortlist</span></div>
+    <div class="plist" id="plist"></div>
+    <div class="shortlist" id="shortlist"></div>
+
+    <div class="lab-label"><span>Custom accent (this mode)</span></div>
+    <div class="custom">
+      <input type="color" id="accent-input" aria-label="Custom accent colour" />
+      <code id="accent-code"></code>
+      <button class="btn" type="button" data-action="reset-accent">Reset</button>
+    </div>
+
+    <div class="lab-label"><span>Type</span><span>T to cycle</span></div>
+    <div class="tlist" id="tlist"></div>
+    <div class="tmix">
+      <label>Display <select id="sel-display"></select></label>
+      <label>Body <select id="sel-body"></select></label>
+      <label>Labels <select id="sel-mono"></select></label>
+      <label>Hand <select id="sel-hand"></select></label>
+      <label class="tscale">Heading size <input type="range" id="sel-scale" min="0.55" max="1.3" step="0.01" /><code id="scale-code"></code></label>
+    </div>
+
+    <div class="lab-label"><span>Photo cut-outs</span></div>
+    <div class="seg" role="group" aria-label="Cut-out edge">
+      <button type="button" data-cutout="clean">Clean edge</button>
+      <button type="button" data-cutout="paper">Paper-cut edge</button>
+    </div>
+
+    <div class="lab-label"><span>Tokens + contrast</span><span id="mode-label"></span></div>
+    <div class="tokens" id="tokens"></div>
+
+    <div class="lab-label"><span>Motion</span></div>
+    <div class="seg" role="group" aria-label="Motion">
+      <button type="button" data-motion="on">On</button>
+      <button type="button" data-motion="off">Off</button>
+    </div>
+
+    <div class="btns">
+      <button class="btn" type="button" data-action="replay">Replay entrance</button>
+      <button class="btn" type="button" data-action="copy">Copy CSS tokens</button>
+    </div>
+    <p class="hintline"><kbd>←</kbd> <kbd>→</kbd> palette · <kbd>D</kbd> dark · <kbd>F</kbd> favourite · <kbd>P</kbd> hide panel</p>
+  </div>
+</aside>
+
+<script>
+/* ═════════════════════════ palettes */
+const PALETTES = [
+  {
+    id: "harith", name: "Chalk & Iron · Harith", tag: "Chosen",
+    blurb: "Locked 7 Oct 2026. Chalk & Iron with a brighter plate-blue accent.",
+    light: { bg: "#f4f4f2", surface: "#fbfbfa", ink: "#141518", body: "#46484d", muted: "#6c6f75", rule: "#14151822", accent: "#5784ff", accentText: "#3563e6", accentSoft: "#adc2f8", note: "#f3e08c", noteInk: "#2a2610", chart: ["#1f4fd1", "#d23b2f", "#d9a91a", "#2f8f5b"] },
+    dark:  { bg: "#0f1012", surface: "#17181b", ink: "#eeeeec", body: "#b3b5b9", muted: "#84878e", rule: "#eeeeec1a", accent: "#7a9cff", accentSoft: "#3a4871", note: "#d6c66e", noteInk: "#22200c", chart: ["#7c9cff", "#f2665a", "#f0cd5a", "#5fc08a"] },
+  },
+  {
+    id: "kertas", name: "Kertas", tag: "Reference",
+    blurb: "Mohtasham's own colours, kept as a control.",
+    light: { bg: "#f3f0e8", surface: "#f8f5ee", ink: "#292722", body: "#55524c", muted: "#8a857b", rule: "#29272224", accent: "#dc713d", accentSoft: "#ed9a78", note: "#f3d68e", noteInk: "#343129", chart: ["#41697c", "#68786a", "#a07347", "#80658c"] },
+    dark:  { bg: "#191815", surface: "#22201c", ink: "#ece7dc", body: "#bdb6a8", muted: "#8f887b", rule: "#ece7dc1f", accent: "#ec8a58", accentSoft: "#7a3d22", note: "#d9be78", noteInk: "#2c2820", chart: ["#86a9ba", "#a1b2a2", "#cfa173", "#b398bf"] },
+  },
+  {
+    id: "kopi", name: "Kopi Susu", tag: "Warm",
+    blurb: "Coffee and condensed milk. Cosy paper, roasted-brown links.",
+    light: { bg: "#f1ebe1", surface: "#f8f3eb", ink: "#2a1f18", body: "#5a4b40", muted: "#75655a", rule: "#2a1f1824", accent: "#9a4f24", accentSoft: "#e8c79a", note: "#f0d9a8", noteInk: "#3a2b1d", chart: ["#7a4a2b", "#b98b5a", "#5f6f52", "#8e5a6b"] },
+    dark:  { bg: "#16110d", surface: "#1f1914", ink: "#f0e6d8", body: "#c7b8a5", muted: "#968572", rule: "#f0e6d81f", accent: "#e0a066", accentSoft: "#6b4325", note: "#d8bd86", noteInk: "#2b1f14", chart: ["#d29a6a", "#e3c18f", "#9db08a", "#c58ea0"] },
+  },
+  {
+    id: "batik", name: "Batik Indigo", tag: "Malaysian",
+    blurb: "Indigo dye with soga brown, the two oldest batik colours.",
+    light: { bg: "#f2efe7", surface: "#f8f6f0", ink: "#1c2133", body: "#4a4f60", muted: "#666a7b", rule: "#1c213324", accent: "#2c4a8c", accentSoft: "#c3cfee", note: "#efd78f", noteInk: "#2d2a1c", chart: ["#2c4a8c", "#9b5a2a", "#5d7a6b", "#7a5b8c"] },
+    dark:  { bg: "#10131c", surface: "#171b27", ink: "#e7e5df", body: "#b4b6c2", muted: "#8a8ea0", rule: "#e7e5df1c", accent: "#8ea8ea", accentSoft: "#2b3d6e", note: "#d6c07f", noteInk: "#232016", chart: ["#8ea8ea", "#d49a6a", "#8fb3a0", "#b49ad0"] },
+  },
+  {
+    id: "pandan", name: "Pandan & Kaya", tag: "Malaysian",
+    blurb: "Pandan green, kaya-yellow highlighter. Breakfast at a kopitiam.",
+    light: { bg: "#f0f1e8", surface: "#f7f8f1", ink: "#1d241e", body: "#4b554c", muted: "#646e5d", rule: "#1d241e24", accent: "#2f6b3c", accentSoft: "#ecd27a", note: "#f2dd8a", noteInk: "#2f2a14", chart: ["#2f6b3c", "#c49a2c", "#5b7f8f", "#9a5d4a"] },
+    dark:  { bg: "#0f140f", surface: "#161d16", ink: "#e6eadf", body: "#b5bdaf", muted: "#87927f", rule: "#e6eadf1c", accent: "#86c48f", accentSoft: "#5c4f1c", note: "#d8c474", noteInk: "#262110", chart: ["#86c48f", "#e2c165", "#8fb6c6", "#d39a86"] },
+  },
+  {
+    id: "portra", name: "Portra 400", tag: "Film",
+    blurb: "Warm highlights, teal shadows. Colours of a film negative scan.",
+    light: { bg: "#f5efe5", surface: "#faf6ee", ink: "#262321", body: "#57514b", muted: "#736961", rule: "#26232124", accent: "#ad4c28", accentSoft: "#f2b993", note: "#f4d79a", noteInk: "#3a2c1c", chart: ["#3e6a6f", "#ad4c28", "#c9a24a", "#7b6a8f"] },
+    dark:  { bg: "#111616", surface: "#182020", ink: "#f1e9dd", body: "#c3bab0", muted: "#8b9693", rule: "#f1e9dd1c", accent: "#ee8f63", accentSoft: "#6b3a24", note: "#dcc184", noteInk: "#2b2218", chart: ["#7fb2b6", "#ee8f63", "#e0c172", "#b2a2c8"] },
+  },
+  {
+    id: "darkroom", name: "Darkroom", tag: "Neutral",
+    blurb: "Neutral grey paper and safelight red. Lets the photos lead.",
+    light: { bg: "#efeeeb", surface: "#f7f6f3", ink: "#161616", body: "#4a4a48", muted: "#6b6a66", rule: "#16161624", accent: "#c0312b", accentSoft: "#f1b3a8", note: "#f0dc8c", noteInk: "#2a2614", chart: ["#2b2b2b", "#c0312b", "#8a8a85", "#6d7f8c"] },
+    dark:  { bg: "#0d0c0c", surface: "#151313", ink: "#ecebe8", body: "#b4b2ad", muted: "#86847f", rule: "#ecebe81a", accent: "#f0614f", accentSoft: "#5c1d18", note: "#cfbb72", noteInk: "#24200f", chart: ["#d8d6d0", "#f0614f", "#8d8b86", "#8fa3b0"] },
+  },
+  {
+    id: "malam", name: "Malam KL", tag: "Night",
+    blurb: "Sodium streetlight amber on a city at night. Best in dark mode.",
+    light: { bg: "#f2f0ec", surface: "#f8f7f4", ink: "#1a1c22", body: "#4b4e57", muted: "#686b75", rule: "#1a1c2224", accent: "#965708", accentSoft: "#f5cf8a", note: "#f3d68a", noteInk: "#2e2612", chart: ["#1f4e79", "#965708", "#5c8a87", "#8a5a7a"] },
+    dark:  { bg: "#0e1014", surface: "#151821", ink: "#ecebe6", body: "#b6b8bf", muted: "#858893", rule: "#ecebe61a", accent: "#f2a83b", accentSoft: "#5e3f10", note: "#d9be73", noteInk: "#272010", chart: ["#7aa7d6", "#f2a83b", "#8cc3bf", "#c99ac0"] },
+  },
+  {
+    id: "chalk", name: "Chalk & Iron", tag: "Cool",
+    blurb: "Gym chalk white, competition-plate blue. Charts use plate colours.",
+    light: { bg: "#f4f4f2", surface: "#fbfbfa", ink: "#141518", body: "#46484d", muted: "#6c6f75", rule: "#14151822", accent: "#1f4fd1", accentSoft: "#c8d6fb", note: "#f3e08c", noteInk: "#2a2610", chart: ["#1f4fd1", "#d23b2f", "#d9a91a", "#2f8f5b"] },
+    dark:  { bg: "#0f1012", surface: "#17181b", ink: "#eeeeec", body: "#b3b5b9", muted: "#84878e", rule: "#eeeeec1a", accent: "#7c9cff", accentSoft: "#1e2f66", note: "#d6c66e", noteInk: "#22200c", chart: ["#7c9cff", "#f2665a", "#f0cd5a", "#5fc08a"] },
+  },
+];
+
+/* ═════════════════════════ type */
+// spec = Google Fonts css2 family spec. Display fonts carry defaults: weight, tracking, size scale, case, stretch.
+const FONTS = {
+  "Instrument Serif":   { spec: "Instrument+Serif:ital@0;1", fb: "Georgia, serif", d: { w: 400, t: "-.02em", s: 1 } },
+  "Newsreader":         { spec: "Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800", fb: "Georgia, serif", d: { w: 400, t: "-.025em", s: .86 } },
+  "Fraunces":           { spec: "Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900", fb: "Georgia, serif", d: { w: 420, t: "-.03em", s: .8 } },
+  "Gloock":             { spec: "Gloock", fb: "Georgia, serif", d: { w: 400, t: "-.015em", s: .78 } },
+  "Young Serif":        { spec: "Young+Serif", fb: "Georgia, serif", d: { w: 400, t: "-.02em", s: .76 } },
+  "Libre Caslon Display": { spec: "Libre+Caslon+Display", fb: "Georgia, serif", d: { w: 400, t: "-.01em", s: .95 } },
+  "Source Serif 4":     { spec: "Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900", fb: "Georgia, serif", d: { w: 500, t: "-.025em", s: .82 } },
+  "Inter Tight":        { spec: "Inter+Tight:ital,wght@0,100..900;1,100..900", fb: "system-ui, sans-serif", d: { w: 600, t: "-.04em", s: .8 } },
+  "Geist":              { spec: "Geist:wght@100..900", fb: "system-ui, sans-serif", d: { w: 600, t: "-.045em", s: .8 } },
+  "Space Grotesk":      { spec: "Space+Grotesk:wght@300..700", fb: "system-ui, sans-serif", d: { w: 500, t: "-.04em", s: .76 } },
+  "Bricolage Grotesque": { spec: "Bricolage+Grotesque:opsz,wght@12..96,200..800", fb: "system-ui, sans-serif", d: { w: 650, t: "-.04em", s: .8 } },
+  "Instrument Sans":    { spec: "Instrument+Sans:wght@400..700", fb: "system-ui, sans-serif", d: { w: 600, t: "-.035em", s: .82 } },
+  "Schibsted Grotesk":  { spec: "Schibsted+Grotesk:ital,wght@0,400..900;1,400..900", fb: "system-ui, sans-serif", d: { w: 700, t: "-.035em", s: .78 } },
+  "Archivo":            { spec: "Archivo:wdth,wght@62..125,100..900", fb: "system-ui, sans-serif", d: { w: 800, t: "-.01em", s: .68, c: "uppercase", st: "125%" } },
+  "Anton":              { spec: "Anton", fb: "Impact, sans-serif", d: { w: 400, t: "0em", s: .9, c: "uppercase" } },
+  "Barlow Condensed":   { spec: "Barlow+Condensed:wght@500;600;700", fb: "sans-serif", d: { w: 600, t: "-.01em", s: 1, c: "uppercase" } },
+  "Manrope":            { spec: "Manrope:wght@200..800", fb: "system-ui, sans-serif" },
+  "Inter":              { spec: "Inter:wght@100..900", fb: "system-ui, sans-serif" },
+  "IBM Plex Sans":      { spec: "IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400", fb: "system-ui, sans-serif" },
+  "Hanken Grotesk":     { spec: "Hanken+Grotesk:wght@100..900", fb: "system-ui, sans-serif" },
+  "IBM Plex Mono":      { spec: "IBM+Plex+Mono:wght@400;500", fb: "ui-monospace, monospace" },
+  "Geist Mono":         { spec: "Geist+Mono:wght@100..900", fb: "ui-monospace, monospace" },
+  "JetBrains Mono":     { spec: "JetBrains+Mono:wght@100..800", fb: "ui-monospace, monospace" },
+  "DM Mono":            { spec: "DM+Mono:wght@300;400;500", fb: "ui-monospace, monospace" },
+  "Martian Mono":       { spec: "Martian+Mono:wght@100..800", fb: "ui-monospace, monospace" },
+  "Fragment Mono":      { spec: "Fragment+Mono:ital@0;1", fb: "ui-monospace, monospace" },
+  "Space Mono":         { spec: "Space+Mono:wght@400;700", fb: "ui-monospace, monospace" },
+  "Caveat":             { spec: "Caveat:wght@400..700", fb: "cursive", h: 1 },
+  "Kalam":              { spec: "Kalam:wght@300;400;700", fb: "cursive", h: .8 },
+  "Gochi Hand":         { spec: "Gochi+Hand", fb: "cursive", h: .85 },
+  "Reenie Beanie":      { spec: "Reenie+Beanie", fb: "cursive", h: 1.2 },
+  "Shadows Into Light": { spec: "Shadows+Into+Light", fb: "cursive", h: .86 },
+  "Nanum Pen Script":   { spec: "Nanum+Pen+Script", fb: "cursive", h: 1.22 },
+  "Permanent Marker":   { spec: "Permanent+Marker", fb: "cursive", h: .74 },
+};
+const ROLE_OPTIONS = {
+  display: ["Instrument Serif", "Newsreader", "Fraunces", "Gloock", "Young Serif", "Libre Caslon Display", "Source Serif 4", "Inter Tight", "Geist", "Space Grotesk", "Bricolage Grotesque", "Instrument Sans", "Schibsted Grotesk", "Archivo", "Anton", "Barlow Condensed"],
+  body: ["Manrope", "Inter", "Geist", "IBM Plex Sans", "Instrument Sans", "Hanken Grotesk", "Space Grotesk", "Archivo", "Source Serif 4", "Newsreader"],
+  mono: ["IBM Plex Mono", "Geist Mono", "JetBrains Mono", "DM Mono", "Martian Mono", "Fragment Mono", "Space Mono"],
+  hand: ["Caveat", "Kalam", "Gochi Hand", "Reenie Beanie", "Shadows Into Light", "Nanum Pen Script", "Permanent Marker"],
+};
+const PAIRINGS = [
+  { id: "editorial", name: "Editorial", note: "Mohtasham's set (reference)", display: "Instrument Serif", body: "Manrope", mono: "IBM Plex Mono", hand: "Caveat" },
+  { id: "swiss", name: "Swiss Chalk", note: "Clean and cool, matches the palette", display: "Inter Tight", body: "Inter", mono: "Geist Mono", hand: "Caveat" },
+  { id: "datasheet", name: "Datasheet", note: "Spec-sheet tech nerd", display: "Space Grotesk", body: "IBM Plex Sans", mono: "JetBrains Mono", hand: "Gochi Hand" },
+  { id: "darkroom", name: "Darkroom Notes", note: "Photo book, literary", display: "Newsreader", body: "Instrument Sans", mono: "Geist Mono", hand: "Kalam" },
+  { id: "geist", name: "Geist Lab", note: "One family, very modern dev", display: "Geist", body: "Geist", mono: "Geist Mono", hand: "Reenie Beanie" },
+  { id: "bricolage", name: "Bricolage", note: "Quirky, a bit playful", display: "Bricolage Grotesque", body: "Hanken Grotesk", mono: "DM Mono", hand: "Shadows Into Light" },
+  { id: "plate", name: "Plate Stamp", note: "Gym poster, hardware label", display: "Archivo", body: "Archivo", mono: "Martian Mono", hand: "Permanent Marker" },
+  { id: "soft", name: "Soft Serif", note: "Warm, friendly serif", display: "Fraunces", body: "Geist", mono: "Fragment Mono", hand: "Caveat" },
+  { id: "catalogue", name: "Catalogue", note: "Magazine, all-serif reading", display: "Gloock", body: "Source Serif 4", mono: "DM Mono", hand: "Nanum Pen Script" },
+];
+const stack = (name) => `"${name}", ${FONTS[name].fb}`;
+// every family in one stylesheet; browsers only download the faces a page actually renders
+document.getElementById("font-css").href = "https://fonts.googleapis.com/css2?" + Object.values(FONTS).map((f) => "family=" + f.spec).join("&") + "&display=swap";
+
+/* ═════════════════════════ state */
+const root = document.documentElement;
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const STORE = "palette-lab-v2";
+const saved = JSON.parse(localStorage.getItem(STORE) || "{}");
+const state = {
+  palette: saved.palette || "harith",
+  mode: saved.mode || "light",
+  motion: saved.motion || (reducedMotion ? "off" : "on"),
+  custom: saved.custom || {},          // { "kopi:light": "#hex" }
+  favs: saved.favs || [],
+  collapsed: !!saved.collapsed,
+  type: saved.type || { preset: "editorial", ...pick(PAIRINGS[0]), scale: null },
+  cutout: saved.cutout || "clean",
+};
+function pick(p) { return { display: p.display, body: p.body, mono: p.mono, hand: p.hand }; }
+const hash = location.hash.slice(1).split("/");
+if (PALETTES.some((p) => p.id === hash[0])) state.palette = hash[0];
+if (hash[1] === "light" || hash[1] === "dark") state.mode = hash[1];
+// ?edge=paper and ?panel=0 make shareable screenshots without touching saved state
+const qs = new URLSearchParams(location.search);
+if (qs.get("edge") === "paper" || qs.get("edge") === "clean") state.cutout = qs.get("edge");
+if (qs.get("panel") === "0") state.collapsed = true;
+const hashPair = PAIRINGS.find((p) => p.id === hash[2]);
+if (hashPair && state.type.preset !== hashPair.id) state.type = { preset: hashPair.id, ...pick(hashPair), scale: null };
+
+const save = () => localStorage.setItem(STORE, JSON.stringify(state));
+const current = () => PALETTES.find((p) => p.id === state.palette);
+
+/* ═════════════════════════ colour helpers */
+const hexToRgb = (h) => {
+  h = h.replace("#", "");
+  if (h.length === 3) h = [...h].map((c) => c + c).join("");
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+};
+const rgbToHex = (rgb) => "#" + rgb.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
+const mix = (a, b, t) => { const A = hexToRgb(a), B = hexToRgb(b); return rgbToHex(A.map((v, i) => v + (B[i] - v) * t)); };
+const lum = (hex) => {
+  const [r, g, b] = hexToRgb(hex).map((v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; });
+  return .2126 * r + .7152 * g + .0722 * b;
+};
+const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + .05) / (y + .05); };
+const grade = (c, large) => c >= 7 ? ["aaa", "AAA"] : c >= 4.5 ? ["aa", "AA"] : c >= 3 ? ["lg", large ? "AA" : "AA large"] : ["fail", "Fail"];
+
+function tokensFor(p, mode) {
+  const t = { ...p[mode], chart: [...p[mode].chart] };
+  const custom = state.custom[`${p.id}:${mode}`];
+  if (custom) {
+    t.accent = custom;
+    t.accentSoft = mix(custom, t.bg, mode === "light" ? .55 : .6);
+    delete t.accentText;
+  }
+  // small text in the accent colour must reach 4.5:1; nudge towards ink until it does
+  t.accentText = t.accentText || readable(t.accent, t.bg, t.ink);
+  t.onAccent = contrast(t.ink, t.accent) >= contrast(t.bg, t.accent) ? t.ink : t.bg;
+  return t;
+}
+function readable(color, bg, towards) {
+  let c = color;
+  for (let i = 1; i <= 20 && contrast(c, bg) < 4.5; i++) c = mix(color, towards, i * .04);
+  return c;
+}
+
+/* ═════════════════════════ apply */
+function apply() {
+  const p = current();
+  const t = tokensFor(p, state.mode);
+  root.dataset.mode = state.mode;
+  root.dataset.motion = state.motion;
+  const vars = {
+    "--bg": t.bg, "--surface": t.surface, "--ink": t.ink, "--body": t.body, "--muted": t.muted,
+    "--rule": t.rule, "--accent": t.accent, "--accent-text": t.accentText, "--on-accent": t.onAccent,
+    "--accent-soft": t.accentSoft, "--note": t.note, "--note-ink": t.noteInk,
+    "--chart-1": t.chart[0], "--chart-2": t.chart[1], "--chart-3": t.chart[2], "--chart-4": t.chart[3],
+  };
+  for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
+  applyType();
+  root.dataset.cutout = state.cutout;
+  history.replaceState(null, "", `#${p.id}/${state.mode}/${state.type.preset}`);
+  document.querySelectorAll("svg").forEach((s) => (state.motion === "off" ? s.pauseAnimations?.() : s.unpauseAnimations?.()));
+  renderPanel(p, t);
+  renderBars();
+  save();
+}
+
+function typeVars() {
+  const t = state.type, d = FONTS[t.display].d;
+  return {
+    "--serif": stack(t.display), "--sans": stack(t.body), "--mono": stack(t.mono), "--hand": stack(t.hand),
+    "--dw": String(d.w), "--dt": d.t, "--ds": String(t.scale ?? d.s), "--dcase": d.c || "none", "--dstretch": d.st || "100%",
+    "--hs": String(FONTS[t.hand].h),
+  };
+}
+function applyType() {
+  for (const [k, v] of Object.entries(typeVars())) root.style.setProperty(k, v);
+}
+
+/* ═════════════════════════ panel */
+const $ = (s, el = document) => el.querySelector(s);
+function renderType() {
+  const t = state.type;
+  $("#tlist").innerHTML = PAIRINGS.map((q) => {
+    const d = FONTS[q.display].d;
+    const style = `font-family:${stack(q.display).replace(/"/g, "'")};font-weight:${d.w};letter-spacing:${d.t};font-stretch:${d.st || "100%"};text-transform:${d.c || "none"}`;
+    return `<button class="titem" type="button" data-type="${q.id}" aria-pressed="${t.preset === q.id}">
+      <span class="aa" style="${style}">Harith</span>
+      <span class="tname">${q.name}</span>
+      <span class="tfonts">${q.display} · ${q.body}<br />${q.mono} · ${q.hand}</span>
+      <span class="tfonts">${q.note}</span>
+    </button>`;
+  }).join("");
+  for (const role of ["display", "body", "mono", "hand"]) {
+    const sel = $(`#sel-${role}`);
+    if (!sel.options.length) sel.innerHTML = ROLE_OPTIONS[role].map((f) => `<option>${f}</option>`).join("");
+    sel.value = t[role];
+  }
+  const scale = t.scale ?? FONTS[t.display].d.s;
+  $("#sel-scale").value = scale;
+  $("#scale-code").textContent = `${scale.toFixed(2)}×${t.scale == null ? " auto" : ""}`;
+  document.querySelectorAll(".seg [data-cutout]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.cutout === state.cutout));
+}
+function renderPanel(p, t) {
+  $("#lab-current").textContent = `· ${p.name} · ${state.mode}`;
+  $("#mode-label").textContent = state.mode;
+  document.querySelectorAll(".seg [data-mode]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.mode === state.mode));
+  document.querySelectorAll(".seg [data-motion]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.motion === state.motion));
+  $("#lab").classList.toggle("is-collapsed", state.collapsed);
+  renderType();
+
+  $("#plist").innerHTML = PALETTES.map((q) => {
+    const sw = (m) => { const x = tokensFor(q, m); return [x.bg, x.ink, x.accent, x.accentSoft, x.note, x.chart[0], x.chart[1]].map((c) => `<i style="background:${c}"></i>`).join(""); };
+    const fav = state.favs.includes(q.id);
+    return `<div class="pitem" role="button" tabindex="0" data-pick="${q.id}" aria-pressed="${q.id === p.id}">
+      <span class="pname">${q.name}</span><span class="ptag">${q.tag}</span>
+      <span class="pblurb">${q.blurb}</span>
+      <div class="sw"><span>light</span>${sw("light")}</div>
+      <div class="sw"><span>dark</span>${sw("dark")}</div>
+      <button class="fav" type="button" data-fav="${q.id}" aria-pressed="${fav}" aria-label="Shortlist ${q.name}">${fav ? "♥" : "♡"}</button>
+    </div>`;
+  }).join("");
+  const shortlisted = PALETTES.filter((q) => state.favs.includes(q.id)).map((q) => q.name);
+  $("#shortlist").textContent = shortlisted.length ? `Shortlist: ${shortlisted.join(", ")}` : "";
+
+  $("#accent-input").value = t.accent;
+  $("#accent-code").textContent = state.custom[`${p.id}:${state.mode}`] ? `custom ${t.accent}` : `palette ${t.accent}`;
+
+  const rows = [
+    ["Ink on paper", t.ink, t.bg, t.ink, false],
+    ["Body on paper", t.body, t.bg, t.body, false],
+    ["Labels on paper", t.muted, t.bg, t.muted, false],
+    ["Accent (lines, big text)", t.accent, t.bg, t.accent, true],
+    ["Accent text on paper", t.accentText, t.bg, t.accentText, false],
+    ["Label on accent button", t.onAccent, t.accent, t.accent, false],
+    ["Ink on highlighter", t.ink, t.accentSoft, t.accentSoft, true],
+    ["Ink on surface", t.ink, t.surface, t.surface, false],
+    ["Note ink on note", t.noteInk, t.note, t.note, true],
+  ];
+  $("#tokens").innerHTML = rows.map(([label, fg, bg, chip, large]) => {
+    const c = contrast(fg, bg); const [cls, txt] = grade(c, large);
+    return `<span class="tk"><i style="background:${chip}"></i>${label}</span><code>${c.toFixed(1)}:1</code><span class="badge ${cls}">${txt}</span>`;
+  }).join("");
+}
+
+function cssFor(p) {
+  const block = (m) => {
+    const t = tokensFor(p, m);
+    return [
+      `  --bg: ${t.bg};`, `  --surface: ${t.surface};`, `  --ink: ${t.ink};`, `  --body: ${t.body};`, `  --muted: ${t.muted};`,
+      `  --rule: ${t.rule};`, `  --accent: ${t.accent};`, `  --accent-text: ${t.accentText};`, `  --on-accent: ${t.onAccent};`,
+      `  --accent-soft: ${t.accentSoft};`, `  --note: ${t.note};`, `  --note-ink: ${t.noteInk};`,
+      ...t.chart.map((c, i) => `  --chart-${i + 1}: ${c};`),
+    ].join("\n");
+  };
+  const tv = typeVars(), t = state.type;
+  const type = [
+    `  --font-display: ${tv["--serif"]};`, `  --font-body: ${tv["--sans"]};`, `  --font-mono: ${tv["--mono"]};`, `  --font-hand: ${tv["--hand"]};`,
+    `  --display-weight: ${tv["--dw"]};`, `  --display-tracking: ${tv["--dt"]};`, `  --display-scale: ${tv["--ds"]};`,
+    `  --display-case: ${tv["--dcase"]};`, `  --display-stretch: ${tv["--dstretch"]};`, `  --hand-scale: ${tv["--hs"]};`,
+  ].join("\n");
+  const pair = PAIRINGS.find((q) => q.id === t.preset);
+  return `/* Palette: ${p.name} */\n:root {\n${block("light")}\n}\n:root[data-theme="dark"] {\n${block("dark")}\n}\n\n` +
+    `/* Type: ${pair ? pair.name : "custom"} (${t.display} / ${t.body} / ${t.mono} / ${t.hand}) */\n:root {\n${type}\n}\n`;
+}
+
+/* ═════════════════════════ events */
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest("[data-pick], button[data-fav], button[data-mode], button[data-motion], button[data-type], button[data-cutout], [data-action]");
+  if (!el) return;
+  if (el.dataset.type) { const q = PAIRINGS.find((x) => x.id === el.dataset.type); state.type = { preset: q.id, ...pick(q), scale: null }; return apply(); }
+  if (el.dataset.cutout) { state.cutout = el.dataset.cutout; return apply(); }
+  if (el.dataset.fav) {
+    e.stopPropagation();
+    const id = el.dataset.fav;
+    state.favs = state.favs.includes(id) ? state.favs.filter((x) => x !== id) : [...state.favs, id];
+    return apply();
+  }
+  if (el.dataset.pick) { state.palette = el.dataset.pick; return apply(); }
+  if (el.dataset.mode) { state.mode = el.dataset.mode; return apply(); }
+  if (el.dataset.motion) { state.motion = el.dataset.motion; apply(); if (state.motion === "on") enter(); return; }
+  switch (el.dataset.action) {
+    case "toggle-mode": state.mode = state.mode === "light" ? "dark" : "light"; return apply();
+    case "collapse": state.collapsed = !state.collapsed; return apply();
+    case "reset-accent": delete state.custom[`${state.palette}:${state.mode}`]; return apply();
+    case "replay": return enter(true);
+    case "copy": {
+      const css = cssFor(current());
+      try { await navigator.clipboard.writeText(css); el.textContent = "Copied ✓"; }
+      catch { prompt("Copy the tokens:", css); }
+      setTimeout(() => (el.textContent = "Copy CSS tokens"), 1400);
+    }
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "Enter" && e.target.dataset?.pick) { state.palette = e.target.dataset.pick; return apply(); }
+  const i = PALETTES.findIndex((p) => p.id === state.palette);
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    if (e.target.closest(".obj")) return;
+    e.preventDefault();
+    state.palette = PALETTES[(i + (e.key === "ArrowRight" ? 1 : PALETTES.length - 1)) % PALETTES.length].id;
+    apply();
+  } else if (e.key.toLowerCase() === "d") { state.mode = state.mode === "light" ? "dark" : "light"; apply(); }
+  else if (e.key.toLowerCase() === "p") { state.collapsed = !state.collapsed; apply(); }
+  else if (e.key.toLowerCase() === "t") {
+    const j = PAIRINGS.findIndex((q) => q.id === state.type.preset);
+    const q = PAIRINGS[(j + (e.shiftKey ? PAIRINGS.length - 1 : 1)) % PAIRINGS.length];
+    state.type = { preset: q.id, ...pick(q), scale: null };
+    apply();
+  }
+  else if (e.key.toLowerCase() === "e") { state.cutout = state.cutout === "paper" ? "clean" : "paper"; apply(); }
+  else if (e.key.toLowerCase() === "f") { const id = state.palette; state.favs = state.favs.includes(id) ? state.favs.filter((x) => x !== id) : [...state.favs, id]; apply(); }
+});
+$("#accent-input").addEventListener("input", (e) => { state.custom[`${state.palette}:${state.mode}`] = e.target.value; apply(); });
+for (const role of ["display", "body", "mono", "hand"]) {
+  $(`#sel-${role}`).addEventListener("change", (e) => {
+    state.type = { ...state.type, [role]: e.target.value, preset: "custom", scale: role === "display" ? null : state.type.scale };
+    apply();
+  });
+}
+$("#sel-scale").addEventListener("input", (e) => { state.type = { ...state.type, scale: Number(e.target.value) }; apply(); });
+
+/* ═════════════════════════ desk objects (drawn stand-ins for photo cut-outs) */
+let uid = 0;
+const OBJECTS = {
+  camera: (u) => `<svg viewBox="0 0 300 210">
+    <defs>
+      <linearGradient id="sB${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3c3f"/><stop offset=".5" stop-color="#232426"/><stop offset="1" stop-color="#151617"/></linearGradient>
+      <pattern id="sR${u}" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="3" fill="#1b1c1d"/><circle cx="1.5" cy="1.5" r=".6" fill="#28292a"/></pattern>
+      <radialGradient id="sG${u}" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#7d6aa8"/><stop offset=".35" stop-color="#26344a"/><stop offset="1" stop-color="#04060a"/></radialGradient>
+    </defs>
+    <path d="M112 66 L124 26 Q127 18 136 18 L172 18 Q181 18 184 26 L196 66 Z" fill="url(#sB${u})"/>
+    <rect x="138" y="12" width="32" height="7" rx="2" fill="#2a2b2d"/>
+    <rect x="222" y="40" width="40" height="20" rx="4" fill="#2b2c2e"/>
+    <g stroke="#18191a" stroke-width="1.2">${Array.from({ length: 9 }, (_, i) => `<line x1="${226 + i * 4}" y1="43" x2="${226 + i * 4}" y2="58"/>`).join("")}</g>
+    <ellipse cx="242" cy="40" rx="20" ry="5" fill="#4a4c4f"/>
+    <rect x="30" y="44" width="34" height="16" rx="3" fill="#2b2c2e"/>
+    <ellipse cx="47" cy="44" rx="17" ry="4.5" fill="#4a4c4f"/>
+    <ellipse cx="47" cy="41" rx="8" ry="3" fill="#9a9c9f"/>
+    <path d="M20 74 Q20 60 34 60 L274 60 Q288 60 288 74 L288 186 Q288 198 276 198 L32 198 Q20 198 20 186 Z" fill="url(#sB${u})"/>
+    <path d="M16 70 Q16 56 32 56 L74 56 Q84 56 86 66 L90 190 Q90 202 78 202 L30 202 Q16 202 16 188 Z" fill="url(#sR${u})"/>
+    <rect x="82" y="66" width="3" height="128" rx="1.5" fill="#000" opacity=".25"/>
+    <circle cx="168" cy="132" r="64" fill="#0d0e0f"/>
+    <circle cx="168" cy="132" r="58" fill="none" stroke="#9a9c9f" stroke-width="3"/>
+    <circle cx="168" cy="132" r="53" fill="#1b1c1e"/>
+    <circle cx="168" cy="132" r="45" fill="#121314" stroke="#2a2b2d" stroke-width="7" stroke-dasharray="2 2.6"/>
+    <circle cx="168" cy="132" r="33" fill="url(#sG${u})"/>
+    <circle cx="168" cy="132" r="12" fill="#05070a"/>
+    <ellipse cx="156" cy="117" rx="12" ry="6" fill="#fff" opacity=".3" transform="rotate(-32 156 117)"/>
+    <circle cx="183" cy="146" r="3.5" fill="#c9a6ff" opacity=".25"/>
+    <circle cx="246" cy="164" r="8" fill="#1d1e20" stroke="#3a3b3e"/>
+    <circle cx="104" cy="80" r="4" fill="#e07a3a" opacity=".85"/>
+    <text x="168" y="86" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="5.5" fill="#8b8d90" letter-spacing="1.5">FE 35mm 1:1.8</text>
+  </svg>`,
+
+  diary: (u) => `<svg viewBox="0 0 220 292">
+    <defs><linearGradient id="dC${u}" x1="0" x2="1"><stop offset="0" stop-color="#1c2620"/><stop offset=".09" stop-color="#36463c"/><stop offset="1" stop-color="#2a372f"/></linearGradient></defs>
+    <rect x="16" y="9" width="196" height="273" rx="10" fill="#eee5d0"/>
+    <g stroke="#d6cbb2" stroke-width=".8">${Array.from({ length: 5 }, (_, i) => `<line x1="${206 - i}" y1="16" x2="${206 - i}" y2="276"/>`).join("")}</g>
+    <rect x="8" y="4" width="196" height="276" rx="10" fill="url(#dC${u})"/>
+    <rect x="8" y="4" width="15" height="276" rx="6" fill="#141b17" opacity=".55"/>
+    <rect x="168" y="4" width="9" height="276" fill="#121212"/>
+    <path d="M118 276 L118 292 L125 285 L132 292 L132 276 Z" fill="#b5402f"/>
+    <text x="94" y="140" text-anchor="middle" font-family="Caveat, cursive" font-weight="600" font-size="34" fill="#dcd2b9" transform="rotate(-4 94 140)">diary</text>
+    <text x="94" y="164" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#9fab9f" letter-spacing="2">2026 · VOL. 3</text>
+    <rect x="23" y="4" width="145" height="276" fill="#fff" opacity=".035"/>
+  </svg>`,
+
+  tag: (u) => `<svg viewBox="0 0 260 180">
+    <defs><linearGradient id="tF${u}" x1="1" y1="0" x2=".7" y2=".3"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient></defs>
+    <rect x="4" y="4" width="252" height="172" rx="14" style="fill:var(--tag)"/>
+    <rect x="14" y="62" width="232" height="92" rx="4" fill="#fbf8f1"/>
+    <text x="130" y="40" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="31" fill="#fff" letter-spacing="1">HELLO</text>
+    <text x="130" y="56" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="11.5" fill="#fff" opacity=".92">my name is</text>
+    <text x="130" y="124" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="56" style="fill:var(--tag)">Harith</text>
+    <path d="M70 138 C110 131 160 142 196 133" fill="none" style="stroke:var(--tag)" stroke-width="3" stroke-linecap="round"/>
+    <rect x="4" y="4" width="252" height="172" rx="14" fill="url(#tF${u})"/>
+  </svg>`,
+
+  gpu: (u) => {
+    const fan = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#101113" stroke="#2c2f34" stroke-width="3"/>` +
+      Array.from({ length: 9 }, (_, i) => `<path d="M0 -13 C 10 -20, 20 -30, 22 -42 L 12 -45 C 10 -32, 4 -22, -4 -14 Z" fill="#2a2d32" transform="translate(${cx} ${cy}) rotate(${i * 40})"/>`).join("") +
+      `<circle cx="${cx}" cy="${cy}" r="13" fill="#32353b"/><circle cx="${cx}" cy="${cy}" r="5" fill="#5a5e66"/>`;
+    return `<svg viewBox="0 0 330 165">
+    <defs>
+      <linearGradient id="gS${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d4046"/><stop offset="1" stop-color="#1f2125"/></linearGradient>
+      <linearGradient id="gM${u}" x1="0" x2="1"><stop offset="0" stop-color="#8f9094"/><stop offset=".5" stop-color="#e2e3e5"/><stop offset="1" stop-color="#9c9da1"/></linearGradient>
+    </defs>
+    <rect x="44" y="128" width="276" height="11" rx="2" fill="#1f4a32"/>
+    <g fill="#d1a640">${Array.from({ length: 24 }, (_, i) => `<rect x="${112 + i * 7 + (i > 5 ? 7 : 0)}" y="138" width="4.5" height="14" rx="1"/>`).join("")}</g>
+    <rect x="44" y="8" width="276" height="124" rx="12" fill="url(#gS${u})"/>
+    <rect x="52" y="12" width="260" height="6" rx="3" fill="#fff" opacity=".07"/>
+    <path d="M58 122 H306" stroke="#7a7f88" stroke-width="2" stroke-linecap="round"/>
+    ${fan(128, 68, 50)}${fan(240, 68, 50)}
+    <rect x="6" y="2" width="40" height="160" rx="3" fill="url(#gM${u})"/>
+    <g fill="#55575b">${Array.from({ length: 6 }, (_, i) => `<rect x="15" y="${12 + i * 11}" width="22" height="5" rx="2.5"/>`).join("")}</g>
+    <g fill="#1a1b1d"><rect x="16" y="94" width="20" height="11" rx="2"/><rect x="16" y="112" width="20" height="11" rx="2"/><rect x="16" y="130" width="20" height="11" rx="2"/></g>
+  </svg>`;
+  },
+
+  mic: (u) => `<svg viewBox="0 0 150 330">
+    <defs>
+      <pattern id="mM${u}" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#c2c3bf"/><circle cx="2.5" cy="2.5" r="1.25" fill="#6f706c"/></pattern>
+      <linearGradient id="mS${u}" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".35" stop-color="#000" stop-opacity="0"/><stop offset=".7" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></linearGradient>
+      <linearGradient id="mB${u}" x1="0" x2="1"><stop offset="0" stop-color="#141415"/><stop offset=".45" stop-color="#3b3c3f"/><stop offset="1" stop-color="#111112"/></linearGradient>
+    </defs>
+    <rect x="28" y="8" width="94" height="156" rx="47" fill="url(#mM${u})"/>
+    <rect x="28" y="8" width="94" height="156" rx="47" fill="url(#mS${u})"/>
+    <rect x="26" y="80" width="98" height="6" rx="3" fill="#8e8f8b"/>
+    <rect x="24" y="158" width="102" height="16" rx="4" fill="#9a9b97"/>
+    <rect x="24" y="158" width="102" height="16" rx="4" fill="url(#mS${u})"/>
+    <path d="M32 172 L118 172 L108 300 Q75 312 42 300 Z" fill="url(#mB${u})"/>
+    <circle cx="75" cy="200" r="4.5" fill="#d4a637"/>
+    <rect x="56" y="300" width="38" height="24" rx="5" fill="#77787b"/>
+  </svg>`,
+
+  badge: (u) => `<svg viewBox="0 0 160 280">
+    <path d="M52 0 L74 104 M108 0 L86 104" stroke="#2b3550" stroke-width="13" stroke-linecap="round"/>
+    <path d="M52 0 L74 104 M108 0 L86 104" stroke="#fff" stroke-width="2" stroke-dasharray="1 9" opacity=".35"/>
+    <rect x="64" y="98" width="32" height="18" rx="4" fill="#b8b9bc"/>
+    <rect x="72" y="112" width="16" height="12" rx="2" fill="#8d8e91"/>
+    <rect x="16" y="122" width="128" height="152" rx="9" fill="#fbfaf7" stroke="#d9d6cf"/>
+    <rect x="66" y="130" width="28" height="6" rx="3" fill="#d9d6cf"/>
+    <rect x="16" y="146" width="128" height="30" fill="#d23b2f"/>
+    <text x="80" y="166" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="13" fill="#fff" letter-spacing="2">HACKATHON</text>
+    <text x="80" y="198" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#6c6f75" letter-spacing="2">PARTICIPANT</text>
+    <text x="80" y="232" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="32" fill="#1e2f8a">Harith</text>
+    <text x="80" y="258" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7" fill="#9a9a96" letter-spacing="1">TEAM · 404 NOT FOUND</text>
+  </svg>`,
+
+  cd: (u) => `<svg viewBox="0 0 220 220">
+    <defs>
+      <mask id="cM${u}"><rect width="220" height="220" fill="#fff"/><circle cx="110" cy="110" r="11" fill="#000"/></mask>
+      <radialGradient id="cB${u}" cx=".5" cy=".5" r=".5"><stop offset=".25" stop-color="#f1f3f5"/><stop offset=".9" stop-color="#d4d8de"/><stop offset="1" stop-color="#b9bec6"/></radialGradient>
+      <linearGradient id="cR${u}" x1="0" y1="0" x2="1" y2="1"><stop offset=".15" stop-color="#ff9ec7" stop-opacity="0"/><stop offset=".35" stop-color="#9fd8ff" stop-opacity=".55"/><stop offset=".5" stop-color="#c8ffb0" stop-opacity=".45"/><stop offset=".62" stop-color="#ffe08a" stop-opacity=".5"/><stop offset=".8" stop-color="#ff9ec7" stop-opacity="0"/></linearGradient>
+    </defs>
+    <g mask="url(#cM${u})">
+      <circle cx="110" cy="110" r="106" fill="url(#cB${u})"/>
+      <circle cx="110" cy="110" r="106" fill="url(#cR${u})"/>
+      <circle cx="110" cy="110" r="38" fill="#f7f8f9" opacity=".85"/>
+      <circle cx="110" cy="110" r="38" fill="none" stroke="#c3c8cf"/>
+      <circle cx="110" cy="110" r="25" fill="#e3e6ea" opacity=".7"/>
+    </g>
+    <circle cx="110" cy="110" r="106" fill="none" stroke="#aeb3ba" stroke-width="1.5"/>
+    <g font-family="Caveat, cursive" font-weight="700" fill="#1e2f8a">
+      <text x="110" y="58" text-anchor="middle" font-size="27" transform="rotate(-7 110 58)">linux (try #3)</text>
+      <text x="114" y="176" text-anchor="middle" font-size="19" transform="rotate(5 114 176)">don't scratch!!</text>
+    </g>
+    <path d="M60 66 C 92 61, 130 59, 160 55" fill="none" stroke="#1e2f8a" stroke-width="2.5" stroke-linecap="round" transform="rotate(-7 110 58)"/>
+  </svg>`,
+
+  laptop: (u) => `<svg viewBox="0 0 340 250">
+    <defs><linearGradient id="lB${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b4c50"/><stop offset="1" stop-color="#2a2b2e"/></linearGradient></defs>
+    <rect x="38" y="4" width="264" height="174" rx="10" fill="#2a2b2e"/>
+    <rect x="52" y="18" width="236" height="146" rx="3" fill="#07110a"/>
+    <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#8ee28e">
+      <text x="62" y="38">live-cd login: harith</text>
+      <text x="62" y="54">$ free -m</text>
+      <text x="62" y="70">Mem:    500    487     13</text>
+      <text x="62" y="86">$ sudo apt-get install firefox</text>
+      <text x="62" y="102">Reading package lists... Done</text>
+      <text x="62" y="118">0% [Connecting to archive...]</text>
+      <text x="62" y="134">$ youtube please work</text>
+    </g>
+    <rect x="62" y="142" width="6" height="11" fill="#8ee28e"/>
+    <path d="M52 18 L150 18 L80 164 L52 164 Z" fill="#fff" opacity=".04"/>
+    <path d="M10 180 L330 180 L340 236 Q340 246 330 246 L10 246 Q0 246 0 236 Z" fill="url(#lB${u})"/>
+    <rect x="30" y="176" width="280" height="6" rx="3" fill="#1d1e20"/>
+    <g fill="#1c1d1f">${Array.from({ length: 4 }, (_, r) => Array.from({ length: 14 }, (_, c) => `<rect x="${44 + c * 18.4 + r * 2}" y="${189 + r * 9}" width="15.6" height="6.8" rx="1.2"/>`).join("")).join("")}</g>
+    <rect x="140" y="226" width="60" height="16" rx="2" fill="#3c3d41" stroke="#26272a"/>
+    <rect x="262" y="226" width="34" height="13" rx="2" fill="#ebe5d4"/>
+    <text x="279" y="236" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="10" fill="#333">500MB</text>
+  </svg>`,
+
+  phone: (u) => `<svg viewBox="0 0 150 300">
+    <rect x="3" y="3" width="144" height="294" rx="24" fill="#1c1c1e" stroke="#3a3a3c" stroke-width="2"/>
+    <rect x="10" y="10" width="130" height="280" rx="18" fill="#f8f7f5"/>
+    <rect x="58" y="16" width="34" height="9" rx="4.5" fill="#1c1c1e"/>
+    <g transform="translate(18 31) scale(.3)">
+      <rect x="7" y="7" width="50" height="50" rx="14" transform="rotate(-12 32 32)" fill="#635BFF"/>
+      <path fill-rule="evenodd" d="M20.5 17H34.25C43.11 17 49.5 23.23 49.5 32C49.5 40.77 43.11 47 34.25 47H20.5V17ZM29 24V40H33.75C38.45 40 41.5 36.92 41.5 32C41.5 27.08 38.45 24 33.75 24H29Z" fill="#fff"/>
+    </g>
+    <text x="40" y="45" font-family="Manrope, sans-serif" font-weight="800" font-size="10.5" fill="#0A2540">DagangNow</text>
+    <rect x="22" y="56" width="106" height="44" rx="6" fill="#e9b949"/>
+    <text x="30" y="74" font-family="Manrope, sans-serif" font-weight="800" font-size="9" fill="#3a2a00">Kedai Kak Ros</text>
+    <text x="30" y="88" font-family="Manrope, sans-serif" font-weight="600" font-size="6.5" fill="#5a4400">Kuih, kek &amp; biskut raya</text>
+    <rect x="22" y="108" width="50" height="50" rx="5" fill="#d97b5c"/><rect x="78" y="108" width="50" height="50" rx="5" fill="#7aa37a"/>
+    <rect x="22" y="162" width="40" height="4" rx="2" fill="#d6d2ca"/><rect x="78" y="162" width="34" height="4" rx="2" fill="#d6d2ca"/>
+    <rect x="22" y="174" width="50" height="50" rx="5" fill="#6c8fb8"/><rect x="78" y="174" width="50" height="50" rx="5" fill="#c9a3c4"/>
+    <rect x="22" y="228" width="36" height="4" rx="2" fill="#d6d2ca"/><rect x="78" y="228" width="42" height="4" rx="2" fill="#d6d2ca"/>
+    <rect x="22" y="254" width="106" height="24" rx="12" fill="#635BFF"/>
+    <text x="75" y="269" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="8" fill="#fff">Checkout · RM 48.00</text>
+  </svg>`,
+
+  polaroid: (u) => `<svg viewBox="0 0 200 240">
+    <rect x="2" y="2" width="196" height="236" rx="3" fill="#f7f5f0"/>
+    <svg x="14" y="14" width="172" height="172">${SCENES.dusk(u, true)}</svg>
+    <text x="100" y="218" text-anchor="middle" font-family="Caveat, cursive" font-weight="600" font-size="23" fill="#3a3630">KL, after rain</text>
+  </svg>`,
+};
+
+/* gallery scenes: fixed colours, the way real photos would be */
+const SKYLINE = `<path d="M0 200 V158 H18 V146 H30 V158 H44 V132 H60 V152 H72 V140 H86 V158 H100 V128 H112 V200 Z M186 200 V150 H198 V122 H210 V150 H226 V136 H240 V154 H256 V142 H270 V160 H300 V200 Z"/>
+  <path d="M116 200 V78 L119 70 L121 52 L123 34 L125 52 L127 70 L130 78 V200 Z M150 200 V78 L153 70 L155 52 L157 34 L159 52 L161 70 L164 78 V200 Z"/>
+  <rect x="130" y="118" width="20" height="4"/>
+  <path d="M232 200 V112 H236 V96 H232 Q240 86 248 96 H244 V112 H248 V200 Z M239 86 V64 H241 V86 Z"/>`;
+const SCENES = {
+  dusk: (u, square) => `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><linearGradient id="sD${u}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f6b36a"/><stop offset=".45" stop-color="#d9787a"/><stop offset="1" stop-color="#4a3c70"/></linearGradient></defs>
+    <rect width="300" height="200" fill="url(#sD${u})"/><circle cx="210" cy="150" r="22" fill="#ffe0aa" opacity=".9"/>
+    <g fill="#2a2238">${SKYLINE}</g></svg>`,
+  hills: (u) => `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><linearGradient id="sH${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe9e2"/><stop offset="1" stop-color="#f3efe2"/></linearGradient></defs>
+    <rect width="300" height="200" fill="url(#sH${u})"/>
+    <path d="M0 110 Q60 70 120 98 T240 84 T300 96 V200 H0 Z" fill="#9dbaa3"/>
+    <path d="M0 132 Q70 100 140 126 T300 118 V200 H0 Z" fill="#6b9278"/>
+    <rect y="118" width="300" height="24" fill="#fff" opacity=".28"/>
+    <path d="M0 158 Q80 128 170 156 T300 150 V200 H0 Z" fill="#3c6550"/>
+    <path d="M0 182 Q90 160 190 184 T300 178 V200 H0 Z" fill="#244333"/></svg>`,
+  night: (u) => `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><linearGradient id="sN${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1628"/><stop offset="1" stop-color="#26324f"/></linearGradient>
+    <radialGradient id="sL${u}"><stop offset="0" stop-color="#ffc56b"/><stop offset="1" stop-color="#ffc56b" stop-opacity="0"/></radialGradient></defs>
+    <rect width="300" height="200" fill="url(#sN${u})"/>
+    <path d="M110 200 L146 110 L154 110 L190 200 Z" fill="#121418"/>
+    <g fill="url(#sL${u})"><circle cx="70" cy="70" r="34"/><circle cx="232" cy="58" r="40"/><circle cx="150" cy="96" r="18"/></g>
+    <g opacity=".55"><circle cx="40" cy="150" r="10" fill="#e55b4d"/><circle cx="262" cy="140" r="13" fill="#4db3c9"/><circle cx="200" cy="160" r="8" fill="#f2c14e"/><circle cx="96" cy="128" r="6" fill="#f2c14e"/></g>
+    <g fill="#0a0c10"><rect x="0" y="40" width="40" height="160"/><rect x="262" y="30" width="38" height="170"/></g></svg>`,
+  sea: (u) => `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><linearGradient id="sS${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6d6e1"/><stop offset="1" stop-color="#eaf4f1"/></linearGradient>
+    <linearGradient id="sW${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f93a1"/><stop offset="1" stop-color="#1d6676"/></linearGradient></defs>
+    <rect width="300" height="200" fill="url(#sS${u})"/><circle cx="72" cy="56" r="16" fill="#fff6dc"/>
+    <rect y="96" width="300" height="60" fill="url(#sW${u})"/>
+    <path d="M0 150 Q80 138 160 152 T300 146 V200 H0 Z" fill="#ead4a8"/>
+    <path d="M0 152 Q80 140 160 154 T300 148" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/></svg>`,
+  studio: (u) => `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><radialGradient id="sT${u}" cx=".55" cy=".42" r=".65"><stop offset="0" stop-color="#5d5f65"/><stop offset="1" stop-color="#18191c"/></radialGradient>
+    <radialGradient id="sK${u}"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <rect width="300" height="200" fill="url(#sT${u})"/>
+    <path d="M0 152 Q150 130 300 152 V200 H0 Z" fill="#2a2b2f"/>
+    <circle cx="62" cy="62" r="54" fill="url(#sK${u})"/>
+    <rect x="38" y="38" width="48" height="48" rx="3" fill="#f4f4f2" transform="rotate(-12 62 62)"/>
+    <path d="M62 86 V176 M62 176 L44 198 M62 176 L80 198" stroke="#0e0e10" stroke-width="2.5" fill="none"/>
+    <circle cx="182" cy="86" r="14" fill="#0c0c0d"/>
+    <path d="M156 200 Q158 120 182 106 Q206 120 208 200 Z" fill="#0c0c0d"/>
+    <path d="M170 82 Q181 66 194 80" fill="none" stroke="#f0f0f0" stroke-width="1.3" opacity=".55"/></svg>`,
+};
+
+function mountObjects() {
+  document.querySelectorAll("[data-obj]").forEach((el) => { el.innerHTML = OBJECTS[el.dataset.obj](++uid); });
+}
+
+/* drag */
+let topZ = 10;
+function makeDraggable(el) {
+  let start = null, offset = { x: 0, y: 0 };
+  el.addEventListener("pointerdown", (e) => {
+    start = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+    el.setPointerCapture(e.pointerId);
+    el.style.zIndex = ++topZ;
+    el.classList.add("is-dragging");
+  });
+  el.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    offset = { x: e.clientX - start.x, y: e.clientY - start.y };
+    el.style.translate = `${offset.x}px ${offset.y}px`;
+  });
+  const end = () => { start = null; el.classList.remove("is-dragging"); };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+
+/* entrance: objects fly in from off-screen with an expo-out curve */
+function enter(force) {
+  if (state.motion === "off" && !force) return;
+  document.querySelectorAll(".hero .obj").forEach((el) => {
+    const [x, y, d] = el.dataset.enter.split(",").map(Number);
+    el.animate(
+      [{ opacity: 0, transform: `translate(${x}vw, ${y}vh) scale(.78)` }, { opacity: 1, transform: "none" }],
+      { duration: 1300, delay: d * 1350, easing: "cubic-bezier(.2, 1.15, .32, 1)", fill: "backwards" },
+    );
+  });
+  document.querySelectorAll(".hero-copy, .hint").forEach((el, i) => {
+    el.animate([{ opacity: 0, transform: "translateY(22px)" }, { opacity: 1, transform: "none" }],
+      { duration: 680, delay: i ? 1050 : 380, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" });
+  });
+  playSprite(document.querySelector('.sprite[data-pose="wave"]'), 1400);
+}
+
+/* ═════════════════════════ pixel Harith (placeholder art: real sprite gets drawn from photos) */
+const SPRITE_COLORS = { H: "#2b1d15", S: "#c68b62", E: "#1b1b1b", M: "#9a5440", W: "var(--accent)", P: "#2f3340", B: "#1b1b1b" };
+const IDLE = [
+  "....HHHHHH....", "...HHHHHHHH...", "..HHHHHHHHHH..", "..HHSSSSSSHH..", "..HSSSSSSSSH..", "..HSESSSSESH..",
+  "...SSSSSSSS...", "...SSSMMSSS...", "....SSSSSS....", "...WWWWWWWW...", "..WWWWWWWWWW..", ".SWWWWWWWWWWS.",
+  ".SWWWWWWWWWWS.", "..WWWWWWWWWW..", "...PPPPPPPP...", "...PPP..PPP...", "...PPP..PPP...", "..BBBB..BBBB..",
+];
+const BLINK = IDLE.map((r, i) => (i === 5 ? "..HSSSSSSSSH.." : r));
+const WAVE = [
+  "....HHHHHH....", "...HHHHHHHH...", "..HHHHHHHHHH.S", "..HHSSSSSSHH.S", "..HSSSSSSSSH.S", "..HSESSSSESH.W",
+  "...SSSSSSSS..W", "...SSSMMSSS.WW", "....SSSSSS.WW.", "...WWWWWWWWW..", "..WWWWWWWWWW..", ".SWWWWWWWWWW..",
+  ".SWWWWWWWWWW..", "..WWWWWWWWWW..", "...PPPPPPPP...", "...PPP..PPP...", "...PPP..PPP...", "..BBBB..BBBB..",
+];
+const spriteSVG = (frames) => `<svg viewBox="0 0 14 18" shape-rendering="crispEdges" aria-hidden="true">${frames.map((rows, i) =>
+  `<g class="f f${i}">${rows.map((r, y) => [...r].map((c, x) => (c === "." ? "" : `<rect x="${x}" y="${y}" width="1.04" height="1.04" style="fill:${SPRITE_COLORS[c]}"/>`)).join("")).join("")}</g>`).join("")}</svg>`;
+
+function playSprite(el, delay = 0) {
+  if (!el || state.motion === "off") return;
+  setTimeout(() => { el.classList.remove("is-playing"); void el.offsetWidth; el.classList.add("is-playing"); }, delay);
+}
+function mountSprites() {
+  document.querySelectorAll(".sprite").forEach((el) => {
+    el.innerHTML = spriteSVG(el.dataset.pose === "wave" ? [IDLE, WAVE] : [IDLE, BLINK]);
+    const squish = () => { el.classList.remove("is-squished"); void el.offsetWidth; el.classList.add("is-squished"); };
+    el.addEventListener("click", () => { squish(); if (el.dataset.pose === "wave") playSprite(el); });
+    el.addEventListener("mouseenter", () => el.dataset.pose === "wave" && playSprite(el));
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); squish(); playSprite(el); } });
+  });
+}
+
+/* ═════════════════════════ journey marks */
+function mountJourney() {
+  const path = document.getElementById("journey-path");
+  const len = path.getTotalLength();
+  const marks = [
+    [.03, "15 · Linux on dad's laptop"], [.2, "Office PCs → gaming rigs"], [.36, "Uni · tech foundation"],
+    [.52, "Year 2 · the camera guy"], [.69, "Year 3 · hackathons"], [.85, "Asterisk Digital"],
+  ];
+  let svg = "";
+  marks.forEach(([t, label], i) => {
+    const { x, y } = path.getPointAtLength(len * t);
+    svg += `<path class="x" d="M${x - 4} ${y - 4} L${x + 4} ${y + 4} M${x + 4} ${y - 4} L${x - 4} ${y + 4}"/>`;
+    svg += `<text class="lbl" x="${x + 8}" y="${i % 2 ? y + 24 : y - 10}">${label}</text>`;
+  });
+  const end = path.getPointAtLength(len);
+  svg += `<path class="x" d="M${end.x} ${end.y} V${end.y - 34}" style="stroke:var(--ink);stroke-width:1.4"/><path class="flag" d="M${end.x} ${end.y - 34} l20 6 -20 7 Z"/>`;
+  svg += `<text class="lbl now-lbl" x="${end.x - 150}" y="${end.y + 28}">Now, building DagangNow</text>`;
+  document.getElementById("journey-marks").innerHTML = svg;
+}
+
+/* ═════════════════════════ report figure */
+const DATA = {
+  p50: [["Klang Valley", 1.2], ["Penang", 1.6], ["Johor", 1.9], ["Sabah", 2.4]],
+  p95: [["Klang Valley", 2.9], ["Penang", 3.8], ["Johor", 4.4], ["Sabah", 9.6]],
+};
+let stat = "p50";
+function renderBars() {
+  const rows = DATA[stat];
+  const max = Math.max(...DATA.p95.map((r) => r[1]));
+  const box = document.getElementById("bars");
+  if (!box.children.length) {
+    box.innerHTML = rows.map((_, i) => `<div class="bar-row"><div class="bar-top"><span></span><b></b></div><div class="track"><div class="fill" style="width:0;background:var(--chart-${i + 1})"></div></div></div>`).join("");
+  }
+  [...box.children].forEach((row, i) => {
+    row.querySelector("span").textContent = rows[i][0];
+    row.querySelector("b").textContent = rows[i][1].toFixed(1) + " s";
+    requestAnimationFrame(() => (row.querySelector(".fill").style.width = (rows[i][1] / max) * 100 + "%"));
+  });
+  document.getElementById("legend").innerHTML = rows.map((r, i) => `<span><i style="background:var(--chart-${i + 1})"></i>${r[0]}</span>`).join("");
+  document.getElementById("data-table").innerHTML = `<tr><th>Region</th><th>Orders</th><th>Median</th><th>p95</th></tr>` +
+    DATA.p50.map((r, i) => `<tr><td>${r[0]}</td><td>${[1180, 420, 330, 210][i]}</td><td>${r[1].toFixed(1)} s</td><td>${DATA.p95[i][1].toFixed(1)} s</td></tr>`).join("");
+}
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
+  stat = b.dataset.stat;
+  document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  renderBars();
+}));
+
+/* ═════════════════════════ gallery */
+function mountGallery() {
+  const photos = [
+    ["studio", "4/5", "First studio session", "SSC studio · UTM KL"],
+    ["dusk", "3/4", "After the rain", "Kuala Lumpur"],
+    ["hills", "3/2", "Outdoor session", "Stand-in photo"],
+    ["night", "4/5", "Night walk", "Kuala Lumpur"],
+    ["studio", "1/1", "Product test", "SSC studio"],
+    ["sea", "16/10", "Low tide", "Stand-in photo"],
+  ];
+  document.getElementById("gallery-grid").innerHTML = photos.map(([scene, ratio, title, meta]) =>
+    `<figure class="photo"><div class="frame" style="aspect-ratio:${ratio}">${SCENES[scene](++uid)}</div>
+     <figcaption><strong>${title}</strong><small>${meta}</small></figcaption></figure>`).join("");
+}
+
+/* ═════════════════════════ boot */
+mountObjects();
+document.querySelectorAll(".obj").forEach(makeDraggable);
+mountSprites();
+mountJourney();
+mountGallery();
+apply();
+enter();
+</script>
+</body>
+</html>

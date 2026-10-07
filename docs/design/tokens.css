@@ -1,0 +1,53 @@
+/*
+ * rith.dev colour tokens. Locked 7 Oct 2026.
+ * Palette: "Chalk & Iron" (gym-chalk paper, competition-plate blue) with Harith's custom accents.
+ * Chosen in docs/design/palette-lab (#harith/light, #harith/dark).
+ *
+ * Roles
+ *   --accent        lines, fills, highlights, squiggles, borders, big text (≥ 3:1)
+ *   --accent-text   accent-coloured SMALL text: nav active, buttons, stamps, hovers (≥ 4.5:1)
+ *   --on-accent     text placed on an --accent fill
+ *   --accent-soft   highlighter behind a word; never used for text
+ *   --chart-1..4    data series in AI reports, in bumper-plate order (blue, red, yellow, green)
+ *
+ * Contrast on paper (light / dark)
+ *   ink 16.6 / 16.4 · body 8.3 / 9.3 · muted 4.6 / 5.3
+ *   accent 3.1 / 7.3 · accent-text 4.7 / 7.3 · ink on accent-soft 10.3 / 7.7
+ */
+:root {
+  --bg: #f4f4f2;
+  --surface: #fbfbfa;
+  --ink: #141518;
+  --body: #46484d;
+  --muted: #6c6f75;
+  --rule: #14151822;
+  --accent: #5784ff;
+  --accent-text: #3563e6;
+  --on-accent: #141518;
+  --accent-soft: #adc2f8;
+  --note: #f3e08c;
+  --note-ink: #2a2610;
+  --chart-1: #1f4fd1;
+  --chart-2: #d23b2f;
+  --chart-3: #d9a91a;
+  --chart-4: #2f8f5b;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1012;
+  --surface: #17181b;
+  --ink: #eeeeec;
+  --body: #b3b5b9;
+  --muted: #84878e;
+  --rule: #eeeeec1a;
+  --accent: #7a9cff;
+  --accent-text: #7a9cff;
+  --on-accent: #0f1012;
+  --accent-soft: #3a4871;
+  --note: #d6c66e;
+  --note-ink: #22200c;
+  --chart-1: #7c9cff;
+  --chart-2: #f2665a;
+  --chart-3: #f0cd5a;
+  --chart-4: #5fc08a;
+}
