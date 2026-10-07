@@ -1,0 +1,401 @@
+<!--report
+title: Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder's pace
+subtitle: What one overnight agent orchestration spent, where the tokens and the hours went, and what to change so a night produces more. With a replay of the whole night.
+chip: Findings
+author: Claude Opus 5.5
+date: 2026-10-07
+meta: Scope = one overnight run · 6 Oct 20:58 to 7 Oct 11:21
+-->
+
+<h2>Bottom line</h2>
+<ol class="summary">
+<li><b>Revise it. This Claude account has 4% of its week left.</b> The three 5-hour windows since the weekly reset at 21:00 on 6 Oct used 96%, about a third each, so the account gives about three windows a week. That makes Claude, not Codex, the limit. At current settings the 27 open tasks would finish around Wed 18 Nov <span class="est">estimate</span>; with changes 1 to 6, around Wed 28 Oct; with those changes and a second account of the same size, around Wed 21 Oct.</li>
+<li><b>Claude's 5-hour limit hit at almost the same output every time: 724k to 762k tokens.</b> That held with one builder or four. Four parallel builders reached it in 62 minutes, serial work in about 3 hours. On one account, fan-out buys speed inside a window, not more tasks per week.</li>
+<li><b>39% of Claude's output was thinking, with every agent on xhigh effort.</b> The code itself was 32%. Anthropic's default for Opus 5.5 and Sonnet 5.5 is medium.</li>
+<li><b>No task passed its first review.</b> The three merged tasks needed 10 review rounds between them. Their fix rounds, two per task, used 21% of Claude's output. Each review round cost about 1.7% of the Codex week, at high and at xhigh alike.</li>
+<li><b>Reviews stop when Claude stops.</b> Only the Fable orchestrator can launch Astra and Sol, so four committed tasks waited from 09:39 while 45% of the Codex week sat unused. At 10:55 a second thread on a separate quota launched all eight reviews, and they were back in 26 minutes.</li>
+<li><b>The replay shows the two quotas never worked at once.</b> Builders ran for 274 minutes and reviewers for 103, with 0 minutes of overlap. Every merged task spent longer in review and fix rounds than in its first build: 199 minutes against 131.</li>
+</ol>
+
+<div class="kpis">
+<div class="tile"><div class="k">Tasks merged</div><div class="v">3 <small>/ 31</small></div><div class="s">4 more built, each needs a fix</div></div>
+<div class="tile"><div class="k">Claude output</div><div class="v">2.21M</div><div class="s">39% thinking · 1,922 calls</div></div>
+<div class="tile"><div class="k">Output at each limit</div><div class="v">724k–762k</div><div class="s">3 windows, 1 to 4 builders</div></div>
+<div class="tile"><div class="k">At API list prices</div><div class="v">$208</div><div class="s">equivalent, not billed</div></div>
+<div class="tile"><div class="k">Codex week used</div><div class="v">38% → 55%</div><div class="s">10 review rounds</div></div>
+<div class="tile"><div class="k">Review rounds per task</div><div class="v">3.3</div><div class="s">0 of 3 passed first time</div></div>
+<div class="tile"><div class="k">Loop working</div><div class="v">6h 57m</div><div class="s">46% of 15h 02m</div></div>
+<div class="tile"><div class="k">Finish as is</div><div class="v">~18 Nov</div><div class="s">estimate · one Claude account</div></div>
+</div>
+
+<h2>1. The night, replayed</h2>
+<p class="lede">The sections below are totals. This replay puts every agent back on the clock, from the planning chat at 18:15 to the last review at 11:21, so you can watch the loop work and stall. It shows something the totals hide: Claude and Codex took turns all night.</p>
+
+<figure class="card vid">
+<h3 data-toc="no">How it all started: fan-out and loops</h3>
+<div class="small">One person, three threads. Each branch is a model session, and each loop is a review round. A 17-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="tree-poster.jpg" aria-label="Animated tree: you start a planning thread that fans out ten sub-agents and writes a spec, ledger and start prompt; Fable reads them and runs four workflow batches; each task loops between a builder and the Astra and Sol reviewers; a second thread launches the last eight reviews."><source src="tree.mp4" type="video/mp4"></video>
+<div class="note">Read it left to right. The planning thread fanned out ten sub-agents, then wrote the spec, the ledger and the start prompt. Fable read them and ran four workflow batches. Each task then looped between its builder and the two GPT reviewers until both passed: three rounds for R1-01 and R1-02, four for R1-03. When Fable ran out of Claude, a second thread on another quota launched the last eight reviews.</div>
+</figure>
+
+<figure class="card vid">
+<h3 data-toc="no">The replay</h3>
+<div class="small">2 min 15 s. While agents work, 1 second is about 8 minutes of the night, and the long waits are skipped. Every bar, counter and verdict comes from the session logs.</div>
+<video id="replay" controls preload="metadata" playsinline poster="replay-poster.jpg"><source src="replay.mp4" type="video/mp4"></video>
+<div class="chapters" aria-label="Chapters"><button type="button" data-seek="0"><span>0:00</span> The cast</button><button type="button" data-seek="6.5"><span>0:06</span> How it was wired</button><button type="button" data-seek="23.5"><span>0:23</span> Before the night</button><button type="button" data-seek="36"><span>0:36</span> R1-01 and the relay problem</button><button type="button" data-seek="61.4"><span>1:01</span> First limit</button><button type="button" data-seek="66.7"><span>1:07</span> Contract and migration</button><button type="button" data-seek="90.5"><span>1:30</span> Fan-out</button><button type="button" data-seek="105.4"><span>1:45</span> Reviews on another quota</button><button type="button" data-seek="121.2"><span>2:01</span> What it shows</button></div>
+<details class="tv"><summary>What's on screen</summary>
+<ul>
+<li><b>Top left, orchestrator:</b> Fable, what it says it is doing, and the 31-task ledger. Cells turn orange while a task builds, cyan while it is in review and green when it merges.</li>
+<li><b>Middle, Claude quota:</b> four worktrees. Each builder shows its model, its output so far and the share of that output spent thinking. The 5-hour meter fills toward the ≈730k cap; the week bar under it is an estimate.</li>
+<li><b>Right, Codex quota:</b> Astra (code review) and Sol (checks and browser tests), their round, and their verdict. The meter is the Codex weekly limit as the rollouts recorded it.</li>
+<li><b>Bottom, swimlanes:</b> every Fable call, builder, fix round, review and wait on one time axis, revealed as the clock moves.</li>
+</ul></details>
+</figure>
+
+<p><b>Who's who.</b> The orange mascots are Claude: the one with a crown is Fable 5.1, the orchestrator. Builders wear a hard hat, yellow for Opus 5.5 and pink for Sonnet 5.5. The white robots run on Codex: the star is GPT-6 Astra, which reviews the diff against the spec, and the sun is GPT-6.1 Sol, which runs the checks and browser tests. The pixel person is you. The Claude mascot is drawn from the Claude Code terminal logo. The GPT robot is an original drawing, not OpenAI's logo.</p>
+<img class="cast" src="cast.png" alt="The cast: Fable 5.1 with a crown, an Opus 5.5 builder with a yellow hard hat, a Sonnet 5.5 builder with a pink hard hat, GPT-6 Astra with a star and magnifier, and GPT-6.1 Sol with a sun and clipboard." width="1600" height="367" loading="lazy">
+
+<p><b>Before the loop.</b> One Opus 5.5 thread at xhigh ran from 18:15 to 20:44. It researched the platform's page builder with ten sub-agents: nine on Sonnet, plus one Opus agent that built a working Puck trial on a real store in 32 minutes. It shipped a phase 1 editor, then grilled the plan through 31 questions. Out of that came the spec, the 31-task ledger and the start prompt Fable followed from 20:58.</p>
+
+<h3>What the replay shows</h3>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-1</span></div>
+<p><b>Claude and Codex never worked at the same time.</b> In the 417 working minutes, builders ran for 274 and reviewers for 103, with 0 minutes of overlap. Fable on its own filled the other 35. Each quota sat idle while the other worked, so the night's wall clock was the sum of the two, not the longer of them.</p>
+<div class="ev">first-to-last model call per builder and fix agent vs Codex rollout start and end · 20:58–09:39</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-2</span></div>
+<p><b>Review and fix rounds took longer than the build.</b> From first review to merge took 72, 78 and 49 minutes for R1-01, R1-02 and R1-03, against first builds of 27, 75 and 29 minutes: 199 minutes against 131. Of those 199 minutes, 103 were reviews and 81 were fix agents.</p>
+<div class="ev">merge times from the ledger · review rounds matched to Codex rollouts</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-3</span></div>
+<p><b>Sol set the pace of every round.</b> Astra's median review took 5 minutes, Sol's 11, and 25 on R1-01's last round with browser checks. In the 7 rounds where Astra had already failed the task, Fable waited another 28 minutes for Sol before it sent the fix round.</p>
+<div class="ev">10 Astra and 9 Sol sessions, 21:44–05:02 · Astra's sub-reviews excluded</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-4</span></div>
+<p><b>A second quota unblocked the reviews at once.</b> Launched at 10:55 from a second thread, all eight reviews of R1-04 to R1-07 ran side by side and were back in 26 minutes, while Claude was still out. The night's ten review rounds had run one at a time, 103 minutes in total. The Codex week went from 55% to 61%.</p>
+<div class="ev">8 Codex rollouts, 10:55–11:21 · rate_limits.primary.used_percent</div>
+</div>
+
+<div class="note key"><b>Update, 11:21.</b> The rest of this report was written at 09:52, with four tasks waiting for review. At 10:55 a second thread on a separate quota launched those reviews. All four tasks need one fix round: Astra failed three of them, and Sol found a 500 error on one store's About page in the fourth. R1-01 to R1-03 were pushed to staging at 11:19.</div>
+
+<h2>2. What the night produced</h2>
+<p class="lede">Three tasks are merged into the integration branch, and four more are built and committed. At 09:52 nothing from this loop was in staging or production git; R1-01 to R1-03 reached staging at 11:19. The new document tables are applied to the staging database.</p>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Task</th><th>What it is</th><th>State</th><th>Commits</th></tr></thead>
+<tbody>
+<tr><td data-l="Task">R1&#8209;01</td><td data-l="What it is">Phase 1 gaps: hero hash, block insert on http, page create, delete and reorder</td><td data-l="State">Merged 6 Oct 22:57</td><td data-l="Commits"><code>afb6f04c0</code></td></tr>
+<tr><td data-l="Task">R1&#8209;02</td><td data-l="What it is">Release 1 contract: page and site documents, block registry, schemas</td><td data-l="State">Merged 7 Oct 03:44</td><td data-l="Commits"><code>5a873fb09</code></td></tr>
+<tr><td data-l="Task">R1&#8209;03</td><td data-l="What it is">Migration <code>0119</code> and the store-document repository, applied to staging</td><td data-l="State">Merged 7 Oct 05:03</td><td data-l="Commits"><code>d48747a90</code></td></tr>
+<tr><td data-l="Task">R1&#8209;03b</td><td data-l="What it is">Test-harness hardening</td><td data-l="State">Deferred</td><td data-l="Commits">—</td></tr>
+<tr><td data-l="Task">R1&#8209;04</td><td data-l="What it is">Backfill script</td><td data-l="State">Built 09:08, waiting for review</td><td data-l="Commits"><code>fee885107</code> <code>800a8fd3e</code></td></tr>
+<tr><td data-l="Task">R1&#8209;05</td><td data-l="What it is">Public store renders the new format</td><td data-l="State">Built 09:38, waiting for review</td><td data-l="Commits"><code>6fd891c02</code></td></tr>
+<tr><td data-l="Task">R1&#8209;06</td><td data-l="What it is">Editor on the new format</td><td data-l="State">Built 09:32, waiting for review</td><td data-l="Commits"><code>35628f774</code> <code>9c30b64f5</code></td></tr>
+<tr><td data-l="Task">R1&#8209;07</td><td data-l="What it is">MCP on the new format</td><td data-l="State">Built 09:13, waiting for review</td><td data-l="Commits"><code>47ac23831</code> <code>a40c73349</code> <code>825fe5bb1</code></td></tr>
+</tbody>
+</table></div>
+
+<p>All four builders started at 08:37 and returned their results between 09:08 and 09:38. Their worktrees are clean. Fable hit the limit at 09:39 while it was taking in those results, so the reviews wait for Claude quota. Twenty-three tasks have not started.</p>
+
+<figure class="card">
+<h3 data-toc="no">The 15 hours, in three blocks</h3>
+<div class="small">From 8:58pm on 6 Oct to the 12:00 reset on 7 Oct. The last wait is still running at 9:52am.</div>
+<div class="legend">
+<span><i style="background:var(--c1)"></i>Loop working</span>
+<span><i style="background:var(--neutral)"></i>Waiting for the Claude limit</span>
+<span><i style="background:var(--c3)"></i>You were out</span>
+</div>
+<div class="rows">
+<div class="row"><div class="lab">15h 02m</div>
+<div class="track">
+<div class="seg" style="--v:46.2%;--fill:var(--c1)" data-tip="Loop working&#10;6h 57m · 46%&#10;20:58–23:49, 02:00–05:04, 08:37–09:39" tabindex="0"></div>
+<div class="seg" style="--v:43.0%;--fill:var(--neutral)" data-tip="Waiting for the Claude limit&#10;6h 28m · 43%&#10;23:49–02:00, 05:04–07:00, 09:39–12:00" tabindex="0"></div>
+<div class="seg" style="--v:10.8%;--fill:var(--c3)" data-tip="You were out&#10;1h 37m · 11%&#10;07:00–08:37" tabindex="0"></div>
+</div>
+<div class="val">46% <small>working</small></div>
+</div>
+</div>
+<div class="note">The loop worked for less than half of the 15 hours. Most of the rest was spent waiting for Claude's limit to reset.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class="stack">
+<thead><tr><th>Block</th><th>Clock</th><th class="n">Minutes</th><th class="n">Share</th></tr></thead>
+<tbody>
+<tr><td data-l="Block">Loop working</td><td data-l="Clock">20:58–23:49, 02:00–05:04, 08:37–09:39</td><td data-l="Minutes" class="n">417</td><td data-l="Share" class="n">46%</td></tr>
+<tr><td data-l="Block">Waiting for the Claude limit</td><td data-l="Clock">23:49–02:00, 05:04–07:00, 09:39–12:00</td><td data-l="Minutes" class="n">388</td><td data-l="Share" class="n">43%</td></tr>
+<tr><td data-l="Block">You were out</td><td data-l="Clock">07:00–08:37</td><td data-l="Minutes" class="n">97</td><td data-l="Share" class="n">11%</td></tr>
+<tr class="tot"><td data-l="Block">Total</td><td data-l="Clock">20:58–12:00</td><td data-l="Minutes" class="n">902</td><td data-l="Share" class="n">100%</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="note warn">Two claims in the earlier draft of this page were wrong. The builders do not run as separate sessions: they run inside Fable's process as workflow agents. And Fable was not spending tokens while it waited: it made no model calls from 08:38 until 09:38, while the builders worked.</div>
+
+<h2>3. The Claude cap is about 730k output tokens per window</h2>
+<p class="lede">Each 5-hour window ended at nearly the same output, while the list-price cost of the same windows rose by 70%. The cap tracks output tokens, which include thinking, much more closely than it tracks dollars.</p>
+
+<figure class="card">
+<h3 data-toc="no">Claude output since the loop started</h3>
+<div class="small">Cumulative output tokens across Fable and every workflow agent, sampled every 10 minutes. The flat stretches are the waits.</div>
+<div class="legend"><span><i class="ln" style="background:var(--c1)"></i>Claude output</span></div>
+<div class="chart"><script type="application/json">
+{"title":"Claude output","xtype":"time","tz":8,"yfmt":"tok","ymin":0,"labels":true,"height":240,
+ "x":["2026-10-06T12:50:00Z","2026-10-06T13:00:00Z","2026-10-06T13:10:00Z","2026-10-06T13:20:00Z","2026-10-06T13:30:00Z","2026-10-06T13:40:00Z","2026-10-06T13:50:00Z","2026-10-06T14:00:00Z","2026-10-06T14:10:00Z","2026-10-06T14:20:00Z","2026-10-06T14:30:00Z","2026-10-06T14:40:00Z","2026-10-06T14:50:00Z","2026-10-06T15:00:00Z","2026-10-06T15:10:00Z","2026-10-06T15:20:00Z","2026-10-06T15:30:00Z","2026-10-06T15:40:00Z","2026-10-06T15:50:00Z","2026-10-06T16:00:00Z","2026-10-06T16:10:00Z","2026-10-06T16:20:00Z","2026-10-06T16:30:00Z","2026-10-06T16:40:00Z","2026-10-06T16:50:00Z","2026-10-06T17:00:00Z","2026-10-06T17:10:00Z","2026-10-06T17:20:00Z","2026-10-06T17:30:00Z","2026-10-06T17:40:00Z","2026-10-06T17:50:00Z","2026-10-06T18:00:00Z","2026-10-06T18:10:00Z","2026-10-06T18:20:00Z","2026-10-06T18:30:00Z","2026-10-06T18:40:00Z","2026-10-06T18:50:00Z","2026-10-06T19:00:00Z","2026-10-06T19:10:00Z","2026-10-06T19:20:00Z","2026-10-06T19:30:00Z","2026-10-06T19:40:00Z","2026-10-06T19:50:00Z","2026-10-06T20:00:00Z","2026-10-06T20:10:00Z","2026-10-06T20:20:00Z","2026-10-06T20:30:00Z","2026-10-06T20:40:00Z","2026-10-06T20:50:00Z","2026-10-06T21:00:00Z","2026-10-06T21:10:00Z","2026-10-06T21:20:00Z","2026-10-06T21:30:00Z","2026-10-06T21:40:00Z","2026-10-06T21:50:00Z","2026-10-06T22:00:00Z","2026-10-06T22:10:00Z","2026-10-06T22:20:00Z","2026-10-06T22:30:00Z","2026-10-06T22:40:00Z","2026-10-06T22:50:00Z","2026-10-06T23:00:00Z","2026-10-06T23:10:00Z","2026-10-06T23:20:00Z","2026-10-06T23:30:00Z","2026-10-06T23:40:00Z","2026-10-06T23:50:00Z","2026-10-07T00:00:00Z","2026-10-07T00:10:00Z","2026-10-07T00:20:00Z","2026-10-07T00:30:00Z","2026-10-07T00:40:00Z","2026-10-07T00:50:00Z","2026-10-07T01:00:00Z","2026-10-07T01:10:00Z","2026-10-07T01:20:00Z","2026-10-07T01:30:00Z","2026-10-07T01:40:00Z","2026-10-07T01:50:00Z"],
+ "series":[{"name":"Claude output","short":"Output","color":"c1","values":[0,2000,46000,135000,179000,236000,290000,296000,364000,397000,422000,428000,428000,445000,494000,561000,616000,666000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,792000,843000,873000,888000,947000,1005000,1022000,1049000,1109000,1122000,1158000,1244000,1296000,1311000,1348000,1363000,1426000,1441000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1502000,1755000,1962000,2046000,2140000,2197000,2214000,2214000]}],
+ "events":[
+   {"x":"2026-10-06T15:49:00Z","label":"Limit hit, resets 2:00am"},
+   {"x":"2026-10-06T21:04:00Z","label":"Limit hit, resets 7:00am"},
+   {"x":"2026-10-07T00:37:00Z","label":"You restarted the loop"},
+   {"x":"2026-10-07T01:39:00Z","label":"Limit hit, resets 12:00pm"}
+ ]}
+</script></div>
+<div class="note">Three climbs of about 730k each. The third is the four parallel builders, and it is three times steeper than the first two.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class="stack">
+<thead><tr><th>Window</th><th>Work before the limit</th><th class="n">Builders at once</th><th class="n">Output</th><th class="n">Cumulative</th><th class="n">Thinking</th><th class="n">Cache reads</th><th class="n">At list prices</th><th class="n">Output per working hour</th></tr></thead>
+<tbody>
+<tr><td data-l="Window">21:00–02:00</td><td data-l="Work before the limit">2h 51m, limit at 23:49</td><td data-l="Builders at once" class="n">1</td><td data-l="Output" class="n">728k</td><td data-l="Cumulative" class="n">728k</td><td data-l="Thinking" class="n">292k</td><td data-l="Cache reads" class="n">132M</td><td data-l="At list prices" class="n">$54</td><td data-l="Output per working hour" class="n">255k</td></tr>
+<tr><td data-l="Window">02:00–07:00</td><td data-l="Work before the limit">3h 04m, limit at 05:04</td><td data-l="Builders at once" class="n">1</td><td data-l="Output" class="n">724k</td><td data-l="Cumulative" class="n">1,452k</td><td data-l="Thinking" class="n">298k</td><td data-l="Cache reads" class="n">138M</td><td data-l="At list prices" class="n">$63</td><td data-l="Output per working hour" class="n">236k</td></tr>
+<tr><td data-l="Window">07:00–12:00</td><td data-l="Work before the limit">1h 02m, limit at 09:39</td><td data-l="Builders at once" class="n">4</td><td data-l="Output" class="n">762k</td><td data-l="Cumulative" class="n">2,214k</td><td data-l="Thinking" class="n">278k</td><td data-l="Cache reads" class="n">214M</td><td data-l="At list prices" class="n">$92</td><td data-l="Output per working hour" class="n">738k</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="grid2">
+<figure class="card">
+<h3 data-toc="no">Output when the limit hit</h3>
+<div class="small">Claude output tokens per window.</div>
+<div class="rows">
+<div class="row"><div class="lab">21:00–02:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:95.5%;--fill:var(--c1)" data-tip="21:00–02:00&#10;728k output" tabindex="0"></div></div><div class="val">728k</div></div>
+<div class="row"><div class="lab">02:00–07:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:95.0%;--fill:var(--c1)" data-tip="02:00–07:00&#10;724k output" tabindex="0"></div></div><div class="val">724k</div></div>
+<div class="row"><div class="lab">07:00–12:00<small>4 builders</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c1)" data-tip="07:00–12:00&#10;762k output" tabindex="0"></div></div><div class="val">762k</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Window</th><th class="n">Output</th></tr></thead><tbody>
+<tr><td>21:00–02:00</td><td class="n">728k</td></tr><tr><td>02:00–07:00</td><td class="n">724k</td></tr><tr><td>07:00–12:00</td><td class="n">762k</td></tr>
+</tbody></table></div></details>
+</figure>
+<figure class="card">
+<h3 data-toc="no">List-price cost of the same windows</h3>
+<div class="small">Output, cache reads and cache writes at API list prices.</div>
+<div class="rows">
+<div class="row"><div class="lab">21:00–02:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:58.7%;--fill:var(--c2)" data-tip="21:00–02:00&#10;$54 · reads $27, writes $11, output $15" tabindex="0"></div></div><div class="val">$54</div></div>
+<div class="row"><div class="lab">02:00–07:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:68.5%;--fill:var(--c2)" data-tip="02:00–07:00&#10;$63 · reads $30, writes $18, output $15" tabindex="0"></div></div><div class="val">$63</div></div>
+<div class="row"><div class="lab">07:00–12:00<small>4 builders</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c2)" data-tip="07:00–12:00&#10;$92 · reads $43, writes $36, output $13" tabindex="0"></div></div><div class="val">$92</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Window</th><th class="n">Cache reads</th><th class="n">Cache writes</th><th class="n">Output</th><th class="n">Total</th></tr></thead><tbody>
+<tr><td>21:00–02:00</td><td class="n">$27</td><td class="n">$11</td><td class="n">$15</td><td class="n">$54</td></tr>
+<tr><td>02:00–07:00</td><td class="n">$30</td><td class="n">$18</td><td class="n">$15</td><td class="n">$63</td></tr>
+<tr><td>07:00–12:00</td><td class="n">$43</td><td class="n">$36</td><td class="n">$13</td><td class="n">$92</td></tr>
+</tbody></table></div></details>
+</figure>
+</div>
+
+<figure class="card vid">
+<h3 data-toc="no">Same window, spent faster</h3>
+<div class="small">The 02:00 window with one builder at a time, against the 07:00 window with four at once, on a shared clock. A 12-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="loop-fanout.jpg" aria-label="Two buckets fill toward the same 730k limit: one builder at a time takes 3 h 04 min to reach 724k; four builders at once reach 762k in 1 h 02 min, then sleep until the reset."><source src="loop-fanout.mp4" type="video/mp4"></video>
+</figure>
+
+<div class="finding">
+<div class="fhd"><span class="fid">FAN-1</span></div>
+<p><b>Fan-out made the batch three times faster, not cheaper.</b> The four parallel builders produced 738k output per working hour, against 236k to 255k for serial work. They hit the same cap, and then the loop sat idle for 2 hours 21 minutes. Their first builds averaged 189k output each (105k to 253k), in line with the serial first builds, so running in parallel did not make each task cost more.</p>
+<div class="ev">wf_a6d7d0b3 journal: 4 results at 09:08, 09:13, 09:32 and 09:38 · limit at 09:39 "resets 12pm"</div>
+</div>
+
+<p>For overnight runs this sets the ceiling. One Claude account gets about two windows a night, which is about 1.5M output tokens. At current settings that is three to four tasks a night <span class="est">estimate</span>, however wide the fan-out. More builders only help if they draw on separate quotas.</p>
+
+<div class="note key">Anthropic does not publish how the limit is calculated. Its cost docs say thinking is billed as output, and that long contexts draw usage on every request through cache reads. Three windows is a small sample, but here cache reads rose 62% from the first window to the third without the cap moving.</div>
+
+<h2>4. Where the output goes</h2>
+<p class="lede">Thinking is the biggest share at 39%, then the code itself at 32%. Most of the other suspects turned out to be small.</p>
+
+<figure class="card">
+<h3 data-toc="no">Claude output by what it was spent on</h3>
+<div class="small">2.21M output tokens, all agents. Thinking is measured exactly. The rest is split by the size of each response's text and tool inputs.</div>
+<div class="rows">
+<div class="row"><div class="lab">Thinking<small>all agents on xhigh</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c1)" data-tip="Thinking&#10;868k · 39%" tabindex="0"></div></div><div class="val">868k <small>39%</small></div></div>
+<div class="row"><div class="lab">Code written<small>file writes and patch scripts</small></div><div class="track"><div class="bar" style="--v:80.9%;--fill:var(--c1)" data-tip="Code written&#10;702k · 32%&#10;whole-file writes 467k, patch scripts 232k" tabindex="0"></div></div><div class="val">702k <small>32%</small></div></div>
+<div class="row"><div class="lab">Shell, git, tests, probes</div><div class="track"><div class="bar" style="--v:17.1%;--fill:var(--c1)" data-tip="Shell, git, tests, probes&#10;148k · 7%" tabindex="0"></div></div><div class="val">148k <small>7%</small></div></div>
+<div class="row"><div class="lab">Reading files</div><div class="track"><div class="bar" style="--v:16.2%;--fill:var(--c1)" data-tip="Reading files&#10;141k · 6%" tabindex="0"></div></div><div class="val">141k <small>6%</small></div></div>
+<div class="row"><div class="lab">Orchestration<small>T3 calls and agent plumbing</small></div><div class="track"><div class="bar" style="--v:16.2%;--fill:var(--c1)" data-tip="Orchestration&#10;141k · 6%" tabindex="0"></div></div><div class="val">141k <small>6%</small></div></div>
+<div class="row"><div class="lab">Scratch scripts in /tmp</div><div class="track"><div class="bar" style="--v:14.4%;--fill:var(--c1)" data-tip="Scratch scripts in /tmp&#10;125k · 6%" tabindex="0"></div></div><div class="val">125k <small>6%</small></div></div>
+<div class="row"><div class="lab">Browser checks</div><div class="track"><div class="bar" style="--v:9.0%;--fill:var(--c1)" data-tip="Browser checks&#10;78k · 4%" tabindex="0"></div></div><div class="val">78k <small>4%</small></div></div>
+<div class="row"><div class="lab">Prose</div><div class="track"><div class="bar" style="--v:1.2%;--fill:var(--c1)" data-tip="Prose&#10;10k · 0.4%" tabindex="0"></div></div><div class="val">10k <small>0.4%</small></div></div>
+</div>
+<div class="note">Code is close to fixed: it is the work. Thinking is the share that the effort setting controls.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table>
+<thead><tr><th>Spent on</th><th class="n">Output</th><th class="n">Share</th></tr></thead>
+<tbody>
+<tr><td>Thinking</td><td class="n">868k</td><td class="n">39%</td></tr>
+<tr><td>Code written</td><td class="n">702k</td><td class="n">32%</td></tr>
+<tr><td>Shell, git, tests, probes</td><td class="n">148k</td><td class="n">7%</td></tr>
+<tr><td>Reading files</td><td class="n">141k</td><td class="n">6%</td></tr>
+<tr><td>Orchestration</td><td class="n">141k</td><td class="n">6%</td></tr>
+<tr><td>Scratch scripts in /tmp</td><td class="n">125k</td><td class="n">6%</td></tr>
+<tr><td>Browser checks</td><td class="n">78k</td><td class="n">4%</td></tr>
+<tr><td>Prose</td><td class="n">10k</td><td class="n">0.4%</td></tr>
+<tr class="tot"><td>Total</td><td class="n">2,214k</td><td class="n">100%</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Who</th><th class="n">Output</th><th class="n">Share</th><th class="n">Of which thinking</th><th class="n">At list prices</th></tr></thead>
+<tbody>
+<tr><td data-l="Who">First builds</td><td data-l="Output" class="n">1,474k</td><td data-l="Share" class="n">67%</td><td data-l="Of which thinking" class="n">41%</td><td data-l="At list prices" class="n">$113.34</td></tr>
+<tr><td data-l="Who">Fix rounds</td><td data-l="Output" class="n">458k</td><td data-l="Share" class="n">21%</td><td data-l="Of which thinking" class="n">44%</td><td data-l="At list prices" class="n">$25.46</td></tr>
+<tr><td data-l="Who">Fable orchestrator</td><td data-l="Output" class="n">244k</td><td data-l="Share" class="n">11%</td><td data-l="Of which thinking" class="n">27%</td><td data-l="At list prices" class="n">$68.59</td></tr>
+<tr><td data-l="Who">Relays to the reviewers</td><td data-l="Output" class="n">38k</td><td data-l="Share" class="n">2%</td><td data-l="Of which thinking" class="n">1%</td><td data-l="At list prices" class="n">$0.92</td></tr>
+<tr class="tot"><td data-l="Who">Total</td><td data-l="Output" class="n">2,214k</td><td data-l="Share" class="n">100%</td><td data-l="Of which thinking" class="n">39%</td><td data-l="At list prices" class="n">$208.31</td></tr>
+</tbody></table></div>
+
+<p>Fable produced 11% of the output but 33% of the list-price cost. Its context had a median of 422k tokens and peaked at 605k. Three wake-ups after long idles rewrote 1.5M tokens of cache, so cache writes are $41.56 of its $68.59.</p>
+
+<div class="cols">
+<div class="card"><h3 data-toc="no">Large levers</h3><ul>
+<li>Thinking at xhigh: 868k, 39% of output.</li>
+<li>Fix rounds: 458k, 21% of output, plus most of the Codex use.</li>
+<li>Fable's long context: 33% of list-price cost.</li>
+</ul></div>
+<div class="card"><h3 data-toc="no">Checked and small</h3><ul>
+<li>Rewrites: 145 file writes covered 138 files. Only 1% of the characters written were later overwritten.</li>
+<li>Builder cache misses: 3 rebuilds after waits of more than 5 minutes, 968k tokens in total.</li>
+<li>Test and check commands: 0.6% of output.</li>
+<li>Builder browser checks: 3.5% of output across 402 calls.</li>
+</ul></div>
+</div>
+
+<h2>5. Reviews and fix rounds</h2>
+<p class="lede">Each merged task needed three or four review rounds. On Claude, the two fix rounds per task cost 21% of output. On Codex, each round costs about 1.7% of the week, whatever the effort level.</p>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Task</th><th class="n">Review rounds</th><th class="n">Fix rounds</th><th class="n">Claude output in fix rounds</th><th>How it ended</th></tr></thead>
+<tbody>
+<tr><td data-l="Task">R1&#8209;01</td><td data-l="Review rounds" class="n">3</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">131k</td><td data-l="How it ended">Passed on round 3</td></tr>
+<tr><td data-l="Task">R1&#8209;02</td><td data-l="Review rounds" class="n">3</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">221k</td><td data-l="How it ended">Passed on round 3. Contract frozen.</td></tr>
+<tr><td data-l="Task">R1&#8209;03</td><td data-l="Review rounds" class="n">4</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">106k</td><td data-l="How it ended">Round 3 failed on the test harness only. A scoped fourth review passed the production code. The harness work became R1-03b.</td></tr>
+<tr class="tot"><td data-l="Task">Total</td><td data-l="Review rounds" class="n">10</td><td data-l="Fix rounds" class="n">6</td><td data-l="Claude output in fix rounds" class="n">458k</td><td data-l="How it ended"></td></tr>
+</tbody></table></div>
+
+<p>Each fix round is a fresh agent. It starts at about 24k tokens of context and reads its way back in. Across the fix rounds, 140k of the 458k output (31%) came before the first code change. A workflow's <code>agent()</code> call has no option to continue an earlier agent's conversation, so a fix round cannot pick up the builder's context.</p>
+
+<figure class="card vid">
+<h3 data-toc="no">One task, as it ran</h3>
+<div class="small">R1-02, the Release 1 contract, from first build to merge. Review rounds in cyan, fix rounds hatched. A 15-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="loop-task.jpg" aria-label="R1-02's loop: a 52-minute build cut off by the limit, a 24-minute rebuild, then review, fix, review, fix and a passing third review. 624k Claude output, 221k of it in fix rounds."><source src="loop-task.mp4" type="video/mp4"></video>
+</figure>
+
+<div class="grid2">
+<figure class="card">
+<h3 data-toc="no">Codex week used per review round</h3>
+<div class="small">Points of the weekly meter, by reviewer effort.</div>
+<div class="rows">
+<div class="row"><div class="lab">high<small>3 rounds · 38% → 43%</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="high effort&#10;5 points over 3 rounds · 1.7 per round" tabindex="0"></div></div><div class="val">1.7</div></div>
+<div class="row"><div class="lab">xhigh<small>7 rounds · 43% → 55%</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="xhigh effort&#10;12 points over 7 rounds · 1.7 per round" tabindex="0"></div></div><div class="val">1.7</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Effort</th><th>Tasks</th><th class="n">Rounds</th><th class="n">Meter</th><th class="n">Per round</th></tr></thead><tbody>
+<tr><td>high</td><td>R1-01</td><td class="n">3</td><td class="n">38% → 43%</td><td class="n">1.7</td></tr>
+<tr><td>xhigh</td><td>R1-02, R1-03</td><td class="n">7</td><td class="n">43% → 55%</td><td class="n">1.7</td></tr>
+</tbody></table></div></details>
+</figure>
+<figure class="card">
+<h3 data-toc="no">Codex tokens by reviewer</h3>
+<div class="small">29 sessions from 21:44 to 05:01.</div>
+<div class="rows">
+<div class="row"><div class="lab">Sol<small>9 sessions · verifier</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="Sol&#10;39.7M input · 181k output · 66%" tabindex="0"></div></div><div class="val">66%</div></div>
+<div class="row"><div class="lab">Astra<small>20 sessions · reviewer</small></div><div class="track"><div class="bar" style="--v:51.1%;--fill:var(--c3)" data-tip="Astra&#10;20.3M input · 95k output · 34%" tabindex="0"></div></div><div class="val">34%</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Reviewer</th><th class="n">Sessions</th><th class="n">Input</th><th class="n">Output</th><th class="n">Share</th></tr></thead><tbody>
+<tr><td>Sol</td><td class="n">9</td><td class="n">39.7M</td><td class="n">181k</td><td class="n">66%</td></tr>
+<tr><td>Astra</td><td class="n">20</td><td class="n">20.3M</td><td class="n">95k</td><td class="n">34%</td></tr>
+</tbody></table></div></details>
+</figure>
+</div>
+
+<p>Raising the reviewers from high to xhigh did not change the cost per round. The number of rounds is what drives Codex use. At 3.3 rounds per task, the four tasks now waiting would take the meter to about 78%, and about four more tasks would empty it before Monday's reset.</p>
+
+<h2>6. The stall: reviews wait for Claude</h2>
+<p class="lede">The two quotas take turns instead of overlapping. When Claude runs out, Codex has spare capacity but nothing can launch it.</p>
+
+<div class="finding">
+<div class="fhd"><span class="sev p2">P2</span><span class="fid">ORCH-1</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>Reviews cannot start while the orchestrator is out of Claude.</b> Astra and Sol run on Codex, but only Fable's thread can launch them, and Fable shares the builders' Claude window. Four committed tasks have waited since 09:39 with 45% of the Codex week unused.</p>
+<div class="ev">builder results 09:08–09:38 · Fable "You've hit your session limit · resets 12pm" at 09:39 · Codex meter 55% at 05:01, no review since</div>
+</div>
+
+<div class="finding">
+<div class="fhd"><span class="sev p2">P2</span><span class="fid">ORCH-2</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>Builders fail at the limit instead of pausing, and nothing retries the resume.</b> The batch launched at 05:04, just as the window ran out, and all four builders failed on their first call. Claude Code pauses a workflow at the limit only in an interactive session. It does not pause under the Agent SDK or in a background session, which matches what happened here. The automatic resume at 7:07am ended with <code>ENOTFOUND</code>, and nothing retried it until you restarted the loop at 8:36am.</p>
+<div class="ev">wf_a6d7d0b3 journal: 4 × started then failed at 05:04 · code.claude.com/docs/en/workflows "When a run hits your usage limit"</div>
+</div>
+
+<div class="finding">
+<div class="fhd"><span class="sev p3">P3</span><span class="fid">ORCH-3</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>A builder cut off by the limit is relaunched as a new agent.</b> R1-02's first build wrote 294k from 22:57 until the 23:49 limit. The relaunched agent spent another 109k, from 02:01 to 02:25, to finish it.</p>
+<div class="ev">wf_b56893a9: R1-02:build:opus × 2 agents, 139 and 153 calls</div>
+</div>
+
+<h2>7. Verdict: keep the shape, change the dials and the coupling</h2>
+<p class="lede">Keep the ledger, a worktree per task, and the two independent reviewers. Change the effort levels, the review loop, and who launches reviews. That should roughly halve Claude output per task and cut Codex use per task by half or more <span class="est">estimate</span>.</p>
+
+<ol class="recs">
+<li><b class="t">Drop builds and fixes to medium effort.</b>Thinking was 868k tokens, 39% of all output, with every agent on xhigh. Medium is Anthropic's default for Opus 5.5 and Sonnet 5.5, and its docs report Opus 5.5 at medium matching or beating Opus 5 at high on coding. Keep high for contract tasks such as R2-01. Halving the thinking would cut output by about a fifth <span class="est">estimate</span>.</li>
+<li><b class="t">Aim for one review round per task.</b>Add the night's review findings to the builder brief as a checklist, and have the builder run Sol's checks before it commits. Allow a second fix round only for a correctness failure. Ten rounds for three tasks cost 17% of the Codex week, and the fix rounds cost 458k Claude output.</li>
+<li><b class="t">Give each fix agent a map.</b>Have the builder's result list the files it touched, the decisions it made, and the commands that prove the change. Pass that to the fix agent with the findings. Fix agents spent 31% of their output, 140k, before their first code change.</li>
+<li><b class="t">Scope Sol.</b>Run Sol on tasks with a browser-visible change. On a re-review, have it check only the items that failed. Sol used 66% of the Codex tokens in 9 of the 29 sessions.</li>
+<li><b class="t">Let reviews run when Claude is out.</b>Review each task as soon as it commits. Launch reviews from a quota the builders don't use: an orchestrator on the second Claude account, or builders launched as T3 threads so the orchestrator is outside their window. Today's wait is 2h 21m with four tasks ready.</li>
+<li><b class="t">Run a smaller, fresher orchestrator.</b>Start a new orchestrator session for each batch from the ledger, on Opus 5.5 or Sonnet 5.5 at medium with a 200k context. Keep Fable for contracts and the final report. Fable's median context was 422k, and it cost 33% at list prices for 11% of the output.</li>
+<li><b class="t">Fan out across quotas, and schedule the resume.</b>More builders on one account reach the cap sooner: 62 minutes for four, about 3 hours for one. Spread lanes over separate quotas, and schedule a resume at each reset that retries if it fails. The 7:07am resume failed once and nothing retried it.</li>
+<li><b class="t">Don't hold a failed review for Sol.</b>When Astra fails a task, start the fix round on its findings and fold in Sol's when they land. In the 7 rounds Astra had already failed, Fable waited 28 more minutes for Sol (RPL-3).</li>
+</ol>
+
+<figure class="card">
+<h3 data-toc="no">When the remaining 27 tasks could finish</h3>
+<div class="small">All rows are estimates from this night's per-task costs. They assume a Claude week gives about 2.3M output tokens, since 2.21M used 96% of it, and that this account's week resets on Tue 13 Oct at 21:00, seven days after the last reset.</div>
+<div class="tw"><table class="stack">
+<thead><tr><th>Setup</th><th class="n">Claude per task</th><th class="n">Codex per task</th><th class="n">Tasks per Claude week</th><th>Finish, one account</th><th>Finish, two accounts</th></tr></thead>
+<tbody>
+<tr><td data-l="Setup">As is</td><td data-l="Claude per task" class="n">~440k</td><td data-l="Codex per task" class="n">~5.7%</td><td data-l="Tasks per Claude week" class="n">~5</td><td data-l="Finish, one account">~Wed 18 Nov</td><td data-l="Finish, two accounts">~Wed 28 Oct</td></tr>
+<tr><td data-l="Setup">Changes 1 to 6</td><td data-l="Claude per task" class="n">~220k</td><td data-l="Codex per task" class="n">~2.5%</td><td data-l="Tasks per Claude week" class="n">~10</td><td data-l="Finish, one account">~Wed 28 Oct</td><td data-l="Finish, two accounts">~Wed 21 Oct</td></tr>
+</tbody></table></div>
+<div class="note">Codex no longer sets the pace: at 2.5% per task, a Codex week covers about 40 tasks. The two-account column assumes a second account of the same size with its full week free from 13 Oct; if it has room this week, the finish moves earlier. Builds that move to Codex would spend that spare quota instead of Claude's.</div>
+</figure>
+
+<div class="note warn">The effort saving has not been measured on this codebase. Run the next batch with changes 1 to 6, measure it with the same scripts, and keep the changes if each task uses at most about 250k Claude output and 2.5% of the Codex week without more review failures. If first-pass failures rise, put builders back on high, not xhigh.</div>
+
+<p>There is room in the plan for more parallel work now. R2-01, the Release 2 contract, needs only R1-02, which merged at 03:44. Twelve tasks wait on R2-01 directly, so starting it alongside the R1d reviews is where fan-out across quotas would pay off first.</p>
+
+<h2>8. Method and caveats</h2>
+<p class="lede">The token figures come from the session logs on this machine, deduplicated per API response. The projections are arithmetic on those figures, not measurements.</p>
+
+<ul>
+<li><b>Claude usage.</b> Fable's Claude Code session log plus every workflow agent transcript under it. Responses are deduplicated by <code>message.id</code>. Usage fields: <code>output_tokens</code>, <code>output_tokens_details.thinking_tokens</code>, <code>cache_read_input_tokens</code> and <code>cache_creation</code> by TTL. Windows are in MYT.</li>
+<li><b>Output split.</b> Thinking is exact. The other output of each response is split by the character size of its text and tool inputs. Builders write files with <code>cat &gt; file &lt;&lt;EOF</code> and patch scripts, so those count as code written.</li>
+<li><b>List prices.</b> From the pricing table of the earlier sub-agent fanning experiment, in USD per million tokens. Opus 5.5: $4 input, $20 output, $0.20 cache read, $5 and $8 for 5-minute and 1-hour cache writes. Sonnet 5.5: $2, $10, $0.20, $2.50 and $4. Fable 5.1: $10, $50, $0.25, $12.50 and $20. These are equivalents for comparison, not a bill.</li>
+<li><b>The cap.</b> Three windows. Anthropic does not publish the formula. Use of claude.ai on the same account would count against the same limit and is not visible here. No other Claude Code session on this machine ran in those windows. The owner's usage page showed 4% of the Claude weekly limit left at 10:46 on 7 Oct. The last weekly reset was 21:00 on 6 Oct (a Claude Code limit message from 4 Oct gives that time), and nothing else on this machine used Claude after it, so this run used about 96% in three windows. Use of claude.ai or another device would also count. The next reset date is inferred, not read.</li>
+<li><b>Codex.</b> 29 rollouts in <code>~/.codex/sessions/2026/10/0{6,7}/</code> from 21:44 to 05:01. The meter is <code>rate_limits.primary.used_percent</code> on the 10,080-minute window, on the Pro Lite plan. It moves in whole points, so per-round figures carry about ±0.5. The high and xhigh rounds were also on different tasks.</li>
+<li><b>Docs.</b> Effort defaults and the medium-versus-high result: <a href="https://code.claude.com/docs/en/model-config">model configuration</a>. Workflow cache TTL, the <code>agent()</code> options and pause-at-limit behaviour: <a href="https://code.claude.com/docs/en/workflows">workflows</a> and the 2.1.291 binary. Thinking billed as output and cache reads drawing usage: <a href="https://code.claude.com/docs/en/costs">costs</a>.</li>
+<li><b>Projections.</b> Remaining work is 27 tasks: the 4 built plus 23 not started, with R1-03b left deferred. As-is cost per task is the three merged tasks' average of 405k, plus about 35k of Fable. Revised Claude cost assumes medium halves thinking on first builds (189k → ~150k), one fix round at ~50k, and ~20k of orchestration. Revised Codex cost assumes 1 to 1.5 rounds per task with Sol scoped. Windows are 730k each, at most 4.8 a day. No allowance is made for the Claude weekly limit.</li>
+<li><b>Other quotas.</b> T3 lists a second Claude account and Cursor-billed Opus 5.5. Whether either is a separate quota from this account was not checked at 09:52. The 10:55 reviews were launched from a thread running through Cursor.</li>
+<li><b>Replay.</b> Drawn frame by frame on a canvas from the same logs: each Claude agent's model calls (time, output and thinking tokens), each Codex session's start, end and weekly meter, the ledger's merge times, and the orchestrator thread's messages for the captions. A bar runs from an agent's first call to its last. Codex sessions are matched to review rounds by launch order against T3's delegated-task list. The replay's Claude week bar is output divided by 2.31M, an estimate; the 5-hour and Codex meters are read values. The planning prologue and the tree use T3's thread list for sub-agent times. The renderer and its derived timeline are in <code>docs/reports/puck-orchestration/replay/</code> in this site's repository.</li>
+</ul>
+
+<p class="ft">Read at 9:52am on 7 Oct 2026 from the session logs, the Codex rollouts, the ledger and the four R1d worktrees; the replay, RPL findings and update cover the run to 11:21. Rebuild with <code>python3 ~/.claude/skills/report/scripts/build.py docs/reports/puck-orchestration/body.html -o public/reports/puck-orchestration/index.html</code>.</p>
+
+<style>
+.vid video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#191A21;border:1px solid var(--line-soft);margin:.75rem 0}
+.chapters{display:flex;flex-wrap:wrap;gap:.4rem;margin:.25rem 0 .5rem}
+.chapters button{font:inherit;font-family:var(--mono);font-size:.72rem;color:var(--ink-2);background:transparent;border:1px solid var(--line);padding:.25rem .55rem;cursor:pointer}
+.chapters button span{color:var(--purple)}
+.chapters button:hover,.chapters button:focus-visible{color:var(--ink);border-color:var(--purple)}
+img.cast{display:block;width:100%;height:auto;margin:1rem 0 1.5rem;border:1px solid var(--line-soft)}
+</style>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const v of document.querySelectorAll('video[data-loop]')) {
+    if (reduce) { v.controls = true; v.removeAttribute('loop'); continue; }
+    v.muted = true;
+    new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.35 }).observe(v);
+  }
+  const replay = document.getElementById('replay');
+  for (const b of document.querySelectorAll('[data-seek]')) b.addEventListener('click', () => { replay.currentTime = +b.dataset.seek; replay.play().catch(() => {}); });
+})();
+</script>
