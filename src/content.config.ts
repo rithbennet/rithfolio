@@ -42,6 +42,10 @@ const work = defineCollection({
     period: z.string().optional(),
     category: z.string(),
     summary: z.string(),
+    stack: z.array(z.string()).default([]),
+    // the company's own mark, with an optional variant for dark mode
+    logo: z.string().optional(),
+    logoDark: z.string().optional(),
     link: z.string().url().optional(),
     repo: z.string().url().optional(),
     featured: z.boolean().default(false),

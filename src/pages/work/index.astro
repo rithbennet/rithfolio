@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import DeskObject from "../../components/site/DeskObject.astro";
+import TechStack from "../../components/site/TechStack.astro";
 import { getCollection } from "astro:content";
 import { site } from "../../data/site";
 
@@ -9,17 +10,41 @@ const featured = all.find((w) => w.data.featured);
 const experience = all.filter((w) => !w.data.featured && (w.data.kind === "role" || w.data.kind === "community"));
 const projects = all.filter((w) => w.data.kind === "project");
 const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
+const education = [
+  {
+    course: "Bachelor of Computer Science (Software Engineering) with Honours",
+    note: "Universiti Teknologi Malaysia, Kuala Lumpur. CGPA 3.80, and a Yayasan Telekom Malaysia scholar from 2023 to 2026.",
+    kind: "Degree",
+    period: "2022–26",
+    logo: "/logos/utm.png",
+  },
+  {
+    course: "Foundation in Physical Science",
+    note: "Universiti Teknologi Malaysia, Kuala Lumpur. GPA 3.87, in the tech foundation year before choosing software engineering.",
+    kind: "Foundation",
+    period: "2021–22",
+    logo: "/logos/utm.png",
+  },
+];
 ---
 
 <BaseLayout
   title="Work"
-  description="What Harith has built: DagangNow, an internship at Asterisk Digital, a campus photo studio, and side projects."
+  description="What Harith has built: DagangNow, full-stack and data engineering at Asterisk Digital, a campus photo studio, and side projects."
   canonical={`${site.url}/work`}
   ogUrl={`${site.url}/work`}
 >
   <div class="page col">
-    <p class="eyebrow">Work</p>
-    <h1 class="h1">Things I've built</h1>
+    <div class="head">
+      <div>
+        <p class="eyebrow">Work</p>
+        <h1 class="h1">Things I've built</h1>
+      </div>
+      <a class="pill" href={site.resume} download="Harith-Bennet-Resume.pdf">
+        Download resume <span aria-hidden="true">↓</span>
+      </a>
+    </div>
 
     {
       featured && (
@@ -32,9 +57,20 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
             </p>
           </div>
           <div>
-            <p class="eyebrow">{featured.data.role}</p>
+            <p class="eyebrow company">
+              {featured.data.logo && (
+                <img
+                  class:list={["co-logo", { "light-only": featured.data.logoDark }]}
+                  src={featured.data.logo}
+                  alt=""
+                />
+              )}
+              {featured.data.logoDark && <img class="co-logo dark-only" src={featured.data.logoDark} alt="" />}
+              {featured.data.role}
+            </p>
             <h2 class="h3" id="featured-h">Your AI-powered eCommerce store, live in minutes</h2>
             <p class="lead">{featured.data.summary}</p>
+            <TechStack items={featured.data.stack} />
             {featured.data.link && (
               <a class="pill" href={featured.data.link} target="_blank" rel="noopener">
                 {host(featured.data.link)} <span aria-hidden="true">↗</span>
@@ -51,13 +87,40 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
         {
           experience.map((w) => (
             <li class="row">
-              <span class="row-name">
-                {w.data.title}
-                {w.data.role && <span class="role"> · {w.data.role}</span>}
-                <span class="row-note">{w.data.summary}</span>
-              </span>
+              <div class="row-name with-tile">
+                <span class="tile">{w.data.logo && <img src={w.data.logo} alt="" loading="lazy" decoding="async" />}</span>
+                <div>
+                  {w.data.title}
+                  {w.data.role && <span class="role"> · {w.data.role}</span>}
+                  <span class="row-note">{w.data.summary}</span>
+                  <TechStack items={w.data.stack} />
+                </div>
+              </div>
               <span class="row-cat">{w.data.category}</span>
               <span class="row-year">{w.data.period}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="edu-h">
+      <h2 class="h3" id="edu-h">Education</h2>
+      <ul class="rows">
+        {
+          education.map((e) => (
+            <li class="row">
+              <div class="row-name with-tile">
+                <span class="tile">
+                  <img src={e.logo} alt="" loading="lazy" decoding="async" />
+                </span>
+                <div>
+                  {e.course}
+                  <span class="row-note">{e.note}</span>
+                </div>
+              </div>
+              <span class="row-cat">{e.kind}</span>
+              <span class="row-year">{e.period}</span>
             </li>
           ))
         }
@@ -71,10 +134,11 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
           projects.map((w) => (
             <li>
               <a class="row" href={w.data.repo ?? w.data.link} target="_blank" rel="noopener">
-                <span class="row-name">
+                <div class="row-name">
                   {w.data.title}
                   <span class="row-note">{w.data.summary}</span>
-                </span>
+                  <TechStack items={w.data.stack} />
+                </div>
                 <span class="row-cat">{w.data.category}</span>
                 <span class="row-year">Code ↗</span>
               </a>
@@ -87,6 +151,13 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
 </BaseLayout>
 
 <style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+  }
   .featured {
     display: grid;
     grid-template-columns: 200px 1fr;
@@ -120,11 +191,23 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
   .featured .h3 {
     margin: 8px 0 12px;
   }
+  .company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .co-logo {
+    width: auto;
+    height: 16px;
+  }
   .lead {
-    margin: 0 0 20px;
+    margin: 0 0 12px;
     font-size: 15px;
     line-height: 1.7;
     color: var(--body);
+  }
+  .featured .pill {
+    margin-top: 20px;
   }
   .block {
     margin-top: 72px;
@@ -138,6 +221,30 @@ const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\
   }
   .row-name {
     max-width: 30rem;
+  }
+  /* experience and education rows: the organisation's logo on a white tile, so logos with their own white ground fit in dark mode too */
+  .with-tile {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    column-gap: 14px;
+    max-width: 33rem;
+  }
+  .tile {
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .tile:empty {
+    visibility: hidden;
+  }
+  .tile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
   @media (max-width: 720px) {
     .featured {

@@ -21,7 +21,7 @@ _Last updated: 8 Oct 2026, from Harith's own telling plus files on his Mac._
 | Based in | Kuala Lumpur, Malaysia |
 | One-liner | Founder and tech nerd building DagangNow |
 | Home hero line | "AI engineer, entrepreneur, founder of DagangNow" (his words, 8 Oct 2026) |
-| Current role | CEO of Daganoss Digital Sdn Bhd, the company behind **DagangNow** |
+| Current role | CEO of Daganoss Sdn. Bhd., the company behind **DagangNow** (confirmed 8 Oct 2026; not "Daganoss Digital") |
 | Self-description | "Basically just a tech nerd. I nerd out about tech and the little, little details." |
 | Known as (uni) | "The camera guy" |
 | Age | 23 (Oct 2026) |
@@ -54,13 +54,15 @@ Founder, not co-founder (confirmed 8 Oct 2026).
 - Picked **software engineering** because he wanted to work remotely, and figured he could do electrical engineering on his own.
 - Didn't pay much attention in the first couple of years.
 
-- Foundation year at UTM in **2021**; degree from **2022**: **Computer Science (Software Engineering)**. Graduated.
+- Foundation year at UTM in **2021**; degree from **2022**: **Bachelor of Computer Science (Software Engineering) with Honours** (confirmed 8 Oct 2026). Graduated.
+- From the resume (Oct 2026): **CGPA 3.80/4.00**, **Yayasan Telekom Malaysia scholar** (2023–2026). Foundation GPA **3.87** (older resume). All on the Work page's Education section.
+  - The Oct 2026 resume says "Bachelor of Software Engineering (Hons.)". That's wrong; the name above is right.
 
 ### Year 2: photography
 
 - Got obsessed with photography.
 - Mentor: **Fika Azman**, a professional photographer. "She was a great mentor and I really nerded out about photography."
-- **President of SSC UTMKL (Sakura Seisaku Club)** and the go-to cameraman: "the camera guy". Ran photography workshops for members ("proud to share everything I knew") and personal studio shoots with friends to teach them: lighting, camera settings, composition, "all the camera stuff you need to know".
+- **Founder and president of SSC UTMKL (Sakura Seisaku Club)**, a multimedia club; grew it past 50 members and ran 10+ activities and workshops (older resume) and the go-to cameraman: "the camera guy". Ran photography workshops for members ("proud to share everything I knew") and personal studio shoots with friends to teach them: lighting, camera settings, composition, "all the camera stuff you need to know".
 - Loves **portrait** photography most.
 - Proudest shoot: his **first concert**, for **SOG (Sekumpulan Orang Gila)**, with an orchestra. He got paid for it.
 - A lecturer wanted to build a studio and brought him in. He was the **first person to help build it**: "I had no experience but I had passion and hunger to learn."
@@ -97,10 +99,13 @@ The internship is when he went deep.
 - 🚫 Never name the client company on the site. Say "a gas company" or "an energy client".
 
 - Dates: **intern from August 2025**, then **full-stack engineer (full-time) February to July 2026**.
+- Resume titles: "Engineer Intern" (Aug 2025 – Feb 2026), then "Full Stack Engineer / Data Engineer" (Feb – Jul 2026). Resume details: legacy pipelines supporting 1,000+ locations, 5+ AWS pipelines (Glue, Step Functions, EventBridge, S3, Boto3), local Glue dev in Docker.
 
 ⚠️ The company profile also calls you a "Data Lake Engineer". Is that title OK to use on its own?
 
 ### Other work
+
+- **EcoPrasinos Engineering**: IT assistant intern, Jul – Sep 2022 (between foundation and degree), Bandar Baru Bangi. IT support, SharePoint, set up 15+ workstations and servers. On Work as a small row.
 
 - ⚠️ **Sentuh Creative**: your Drive account is on this domain, and there's a contract for services. What's the relationship? Should it appear on Work?
 - Older side projects in the current site: CalTrack (calorie tracker), GameRent (rental marketplace), HMM-LSTM (ML research), PDF Tool, Go Weather (CLI), AchievTrack. ⚠️ Keep, or archive quietly?
@@ -108,6 +113,8 @@ The internship is when he went deep.
 ## 6. Now: DagangNow
 
 - **Started:** August 2026, the month after leaving Asterisk.
+  - Founder, confirmed again 9 Oct 2026. The Oct 2026 resume's "Co-Founder & CEO" is wrong and needs fixing in the PDF.
+  - ⚠️ Start date: the resume says Jan 2026, this doc says August 2026. Which is it?
 - **Why (his words):** to help small brands and SMEs launch fast. Most people don't know how, so he wanted to give them affordable infrastructure that's ready for the AI era and keeps them up to date.
 - **Traction:** none to show yet. Write around it.
 - **What:** an agentic commerce platform for Malaysian SMEs. It's "merchant-owned commerce infrastructure for the AI shopping era".
@@ -181,6 +188,7 @@ The full list and shooting guide are in `docs/design/shot-list.md`.
 | LinkedIn | linkedin.com/in/harith-bennet |
 | Instagram | instagram.com/rithbn_ (personal) |
 | Instagram (photography) | instagram.com/rith_bennet. Link photography mentions here |
+| SSC UTMKL | instagram.com/ssc.utmkl (Kelab Sakura Seisaku UTMKL) |
 | X | x.com/rithbennet |
 | TikTok | tiktok.com/@rithbennet |
 | Public email | ⚠️ e.g. hello@rith.dev |
@@ -235,3 +243,4 @@ The full list and shooting guide are in `docs/design/shot-list.md`.
 10. Gear models (lens, mic, GPU) and the hackathon name.
 11. Public email. (Instagram, X and TikTok are in.)
 12. OK to publish the sub-agent-fanning report as is?
+13. DagangNow start: Jan or Aug 2026? (Founder, company name and degree: settled.)

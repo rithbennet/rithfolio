@@ -470,6 +470,20 @@ a.row:hover {
   }
 }
 
+/* ───────────────────────── logos with a dark-mode twin: .light-only + .dark-only, or .invert-in-dark for black marks */
+.dark-only {
+  display: none;
+}
+[data-theme="dark"] .light-only {
+  display: none;
+}
+[data-theme="dark"] .dark-only {
+  display: revert;
+}
+[data-theme="dark"] .invert-in-dark {
+  filter: invert(1);
+}
+
 /* ───────────────────────── reduced motion: calm everything down */
 @media (prefers-reduced-motion: reduce) {
   *,

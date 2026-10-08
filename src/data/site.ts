@@ -9,6 +9,8 @@ export const site = {
     "Harith is a founder and tech nerd in Kuala Lumpur, building DagangNow. Work, a diary, AI reports and photographs.",
   email: "harith.bennett@gmail.com",
   location: "Kuala Lumpur",
+  // To update the resume, replace public/resume.pdf. The link stays the same.
+  resume: "/resume.pdf",
 } as const;
 
 export const nav = [

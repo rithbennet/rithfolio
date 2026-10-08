@@ -28,6 +28,19 @@
         "summary": {
           "type": "string"
         },
+        "stack": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "logo": {
+          "type": "string"
+        },
+        "logoDark": {
+          "type": "string"
+        },
         "link": {
           "type": "string",
           "format": "uri"
