@@ -1,0 +1,75 @@
+---
+// "DagangNow" spelled with its own brand mark: the tilted D tile is the first letter.
+// Tile from the DagangNow brand kit (DagangNow repo, public/brand/dagangnow-mark.svg).
+// Hover straightens the tile; adding .is-wobbling (the bio slider does) gives it a nudge.
+// The link sits last and on one line: whitespace after it would render as a space before the full stop.
+---
+
+<style is:global>
+  .dn {
+    --dn: #635bff;
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .dn-tile {
+    display: inline-block;
+    width: 1.42em;
+    height: 1.42em;
+    margin: 0 -0.05em 0 -0.06em;
+    vertical-align: -0.37em;
+    overflow: visible;
+  }
+  .dn-tile rect {
+    transform: rotate(-12deg);
+    transform-origin: 32px 32px;
+    transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.4, 1);
+  }
+  /* the real D stays in the text for copy-paste; the tile draws it */
+  .dn-d {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .dn-word {
+    text-decoration: underline 1.5px;
+    text-decoration-color: color-mix(in oklab, var(--dn) 45%, transparent);
+    text-underline-offset: 3px;
+    transition: color 0.18s, text-decoration-color 0.18s;
+  }
+  .dn:hover .dn-tile rect,
+  .dn:focus-visible .dn-tile rect {
+    transform: rotate(0deg) scale(1.06);
+  }
+  .dn:hover .dn-word,
+  .dn:focus-visible .dn-word {
+    color: var(--dn);
+    text-decoration-color: var(--dn);
+  }
+  :root[data-theme="dark"] .dn:hover .dn-word,
+  :root[data-theme="dark"] .dn:focus-visible .dn-word {
+    color: color-mix(in oklab, var(--dn) 70%, white);
+  }
+  .dn.is-wobbling .dn-tile rect {
+    animation: dn-wobble 0.6s cubic-bezier(0.3, 1.4, 0.4, 1);
+  }
+  @keyframes dn-wobble {
+    0% { transform: rotate(-12deg); }
+    30% { transform: rotate(-26deg) scale(1.08); }
+    65% { transform: rotate(-4deg); }
+    100% { transform: rotate(-12deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dn-tile rect {
+      transition: none;
+    }
+    .dn.is-wobbling .dn-tile rect {
+      animation: none;
+    }
+  }
+</style>
+
+<a class="dn" href="https://dagangnow.com" target="_blank" rel="noopener" aria-label="DagangNow (opens in a new tab)"><svg class="dn-tile" viewBox="0 0 64 64" aria-hidden="true"><rect x="7" y="7" width="50" height="50" rx="14" transform="rotate(-12 32 32)" fill="#635BFF"></rect><path fill="#fff" fill-rule="evenodd" d="M20.5 17H34.25C43.11 17 49.5 23.23 49.5 32C49.5 40.77 43.11 47 34.25 47H20.5V17ZM29 24V40H33.75C38.45 40 41.5 36.92 41.5 32C41.5 27.08 38.45 24 33.75 24H29Z"></path></svg><span class="dn-d">D</span><span class="dn-word">agangNow</span></a>

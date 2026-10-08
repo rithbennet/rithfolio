@@ -8,7 +8,7 @@ How to use it:
 - 🚫 marks things that must not appear on the site.
 - A copy syncs to Google Drive (`My Drive/rith.dev/`) after every commit or pull on Harith's Mac (`scripts/sync-docs.sh`). Edit this repo copy; the Drive copy gets overwritten.
 
-_Last updated: 7 Oct 2026, from Harith's own telling plus files on his Mac._
+_Last updated: 8 Oct 2026, from Harith's own telling plus files on his Mac._
 
 ---
 
@@ -20,13 +20,15 @@ _Last updated: 7 Oct 2026, from Harith's own telling plus files on his Mac._
 | Goes by | Harith (handle `rithbennet`, site `rith.dev`) |
 | Based in | Kuala Lumpur, Malaysia |
 | One-liner | Founder and tech nerd building DagangNow |
+| Home hero line | "AI engineer, entrepreneur, founder of DagangNow" (his words, 8 Oct 2026) |
 | Current role | CEO of Daganoss Digital Sdn Bhd, the company behind **DagangNow** |
 | Self-description | "Basically just a tech nerd. I nerd out about tech and the little, little details." |
 | Known as (uni) | "The camera guy" |
+| Age | 23 (Oct 2026) |
 
-⚠️ Founder or co-founder? The company profile lists a team: CTO, COO, CMO and Customer & Brand Success. Which word should the site use?
+Founder, not co-founder (confirmed 8 Oct 2026).
 
-## 2. Origin story (age ~15)
+## 2. Origin story (age 15)
 
 - Strict parents, so no phone.
 - Dad had a lot of old gear. One piece was an old **Sony VAIO** laptop with **500 MB of RAM**.
@@ -41,6 +43,7 @@ _Last updated: 7 Oct 2026, from Harith's own telling plus files on his Mac._
 
 - Got into games, then learned to "hack" hardware (⚠️ wording: modding, not hacking).
 - Bought compact **HP office desktops**, ripped them open and squeezed **graphics cards** in to use them as gaming PCs.
+- Built his **first gaming PC at 18**, straight out of high school.
 - Once he had more money, he invested in **microphones and audio gear**. He got into audio properly.
 
 ⚠️ Audio gear models and the GPU(s) you used. We'll need them for the desk-object photos.
@@ -51,13 +54,15 @@ _Last updated: 7 Oct 2026, from Harith's own telling plus files on his Mac._
 - Picked **software engineering** because he wanted to work remotely, and figured he could do electrical engineering on his own.
 - Didn't pay much attention in the first couple of years.
 
-⚠️ Degree name and graduation year. The company profile says "UTM graduate".
+- Foundation year at UTM in **2021**; degree from **2022**: **Computer Science (Software Engineering)**. Graduated.
 
 ### Year 2: photography
 
 - Got obsessed with photography.
 - Mentor: **Fika Azman**, a professional photographer. "She was a great mentor and I really nerded out about photography."
-- Started his own club, **SSC UTMKL (Sakura Sakura Club)**, and became the go-to cameraman: "the camera guy". People came to him for studio shoots.
+- **President of SSC UTMKL (Sakura Seisaku Club)** and the go-to cameraman: "the camera guy". Ran photography workshops for members ("proud to share everything I knew") and personal studio shoots with friends to teach them: lighting, camera settings, composition, "all the camera stuff you need to know".
+- Loves **portrait** photography most.
+- Proudest shoot: his **first concert**, for **SOG (Sekumpulan Orang Gila)**, with an orchestra. He got paid for it.
 - A lecturer wanted to build a studio and brought him in. He was the **first person to help build it**: "I had no experience but I had passion and hunger to learn."
 - Shot studio, outdoor, cosplay and product photography for over a year.
 - Built a small community around it: one-on-one sessions, and studio sessions with juniors.
@@ -70,6 +75,8 @@ _Last updated: 7 Oct 2026, from Harith's own telling plus files on his Mac._
 
 - "Time to change." Switched focus from photography back to tech.
 - Joined hackathons and lost a lot of them, because he didn't know how to code yet.
+  - First: **DevMatch** (2024). Built nothing.
+  - Next: **Loophole**, for fun. Built his first fun product, **The Conch** (github.com/rithbennet/theconch): a game where you shake it, ask the conch what to do, and get a cryptic, useless answer.
 - App development is what kick-started learning **Next.js**.
 - ⚠️ You said "algorithms grew and made me able to build as fast as possible". Did you mean AI, LLMs or AI coding tools?
 - Loves building, and loves the gritty details.
@@ -89,7 +96,9 @@ The internship is when he went deep.
   - helped **build and prototype an AI tool** for that client's whole department
 - 🚫 Never name the client company on the site. Say "a gas company" or "an energy client".
 
-⚠️ Dates of the internship. Did it turn into a full-time role? There's a "Full Stack Developer" offer letter in `~/Documents/work/OFFER/`. ⚠️ The company profile also calls you a "Data Lake Engineer". Is that title OK to use on its own?
+- Dates: **intern from August 2025**, then **full-stack engineer (full-time) February to July 2026**.
+
+⚠️ The company profile also calls you a "Data Lake Engineer". Is that title OK to use on its own?
 
 ### Other work
 
@@ -98,6 +107,9 @@ The internship is when he went deep.
 
 ## 6. Now: DagangNow
 
+- **Started:** August 2026, the month after leaving Asterisk.
+- **Why (his words):** to help small brands and SMEs launch fast. Most people don't know how, so he wanted to give them affordable infrastructure that's ready for the AI era and keeps them up to date.
+- **Traction:** none to show yet. Write around it.
 - **What:** an agentic commerce platform for Malaysian SMEs. It's "merchant-owned commerce infrastructure for the AI shopping era".
 - **Primary tagline:** "Your AI-powered eCommerce store, live in minutes."
 - **Supporting lines (approved by the brand kit):**
@@ -125,8 +137,10 @@ The internship is when he went deep.
 
 | | |
 | --- | --- |
-| Photography | Sony A7R III. Studio, cosplay, product, outdoor |
-| Lifting | Still lifting. **Bench: 70 kg**. ⚠️ Squat and deadlift numbers, if you want them shown |
+| Photography | Sony A7R III. Portraits most of all; also studio, cosplay, product, outdoor, one concert. "I could yap about cameras and tech for hours." |
+| Working out | Still lifts and enjoys working out. 🚫 No lift numbers on the site (bench is 70 kg, but don't publish it) |
+| Nerding out about (Oct 2026) | Bio phrasing: "tinkering with AI in every way he can". Specifically: AI agents and orchestration; self-hosting (wants his own server to run his agents and everything else). Also follows Theo Browne (T3 / T3 Code), Matt Pocock's skills, Lauren Tan (github.com/poteto). 🚫 Don't name people in the bio: it dates fast |
+| Belief | "Always be passionate about the things you love. Life is an endless journey of learning, and that's what I love." |
 | Tech tinkering | Old PCs, GPUs, audio gear, anything with screws |
 | Games | Started everything. ⚠️ Still gaming? Which games? |
 | Writing | A diary on this site, plus AI research reports |
@@ -165,7 +179,10 @@ The full list and shooting guide are in `docs/design/shot-list.md`.
 | Site | rith.dev |
 | GitHub | github.com/rithbennet |
 | LinkedIn | linkedin.com/in/harith-bennet |
-| Instagram | ⚠️ |
+| Instagram | instagram.com/rithbn_ (personal) |
+| Instagram (photography) | instagram.com/rith_bennet. Link photography mentions here |
+| X | x.com/rithbennet |
+| TikTok | tiktok.com/@rithbennet |
 | Public email | ⚠️ e.g. hello@rith.dev |
 | DagangNow | dagangnow.com |
 
@@ -176,8 +193,11 @@ The full list and shooting guide are in `docs/design/shot-list.md`.
 - Shows the nerdiness through specifics (500 MB of RAM, burned CDs, GPUs in office PCs), not adjectives.
 - Avoid: buzzwords ("passionate", "innovative", "leveraging"), résumé voice, listing every skill.
 - **Home page is light on words.** The detail lives on About.
+- **Copy should hold for about six months** (the current home bio is meant to last until ~April 2027). Avoid things that date fast: current age, metrics, people he follows, "currently building X".
 
 ## 12. Copy bank (drafts to pick from)
+
+**Home bio slider:** 20 stops, third person, in `src/data/home-bio.ts`. Written 8 Oct 2026; revise around April 2027.
 
 **Home intro (pick one):**
 - "Hi, I'm Harith, a founder and tech nerd building DagangNow in Kuala Lumpur."
@@ -203,15 +223,15 @@ The full list and shooting guide are in `docs/design/shot-list.md`.
 
 ## 13. Open questions (summary)
 
-1. Founder or co-founder?
+1. ~~Founder or co-founder?~~ Founder.
 2. VAIO: confirm the brand.
-3. Degree name and graduation year.
+3. ~~Degree name and graduation year.~~ CS (Software Engineering), graduated.
 4. "Algorithms" or "AI"? And "Curly"?
-5. Internship dates, and what came after.
+5. ~~Internship dates, and what came after.~~ Aug 2025 intern, Feb–Jul 2026 full-time.
 6. Sentuh Creative: include or not?
 7. Old side projects: keep or archive?
 8. Which photo folders can go in the Gallery?
-9. Lifting numbers beyond bench; still gaming?
+9. ~~Lifting numbers~~ (not shown on the site). Still gaming?
 10. Gear models (lens, mic, GPU) and the hackathon name.
-11. Public email and Instagram.
+11. Public email. (Instagram, X and TikTok are in.)
 12. OK to publish the sub-agent-fanning report as is?

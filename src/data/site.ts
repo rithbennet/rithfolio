@@ -19,6 +19,9 @@ export const nav = [
 ] as const;
 
 export const socials = [
-  { href: "https://github.com/rithbennet", label: "GitHub", icon: "github" },
+  { href: "https://x.com/rithbennet", label: "X", icon: "x" },
+  { href: "https://www.instagram.com/rithbn_/", label: "Instagram", icon: "instagram" },
+  { href: "https://www.tiktok.com/@rithbennet", label: "TikTok", icon: "tiktok" },
   { href: "https://www.linkedin.com/in/harith-bennet/", label: "LinkedIn", icon: "linkedin" },
+  { href: "https://github.com/rithbennet", label: "GitHub", icon: "github" },
 ] as const;

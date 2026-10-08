@@ -3,9 +3,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import DeskObject from "../components/site/DeskObject.astro";
 import Sprite from "../components/site/Sprite.astro";
 import StickyNote from "../components/site/StickyNote.astro";
+import DagangNow from "../components/site/DagangNow.astro";
 import { getCollection } from "astro:content";
 import { format } from "date-fns";
-import { site } from "../data/site";
+import { site, socials } from "../data/site";
+import { bioStops, parseParagraph, wordCount } from "../data/home-bio";
+import { socialIcons } from "../lib/social-icons";
 
 const [latestPost] = (await getCollection("posts", ({ data }) => data.published)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -21,7 +24,7 @@ const jsonLd = {
   url: site.url,
   jobTitle: "CEO, DagangNow",
   address: { "@type": "PostalAddress", addressLocality: "Kuala Lumpur", addressCountry: "MY" },
-  sameAs: ["https://github.com/rithbennet", "https://www.linkedin.com/in/harith-bennet/"],
+  sameAs: socials.map((s) => s.href),
 };
 ---
 
@@ -38,16 +41,62 @@ const jsonLd = {
     <DeskObject name="phone" label="A phone showing a DagangNow store" class="o-phone" enter={[48, 32, 0.22]} />
 
     <div class="hero-copy" data-hero-copy>
-      <h1>
-        <span>Hi, I'm Harith<Sprite pose="wave" class="hero-sprite" />, a founder and <em class="hl">tech nerd</em></span>
-        <span>building DagangNow in Kuala Lumpur.</span>
-      </h1>
-      <p class="status">Currently in 📍 Kuala Lumpur. CEO of <b>DagangNow</b>. Still the camera guy.</p>
-      <p class="hero-links">
-        <a class="underline-link" href="/about">More about me</a>
-        <span aria-hidden="true">·</span>
-        <a class="underline-link" href="#contact">Email me</a>
-      </p>
+      <h1>Hello, I'm Harith<Sprite pose="wave" class="hero-sprite" /></h1>
+
+      <ul class="hero-socials" aria-label="Elsewhere">
+        {
+          socials.map((s) => (
+            <li>
+              <a href={s.href} aria-label={s.label} rel="me noopener" target="_blank">
+                <svg viewBox="0 0 24 24" aria-hidden="true" set:html={socialIcons[s.icon]} />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={`mailto:${site.email}`} aria-label="Email">
+            <svg viewBox="0 0 24 24" aria-hidden="true" set:html={socialIcons.email} />
+          </a>
+        </li>
+      </ul>
+
+      <label class="bio-length">
+        <span>Bio length</span>
+        <input type="range" min="0" max={bioStops.length - 1} step="1" value="0" autocomplete="off" aria-valuetext={`${wordCount(bioStops[0])} words`} data-bio-range />
+      </label>
+
+      <!-- every stop is rendered; the slider shows one. Copy lives in src/data/home-bio.ts -->
+      <div class="bio" data-bio>
+        {
+          bioStops.map((stop, i) => (
+            <div data-level={`${wordCount(stop)} words`} hidden={i > 0}>
+              {stop.map(parseParagraph).map(({ heading, parts }) => (
+                <p>
+                  {heading && <span class="bio-head">{heading}</span>}
+                  {parts.map((part) =>
+                    "mark" in part ? (
+                      <DagangNow />
+                    ) : part.href?.startsWith("http") ? (
+                      <a href={part.href} target="_blank" rel="noopener">{part.text}</a>
+                    ) : part.href ? (
+                      <a href={part.href}>{part.text}</a>
+                    ) : (
+                      part.text
+                    ),
+                  )}
+                </p>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+
+      <a class="about-btn" href="/about">
+        Learn more about me
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 18 6-6-6-6"></path>
+        </svg>
+      </a>
     </div>
     <p class="hint" data-hero-copy>Drag the objects around</p>
   </section>
@@ -84,16 +133,54 @@ const jsonLd = {
 </BaseLayout>
 
 <script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ease = "cubic-bezier(.22, 1, .36, 1)";
+
   // the intro fades up while the objects land
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (!reduce) {
     document.querySelectorAll<HTMLElement>("[data-hero-copy]").forEach((el, i) => {
       el.animate([{ opacity: 0, transform: "translateY(22px)" }, { opacity: 1, transform: "none" }], {
         duration: 680,
         delay: i ? 1050 : 380,
-        easing: "cubic-bezier(.22, 1, .36, 1)",
+        easing: ease,
         fill: "backwards",
       });
     });
+  }
+
+  // bio length: show the chosen stop and ease the height between stops
+  const range = document.querySelector<HTMLInputElement>("[data-bio-range]");
+  const bio = document.querySelector<HTMLElement>("[data-bio]");
+  if (range && bio) {
+    const levels = [...bio.querySelectorAll<HTMLElement>("[data-level]")];
+    let current = levels.findIndex((el) => !el.hidden);
+    let resize: Animation | undefined;
+    const show = (next: number) => {
+      if (next === current || !levels[next]) return;
+      const from = bio.offsetHeight;
+      levels[current].hidden = true;
+      levels[next].hidden = false;
+      current = next;
+      range.setAttribute("aria-valuetext", levels[next].dataset.level ?? "");
+      if (reduce) return;
+      resize?.cancel();
+      const to = bio.offsetHeight;
+      resize = bio.animate([{ height: `${from}px`, overflow: "hidden" }, { height: `${to}px`, overflow: "hidden" }], {
+        duration: 460,
+        easing: ease,
+      });
+      levels[next].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: ease });
+      // the DagangNow tile gives a little nudge each time the bio changes
+      const mark = levels[next].querySelector<HTMLElement>(".dn");
+      if (mark) {
+        mark.classList.remove("is-wobbling");
+        void mark.offsetWidth;
+        mark.classList.add("is-wobbling");
+      }
+    };
+    range.addEventListener("input", () => show(range.valueAsNumber));
+    // the browser may restore the slider on back/forward; match the bio to it
+    show(range.valueAsNumber);
   }
 </script>
 
@@ -102,57 +189,180 @@ const jsonLd = {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    place-items: center;
-    min-height: max(100svh, 760px);
+    justify-items: center;
+    align-content: start;
+    --hero-h: max(100svh, 760px);
+    min-height: var(--hero-h);
+    /* the copy hangs from a fixed line, so the slider stays put while the bio grows downward */
+    padding: max(150px, calc(50svh - 150px)) 0 250px;
     overflow: hidden;
     background: radial-gradient(circle at 50% 44%, var(--lamp), transparent 34rem);
   }
   .hero-copy {
     position: relative;
     z-index: 6;
-    width: min(900px, 72vw, calc(100vw - 36px));
+    width: min(620px, calc(100vw - 36px));
     text-align: center;
     pointer-events: none;
   }
   .hero-copy :global(a),
-  .hero-copy :global(.sprite) {
+  .hero-copy :global(.sprite),
+  .hero-copy input,
+  .bio {
     pointer-events: auto;
   }
   h1 {
     margin: 0;
     font-family: var(--font-display);
     font-weight: var(--display-weight);
-    font-size: calc(clamp(34px, 2.9vw, 44px) * var(--display-scale) * 1.12);
-    line-height: 1.1;
+    font-size: calc(clamp(46px, 5vw, 70px) * var(--display-scale));
+    line-height: 1.05;
     letter-spacing: var(--display-tracking);
   }
-  h1 > span {
-    display: block;
-  }
   h1 :global(.hero-sprite) {
-    margin: -14px 2px 0 6px;
+    width: 44px;
+    height: 57px;
+    margin: -0.3em 0 0 0.14em;
   }
-  .status {
-    margin: 18px auto 0;
-    max-width: 560px;
-    font-size: clamp(12.5px, 1vw, 14px);
-    font-weight: 500;
-    line-height: 1.55;
-    color: var(--muted);
-  }
-  .status b {
-    color: var(--ink);
-    font-weight: 650;
-  }
-  .hero-links {
+
+  .hero-socials {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    margin: 16px 0 0;
-    font-size: 13px;
-    font-weight: 500;
+    gap: 4px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hero-socials a {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: var(--body);
+    transition: color 0.16s, transform 0.18s var(--ease-hover);
+  }
+  .hero-socials a:hover {
+    color: var(--accent-text);
+    transform: translateY(-2px);
+  }
+  .hero-socials svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .bio-length {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    font: 11px/1 var(--font-mono);
+    letter-spacing: 0.04em;
     color: var(--muted);
   }
+  .bio-length input {
+    width: 128px;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .bio-length input::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--ink) 13%, transparent);
+  }
+  .bio-length input::-moz-range-track {
+    height: 4px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--ink) 13%, transparent);
+  }
+  .bio-length input::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--ink);
+    transition: scale 0.15s var(--ease-hover);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .bio-length input::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--ink);
+    transition: scale 0.15s var(--ease-hover);
+  }
+  .bio-length input:active::-webkit-slider-thumb {
+    scale: 1.2;
+  }
+  .bio-length input:active::-moz-range-thumb {
+    scale: 1.2;
+  }
+
+  .bio {
+    max-width: 34rem;
+    margin: 18px auto 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .bio p {
+    margin: 0;
+  }
+  .bio p + p {
+    margin-top: 12px;
+  }
+  .bio-head {
+    display: block;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .bio a {
+    color: var(--ink);
+    text-decoration: underline 1px;
+    text-decoration-color: color-mix(in oklab, var(--ink) 32%, transparent);
+    text-underline-offset: 3px;
+    transition: color 0.16s, text-decoration-color 0.16s;
+  }
+  .bio a:hover {
+    color: var(--accent-text);
+    text-decoration-color: currentColor;
+  }
+
+  .about-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    margin-top: 24px;
+    padding: 0 16px 0 20px;
+    border: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.16s;
+  }
+  .about-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.18s var(--ease-hover);
+  }
+  .about-btn:hover {
+    border-color: color-mix(in oklab, var(--ink) 36%, transparent);
+  }
+  .about-btn:hover svg {
+    transform: translateX(3px);
+  }
+
   .hint {
     position: absolute;
     right: 28px;
@@ -165,11 +375,12 @@ const jsonLd = {
     color: var(--muted);
   }
 
-  /* where each object sits on the desk */
-  .hero :global(.o-polaroid) { width: clamp(120px, 11vw, 175px); top: 9%; left: 3%; --r: -9deg; }
-  .hero :global(.o-camera)   { width: clamp(170px, 15vw, 245px); top: 23%; left: 15%; --r: -6deg; }
-  .hero :global(.o-tag)      { width: clamp(160px, 14vw, 220px); top: 12%; right: 23%; --r: 7deg; }
-  .hero :global(.o-plate)    { width: clamp(150px, 13vw, 210px); top: 6%; right: 3%; --r: 18deg; }
+  /* where each object sits on the desk. The top row is measured against the first screen, not the hero,
+     so it stays put when a longer bio stretches the hero; the bottom row rides down with it. */
+  .hero :global(.o-polaroid) { width: clamp(120px, 11vw, 175px); top: calc(var(--hero-h) * 0.09); left: 3%; --r: -9deg; }
+  .hero :global(.o-camera)   { width: clamp(170px, 15vw, 245px); top: calc(var(--hero-h) * 0.23); left: 15%; --r: -6deg; }
+  .hero :global(.o-tag)      { width: clamp(160px, 14vw, 220px); top: calc(var(--hero-h) * 0.12); right: 23%; --r: 7deg; }
+  .hero :global(.o-plate)    { width: clamp(150px, 13vw, 210px); top: calc(var(--hero-h) * 0.06); right: 3%; --r: 18deg; }
   .hero :global(.o-gpu)      { width: clamp(220px, 20vw, 320px); bottom: 5%; left: -3%; --r: -8deg; }
   .hero :global(.o-mic)      { width: clamp(70px, 6.2vw, 100px); bottom: 4%; left: 27%; --r: -14deg; }
   .hero :global(.o-badge)    { width: clamp(96px, 8vw, 130px); bottom: 2%; left: 47%; --r: 10deg; }
@@ -183,17 +394,17 @@ const jsonLd = {
   }
 
   @media (max-width: 720px) {
-    h1 > span {
-      display: inline;
+    .hero {
+      padding-bottom: 300px;
     }
     .hero :global(.o-polaroid),
     .hero :global(.o-mic),
     .hero :global(.o-badge) {
       display: none;
     }
-    .hero :global(.o-camera) { width: 30vw; top: 13%; left: 4%; }
-    .hero :global(.o-tag)    { width: 34vw; top: 15%; right: 6%; }
-    .hero :global(.o-plate)  { width: 26vw; top: auto; bottom: 18%; right: 4%; }
+    .hero :global(.o-camera) { width: 30vw; top: calc(var(--hero-h) * 0.13); left: 4%; }
+    .hero :global(.o-tag)    { width: 34vw; top: calc(var(--hero-h) * 0.15); right: 6%; }
+    .hero :global(.o-plate)  { width: 26vw; top: auto; bottom: 11%; right: 4%; }
     .hero :global(.o-gpu)    { width: 46vw; bottom: 3%; left: -10%; }
     .hero :global(.o-phone)  { width: 22vw; bottom: 2%; right: 30%; }
     .hint {
