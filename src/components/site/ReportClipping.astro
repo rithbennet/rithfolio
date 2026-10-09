@@ -17,7 +17,7 @@ const posts = await getCollection("posts", ({ data }) => data.published && data.
 const referenced = posts
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .map((p) => ({ title: p.data.title, href: `/blog/${p.id.replace(/\/index$/, "")}` }));
-const href = `/reports/${id}/`;
+const href = `/reports/${id}`;
 ---
 
 <figure class="clip" aria-label={`AI report: ${report.data.title}`}>

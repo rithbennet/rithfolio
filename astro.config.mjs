@@ -46,6 +46,9 @@ const prettyCodeOptions = {
 export default defineConfig({
     site: process.env.SITE_URL || "https://rith.dev",
     output: "static",
+    // one address per page: /about, never /about/. Vercel redirects the slashed form, and the
+    // sitemap, canonical tags and links all agree, so Google doesn't see duplicates
+    trailingSlash: "never",
     adapter: vercel(),
     integrations: [react(), mdx(), sitemap()],
     // old routes from the previous site

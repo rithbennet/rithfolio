@@ -15,7 +15,7 @@ export async function GET(context: APIContext) {
       title: p.data.title,
       pubDate: p.data.date,
       description: p.data.description,
-      link: `/blog/${p.id.replace(/\/index$/, "")}/`,
+      link: `/blog/${p.id.replace(/\/index$/, "")}`,
     })),
   });
 }

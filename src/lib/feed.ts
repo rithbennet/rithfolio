@@ -25,7 +25,7 @@ export async function getFeed(): Promise<FeedItem[]> {
       date: r.data.date,
       tags: r.data.tags,
       kind: "AI report" as const,
-      href: `/reports/${r.id}/`,
+      href: `/reports/${r.id}`,
     })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime());
 }

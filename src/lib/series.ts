@@ -45,7 +45,7 @@ async function resolve(entry: CollectionEntry<"series">): Promise<Series> {
         key: `report:${part.report}`,
         kind: "AI report",
         title: report.data.title,
-        href: `/reports/${part.report}/`,
+        href: `/reports/${part.report}`,
         date: report.data.date,
       });
     }
