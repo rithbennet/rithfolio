@@ -50,3 +50,6 @@ photos-inbox/
 
 # local path for scripts/sync-docs.sh (machine-specific)
 .drive-dir
+
+# cloudflare
+.wrangler

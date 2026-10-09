@@ -1,0 +1,5 @@
+# Old routes from the previous site. Cloudflare reads this file at deploy time.
+/projects  /work           301
+/skills    /about          301
+/contact   /#contact       301
+/reports   /blog#reports   301

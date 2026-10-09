@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "rithfolio-www-redirect",
+  "account_id": "584717a5616edba9bb2c915d52c691e5",
+  "main": "index.js",
+  "compatibility_date": "2026-10-10",
+  "workers_dev": false,
+  "routes": [{ "pattern": "www.rith.dev", "custom_domain": true }]
+}

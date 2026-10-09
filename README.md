@@ -96,9 +96,13 @@ Add new blog posts by creating a folder under `content/posts/` with an `index.md
 
 ## Deployment
 
-This project is configured for Vercel deployment with the `@astrojs/vercel` adapter:
+rith.dev runs on Cloudflare Workers as a static site (no adapter). Pushing to `main` builds and deploys it
+through Workers Builds; settings live in `wrangler.jsonc`.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rithbennet/rithfolio)
+- Redirects for old routes: `public/_redirects`. Cache headers: `public/_headers`.
+- `www.rith.dev` redirects to `rith.dev` through a tiny separate Worker in `workers/www-redirect/`, deployed by hand
+  since it never changes: `pnpm exec wrangler deploy -c workers/www-redirect/wrangler.jsonc`.
+- Manual deploy from your machine: `pnpm run deploy`.
 
 ## License
 

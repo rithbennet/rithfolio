@@ -2,7 +2,6 @@ import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
-import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -46,18 +45,12 @@ const prettyCodeOptions = {
 export default defineConfig({
     site: process.env.SITE_URL || "https://rith.dev",
     output: "static",
-    // one address per page: /about, never /about/. Vercel redirects the slashed form, and the
-    // sitemap, canonical tags and links all agree, so Google doesn't see duplicates
+    // one address per page: /about, never /about/. Cloudflare redirects the slashed form (see
+    // wrangler.jsonc), and the sitemap, canonical tags and links all agree, so Google doesn't see duplicates
     trailingSlash: "never",
-    adapter: vercel(),
+    // no adapter: the site is fully static and Cloudflare serves dist/ as-is.
+    // Redirects for old routes live in public/_redirects.
     integrations: [react(), mdx(), sitemap()],
-    // old routes from the previous site
-    redirects: {
-        "/projects": "/work",
-        "/skills": "/about",
-        "/contact": "/#contact",
-        "/reports": "/blog#reports",
-    },
     vite: {
         plugins: [tailwindcss()],
     },
