@@ -23,8 +23,6 @@ interface Props {
   twitterDescription?: string;
   twitterImage?: string;
   jsonLd?: Record<string, unknown>;
-  /** pages that draw their own full-bleed hero hide the footer rule */
-  bare?: boolean;
 }
 
 const {
@@ -41,7 +39,6 @@ const {
   twitterDescription,
   twitterImage,
   jsonLd,
-  bare = false,
 } = Astro.props;
 
 const resolvedTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.tagline}`;
@@ -92,6 +89,6 @@ const resolvedTitle = title ? `${title} · ${site.name}` : `${site.name} · ${si
     <main id="main">
       <slot />
     </main>
-    <Footer bare={bare} />
+    <Footer />
   </body>
 </html>

@@ -6,7 +6,9 @@
 ---
 
 <style is:global>
-  .dn {
+  /* .prose .dn outranks the prose link underline, which would otherwise run under the tile */
+  .dn,
+  .prose .dn {
     --dn: #635bff;
     color: var(--ink);
     text-decoration: none;

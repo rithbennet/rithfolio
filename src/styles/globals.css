@@ -121,6 +121,12 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.35s var(--ease-out), color 0.35s var(--ease-out);
   overflow-x: hidden;
+  /* main takes the spare height so the footer sits at the bottom of short pages */
+  display: flex;
+  flex-direction: column;
+}
+body > main {
+  flex: 1 0 auto;
 }
 ::selection {
   background: var(--accent);
@@ -374,7 +380,8 @@ body::before {
 [data-theme="dark"] .prose pre code span {
   color: var(--shiki-dark) !important;
 }
-.dropcap::first-letter {
+.dropcap::first-letter,
+.dropcap-first > p:first-child::first-letter {
   float: left;
   margin: 7px 6px 0 0;
   font-family: var(--font-display);

@@ -1,53 +1,178 @@
 ---
+// Footer laid out after mfrashad.com's: who I am and where to find me, three columns of links, then a fine-print row.
 import { site, socials } from "../../data/site";
+import { socialIcons } from "../../lib/social-icons";
 
-interface Props {
-  bare?: boolean;
-}
-const { bare = false } = Astro.props;
+const columns = [
+  {
+    title: "Site",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/work", label: "Work" },
+      { href: "/gallery", label: "Gallery" },
+    ],
+  },
+  {
+    title: "Writing",
+    links: [
+      { href: "/blog", label: "Diary" },
+      { href: "/blog#reports", label: "AI reports" },
+      { href: "/rss.xml", label: "RSS" },
+    ],
+  },
+  {
+    title: "Elsewhere",
+    links: [
+      { href: "https://dagangnow.com", label: "DagangNow" },
+      { href: site.photography, label: "Photography" },
+      { href: `mailto:${site.email}`, label: "Email" },
+    ],
+  },
+];
+const external = (href: string) => href.startsWith("http");
 ---
 
-<footer class:list={["site-footer", { bare }]}>
-  <p>
-    Or email <a href={`mailto:${site.email}`}>{site.email}</a>. I'm also on
-    {socials.map((s, i) => (<>{i > 0 && (i === socials.length - 1 ? " and " : ", ")}<a href={s.href} rel="me noopener" target="_blank">{s.label}</a></>))}.
-  </p>
-  <p>© {new Date().getFullYear()} {site.fullName} · <a href="/rss.xml">RSS</a></p>
+<footer class="site-footer">
+  <div class="inner">
+    <div class="top">
+      <div class="brand">
+        <p class="name">{site.name}</p>
+        <p class="line">AI engineer, entrepreneur, founder of DagangNow.</p>
+        <ul class="icons" aria-label="Elsewhere">
+          {
+            socials.map((s) => (
+              <li>
+                <a href={s.href} aria-label={s.label} rel="me noopener" target="_blank">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" set:html={socialIcons[s.icon]} />
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={`mailto:${site.email}`} aria-label="Email">
+              <svg viewBox="0 0 24 24" aria-hidden="true" set:html={socialIcons.email} />
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {
+        columns.map((col) => (
+          <div>
+            <h2 class="title">{col.title}</h2>
+            <ul class="links">
+              {col.links.map((l) => (
+                <li>
+                  {external(l.href) ? (
+                    <a href={l.href} target="_blank" rel="noopener">
+                      {l.label}
+                    </a>
+                  ) : (
+                    <a href={l.href}>{l.label}</a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="bottom">
+      <p>© {new Date().getFullYear()} {site.fullName}</p>
+      <a href={site.repo} target="_blank" rel="noopener">View source code</a>
+    </div>
+  </div>
 </footer>
 
 <style>
   .site-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 30px;
-    width: var(--wide);
-    margin: 0 auto;
-    padding: 22px 0 28px;
-    border-top: 1px dashed var(--rule);
-    font-size: 11px;
-    line-height: 1.6;
+    background: color-mix(in oklab, var(--ink) 5%, var(--bg));
     color: var(--muted);
   }
-  .site-footer.bare {
-    border-top: 0;
+  .inner {
+    width: min(64rem, 100% - 48px);
+    margin: 0 auto;
+    padding: 48px 0 30px;
   }
-  .site-footer p {
+  .top {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  p {
     margin: 0;
   }
-  .site-footer a {
-    color: var(--body);
-    text-decoration-color: color-mix(in oklab, var(--muted) 60%, transparent);
-    text-underline-offset: 2px;
+  .name,
+  .title {
+    margin: 0 0 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: 0;
+    color: var(--ink);
   }
-  .site-footer a:hover {
-    color: var(--accent-text);
+  .line {
+    max-width: 16rem;
+    font-size: 13px;
+    line-height: 1.6;
   }
+  .icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .icons a {
+    display: block;
+    color: var(--muted);
+    transition: color 0.16s;
+  }
+  .icons svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+  .links {
+    display: grid;
+    gap: 9px;
+    font-size: 13px;
+  }
+  a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.16s;
+  }
+  a:hover {
+    color: var(--ink);
+  }
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 12px;
+  }
+
   @media (max-width: 720px) {
-    .site-footer {
+    .top {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px 16px;
+    }
+    .brand {
+      grid-column: 1 / -1;
+    }
+    .bottom {
       flex-direction: column;
       align-items: flex-start;
-      gap: 6px;
     }
   }
 </style>
