@@ -1,186 +1,84 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+// A diary entry, on the same layout as the AI reports.
+import ArticleLayout from "../../layouts/ArticleLayout.astro";
 import ReportClipping from "../../components/site/ReportClipping.astro";
-import Comments from "../../components/Comments";
+import { articleComponents } from "../../components/article";
+import { getImage } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import { format } from "date-fns";
 import readingTime from "reading-time";
-import { slugify } from "../../lib/utils";
+import { getSeriesFor } from "../../lib/series";
 import { site } from "../../data/site";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts", ({ data }) => data.published);
+  // drafts still open at their URL in dev
+  const posts = await getCollection("posts", ({ data }) => data.published || import.meta.env.DEV);
   return posts.map((post) => ({ params: { slug: post.id.replace(/\/index$/, "") }, props: { post } }));
 }
 
 const { post } = Astro.props;
+const { title, description, date, cover, coverAlt, coverCaption, location, tags, reports } = post.data;
 const slug = post.id.replace(/\/index$/, "");
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const url = `${site.url}/blog/${slug}`;
 
-// covers sit next to the post in content/posts/<slug>/ and are copied to public/content/blogs/<slug>/
-const cover = post.data.coverImageSrc
-  ? post.data.coverImageSrc.startsWith("/")
-    ? post.data.coverImageSrc
-    : `/content/blogs/${slug}/${post.data.coverImageSrc.replace("./", "")}`
-  : undefined;
-const rt = post.body ? readingTime(post.body).text : "1 min read";
-const ogImage = cover ? `${site.url}${cover}` : undefined;
+const series = await getSeriesFor(`diary:${slug}`);
+const minutes = Math.max(1, Math.round(readingTime(post.body ?? "").minutes));
+const meta = [
+  { text: "Diary" },
+  { text: format(date, "d MMM yyyy"), datetime: date.toISOString() },
+  { text: `${minutes} min read` },
+  ...(location ? [{ text: location }] : []),
+];
+
+const ogImage = cover ? `${site.url}${(await getImage({ src: cover, width: 1200, format: "jpg" })).src}` : undefined;
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  headline: post.data.title,
-  datePublished: post.data.date.toISOString(),
-  description: post.data.description,
+  headline: title,
+  datePublished: date.toISOString(),
+  description,
   url,
   ...(ogImage && { image: ogImage }),
   author: { "@type": "Person", name: site.fullName, url: site.url },
 };
 ---
 
-<BaseLayout
-  title={post.data.title}
-  description={post.data.description}
-  canonical={url}
-  ogType="article"
-  ogUrl={url}
+<ArticleLayout
+  title={title}
+  description={description}
+  url={url}
   ogImage={ogImage}
   jsonLd={jsonLd}
+  meta={meta}
+  standfirst={description}
+  cover={cover}
+  coverAlt={coverAlt}
+  coverCaption={coverCaption}
+  toc={headings.filter((h) => h.depth === 2)}
+  numbered
+  tags={tags}
+  series={series}
 >
-  <article class="page col">
-    <header>
-      <p class="meta">
-        <time datetime={post.data.date.toISOString()}>{format(post.data.date, "d MMMM yyyy")}</time>
-        · {rt}
-        {post.data.location && ` · ${post.data.location}`}
-      </p>
-      <h1 class="h1 title">{post.data.title}</h1>
-      <p class="lead">{post.data.description}</p>
-      {cover && <img class="cover" src={cover} alt="" loading="eager" />}
-    </header>
+  <Content components={articleComponents} />
 
-    <div class="prose">
-      <Content components={{ Report: ReportClipping }} />
-    </div>
-
-    {
-      post.data.reports.length > 0 && (
-        <section class="discussed" aria-labelledby="discussed-h">
-          <p class="eyebrow" id="discussed-h">
-            Discussed in this entry
-          </p>
-          {post.data.reports.map((id) => (
-            <ReportClipping id={id} compact />
-          ))}
-        </section>
-      )
-    }
-
-    <footer class="post-foot">
-      <a href="/blog">← All entries</a>
-      {
-        post.data.tags.length > 0 && (
-          <span class="tags">
-            {post.data.tags.map((tag) => (
-              <a href={`/blog/tag/${slugify(tag)}`}>#{tag}</a>
-            ))}
-          </span>
-        )
-      }
-    </footer>
-
-    <Comments client:visible />
-  </article>
-</BaseLayout>
-
-<script>
-  // copy button on code blocks
-  document.querySelectorAll<HTMLElement>("[data-rehype-pretty-code-figure]").forEach((figure) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "copy-code";
-    btn.textContent = "Copy";
-    btn.addEventListener("click", async () => {
-      const pre = figure.querySelector('pre:not([style*="display: none"])') ?? figure.querySelector("pre");
-      await navigator.clipboard.writeText(pre?.textContent ?? "");
-      btn.textContent = "Copied";
-      setTimeout(() => (btn.textContent = "Copy"), 1600);
-    });
-    figure.appendChild(btn);
-  });
-</script>
+  {
+    reports.length > 0 && (
+      <section class="discussed" slot="after" aria-labelledby="discussed-h">
+        <p class="eyebrow" id="discussed-h">
+          Discussed in this entry
+        </p>
+        {reports.map((id) => (
+          <ReportClipping id={id} compact />
+        ))}
+      </section>
+    )
+  }
+</ArticleLayout>
 
 <style>
-  .title {
-    margin: 10px 0 14px;
-    font-size: calc(clamp(32px, 3.4vw, 44px) * var(--display-scale) * 1.1);
-    line-height: 1.08;
-  }
-  .lead {
-    margin: 0 0 8px;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--body);
-  }
-  .cover {
-    display: block;
-    width: 100%;
-    margin: 28px 0 0;
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    filter: contrast(0.98) saturate(0.88);
-  }
-  .prose {
-    padding-top: 36px;
-  }
   .discussed {
     margin-top: 48px;
-  }
-  .post-foot {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 40px;
-    padding-top: 18px;
-    border-top: 1px dashed var(--rule);
-    font-size: 12.5px;
-  }
-  .post-foot a {
-    color: var(--accent-text);
-    text-decoration: none;
-  }
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .tags a {
-    font: 11px var(--font-mono);
-    color: var(--muted);
-  }
-  .tags a:hover {
-    color: var(--accent-text);
-  }
-  :global(.copy-code) {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    padding: 3px 8px;
-    border: 1px solid var(--rule);
-    border-radius: 5px;
-    background: var(--bg);
-    color: var(--muted);
-    font: 10px var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  :global([data-rehype-pretty-code-figure]:hover .copy-code),
-  :global(.copy-code:focus-visible) {
-    opacity: 1;
   }
 </style>

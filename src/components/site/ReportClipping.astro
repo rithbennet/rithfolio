@@ -1,6 +1,6 @@
 ---
 // An AI report shown as a taped paper clipping: stamp, model, date, summary, key numbers,
-// a link to the full self-contained report, and the diary entries that discuss it.
+// a link to the full report page, and the diary entries that discuss it.
 import { getCollection, getEntry } from "astro:content";
 import { format } from "date-fns";
 
@@ -41,7 +41,7 @@ const href = `/reports/${id}/`;
     )
   }
   <footer class="clip-foot">
-    <a class="clip-open" href={href}>Read the full report <span aria-hidden="true">↗</span></a>
+    <a class="clip-open" href={href}>Read the full report <span aria-hidden="true">→</span></a>
     {
       !compact && referenced.length > 0 && (
         <span>

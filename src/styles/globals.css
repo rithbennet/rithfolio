@@ -23,6 +23,7 @@
   --chart-2: #d23b2f;
   --chart-3: #d9a91a;
   --chart-4: #2f8f5b;
+  --chart-5: #0e8aa3;
 
   --font-display: "Fraunces Variable", Georgia, serif;
   --font-body: "Geist Variable", system-ui, -apple-system, sans-serif;
@@ -53,25 +54,28 @@
   color-scheme: light;
 }
 
+/* dark: a softened Dracula (the AI reports' palette). Same hues, a deeper background,
+   the neon taken down a notch so it still reads as this site. */
 :root[data-theme="dark"] {
-  --bg: #0f1012;
-  --surface: #17181b;
-  --ink: #eeeeec;
-  --body: #b3b5b9;
-  --muted: #84878e;
-  --rule: #eeeeec1a;
-  --accent: #7a9cff;
-  --accent-text: #7a9cff;
-  --on-accent: #0f1012;
-  --accent-soft: #3a4871;
-  --note: #d6c66e;
-  --note-ink: #22200c;
-  --chart-1: #7c9cff;
-  --chart-2: #f2665a;
-  --chart-3: #f0cd5a;
-  --chart-4: #5fc08a;
+  --bg: #1f2029;
+  --surface: #272935;
+  --ink: #f6f5ef;
+  --body: #c5c7d6;
+  --muted: #9097b8;
+  --rule: #f8f8f21c;
+  --accent: #b49bfa;
+  --accent-text: #b49bfa;
+  --on-accent: #1f2029;
+  --accent-soft: #4a3f74;
+  --note: #e9e48f;
+  --note-ink: #26240e;
+  --chart-1: #b49bfa;
+  --chart-2: #f285c3;
+  --chart-3: #f5b979;
+  --chart-4: #6fd893;
+  --chart-5: #8be0f0;
 
-  --lamp: rgba(255, 236, 205, 0.045);
+  --lamp: rgba(200, 180, 255, 0.05);
   --paper: #e6e4dd;
   --obj-shadow: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.62)) brightness(0.92) saturate(0.95);
   --obj-shadow-hover: drop-shadow(0 28px 30px rgba(0, 0, 0, 0.7)) brightness(0.95);
@@ -266,6 +270,15 @@ body::before {
   text-align: justify;
   hyphens: auto;
 }
+/* Tailwind's reset strips list markers; put them back */
+.prose ul {
+  padding-left: 1.3em;
+  list-style: disc;
+}
+.prose ol {
+  padding-left: 2.2em;
+  list-style: decimal;
+}
 .prose li {
   margin: 0.42em 0;
 }
@@ -339,23 +352,51 @@ body::before {
   border-radius: 4px;
   filter: saturate(0.88);
 }
+.prose figure {
+  margin: 2em 0;
+}
+.prose figure img {
+  margin-top: 0;
+}
+.prose figcaption {
+  font: 11px/1.5 var(--font-mono);
+  color: var(--muted);
+  text-align: center;
+}
+/* tables follow the AI reports: mono headers, horizontal rules only */
 .prose table {
   width: 100%;
   margin: 1.5em 0;
   border-collapse: collapse;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 .prose th,
 .prose td {
-  padding: 8px 10px;
-  border: 1px solid var(--rule);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--rule);
   text-align: left;
+  vertical-align: top;
+}
+.prose th:first-child,
+.prose td:first-child {
+  padding-left: 0;
+}
+.prose th:last-child,
+.prose td:last-child {
+  padding-right: 0;
 }
 .prose th {
-  background: color-mix(in oklab, var(--ink) 5%, transparent);
-  color: var(--ink);
-  font-weight: 650;
+  border-bottom-color: color-mix(in oklab, var(--ink) 28%, transparent);
+  color: var(--muted);
+  font: 400 10px/1.5 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
+.prose td:first-child {
+  color: var(--ink);
+}
+
 /* rehype-pretty-code blocks: a quiet "code window" */
 .prose figure[data-rehype-pretty-code-figure] {
   position: relative;
@@ -372,10 +413,19 @@ body::before {
   font: 12.5px/1.72 var(--font-mono);
 }
 .prose pre code {
+  display: grid;
   font: inherit;
 }
 .prose pre [data-line] {
   padding-inline: 2px;
+}
+.prose pre [data-highlighted-line] {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  box-shadow: inset 2px 0 var(--accent);
+}
+.prose figcaption[data-rehype-pretty-code-title] {
+  margin-bottom: 8px;
+  text-align: left;
 }
 [data-theme="dark"] .prose pre code span {
   color: var(--shiki-dark) !important;

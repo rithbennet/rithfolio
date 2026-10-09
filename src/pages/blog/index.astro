@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ReportClipping from "../../components/site/ReportClipping.astro";
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import { format } from "date-fns";
 import { site } from "../../data/site";
@@ -32,6 +33,16 @@ const [latest, ...rest] = posts;
     {
       latest && (
         <article class="latest">
+          {latest.data.cover && (
+            <a class="latest-cover" href={`/blog/${slug(latest.id)}`} tabindex="-1" aria-hidden="true">
+              <Image
+                src={latest.data.cover}
+                alt=""
+                widths={[640, 960, 1344]}
+                sizes="(max-width: 720px) calc(100vw - 48px), 672px"
+              />
+            </a>
+          )}
           <p class="meta">
             {format(latest.data.date, "d MMM yyyy")}
             {latest.data.location && ` · ${latest.data.location}`}
@@ -103,6 +114,16 @@ const [latest, ...rest] = posts;
   }
   .latest {
     margin-top: 64px;
+  }
+  .latest-cover :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 22px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: var(--paper-shadow);
   }
   .latest-title {
     margin: 8px 0 14px;

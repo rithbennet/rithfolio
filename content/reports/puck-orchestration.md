@@ -13,5 +13,5 @@ highlights:
 tags: [agents, orchestration, dagangnow]
 ---
 
-<!-- The report is public/reports/puck-orchestration/index.html, built from docs/reports/puck-orchestration/body.html with the /report skill.
-     Videos are rendered from docs/reports/puck-orchestration/replay/. -->
+<!-- The report is puck-orchestration.html next to this file, built from docs/reports/puck-orchestration/body.html with the /report skill.
+     Its videos and images live in public/reports/puck-orchestration/, rendered from docs/reports/puck-orchestration/replay/. -->

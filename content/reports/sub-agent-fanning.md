@@ -13,5 +13,5 @@ highlights:
 tags: [agents, cost, dagangnow]
 ---
 
-<!-- The report itself is public/reports/sub-agent-fanning/index.html (self-contained HTML from the /report skill).
+<!-- The report itself is sub-agent-fanning.html next to this file (self-contained HTML from the /report skill).
      Source: ~/dev/experiments/sub-agent-fanning. Review for internal details before deploying (see docs/bio.md §8). -->

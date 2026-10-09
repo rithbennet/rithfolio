@@ -1,0 +1,14 @@
+---
+// A side note with a rule down the left, as in the AI reports.
+// <Note kind="key" label="Takeaway">…</Note>   kind: plain (default) | key | warn | bad
+interface Props {
+  kind?: "plain" | "key" | "warn" | "bad";
+  label?: string;
+}
+const { kind = "plain", label } = Astro.props;
+---
+
+<div class:list={["note", kind !== "plain" && kind]}>
+  {label && <span class="note-label">{label}</span>}
+  <slot />
+</div>

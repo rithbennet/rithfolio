@@ -31,7 +31,7 @@ export default function Comments() {
         reactionsEnabled="1"
         emitMetadata="0"
         inputPosition="bottom"
-        theme={theme === "dark" ? "dark" : "light"}
+        theme={theme === "dark" ? "transparent_dark" : "light"}
         lang="en"
         loading="lazy"
       />

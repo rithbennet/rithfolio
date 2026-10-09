@@ -1,0 +1,65 @@
+---
+// A series: its diary entries and AI reports in reading order.
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { format } from "date-fns";
+import { getAllSeries } from "../../../lib/series";
+import { site } from "../../../data/site";
+
+export async function getStaticPaths() {
+  return (await getAllSeries()).map((series) => ({ params: { id: series.id }, props: { series } }));
+}
+
+const { series } = Astro.props;
+---
+
+<BaseLayout title={series.title} description={series.description} canonical={`${site.url}${series.href}`}>
+  <div class="page col">
+    <p class="eyebrow"><a href="/blog">Blog</a> · Series · {series.parts.length} parts</p>
+    <h1 class="h1">{series.title}</h1>
+    <p class="intro">{series.description}</p>
+    <ol class="rows list">
+      {
+        series.parts.map((p, i) => (
+          <li>
+            <a class="row part" href={p.href}>
+              <span class="part-no">{String(i + 1).padStart(2, "0")}</span>
+              <span class="row-name">{p.title}</span>
+              <span class="row-cat">{p.kind}</span>
+              <time class="row-year" datetime={p.date.toISOString()}>
+                {format(p.date, "d MMM")}
+              </time>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .eyebrow a {
+    color: inherit;
+  }
+  .intro {
+    max-width: 34rem;
+    margin: 16px 0 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--body);
+  }
+  .list {
+    margin-top: 40px;
+  }
+  .row.part {
+    grid-template-columns: 32px 1fr auto 64px;
+  }
+  .part-no {
+    font: 11px var(--font-mono);
+    color: var(--accent-text);
+  }
+  @media (max-width: 560px) {
+    .row.part {
+      grid-template-columns: 32px 1fr auto;
+    }
+  }
+</style>

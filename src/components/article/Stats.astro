@@ -1,0 +1,22 @@
+---
+// Headline numbers as tiles, as in the AI reports.
+// <Stats items={[{ label: "Cost", value: "$147", note: "at API list prices" }]} />
+interface Props {
+  items: { label: string; value: string; note?: string }[];
+  /** tiles per row on wide screens (default 4) */
+  cols?: number;
+}
+const { items, cols } = Astro.props;
+---
+
+<div class="kpis" style={cols ? `--kpi-cols:${cols}` : undefined}>
+  {
+    items.map((s) => (
+      <div class="tile">
+        <div class="k">{s.label}</div>
+        <div class="v">{s.value}</div>
+        {s.note && <div class="s">{s.note}</div>}
+      </div>
+    ))
+  }
+</div>

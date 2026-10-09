@@ -4,19 +4,23 @@ import { glob } from "astro/loaders";
 // Diary entries (the blog). `reports` lists report ids this entry discusses.
 const posts = defineCollection({
   loader: glob({ pattern: "**/index.mdx", base: "./content/posts" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    description: z.string(),
-    coverImageSrc: z.string().optional(),
-    tags: z.array(z.string()).optional().default([]),
-    published: z.boolean().default(true),
-    location: z.string().optional(),
-    reports: z.array(z.string()).optional().default([]),
-  }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      date: z.coerce.date(),
+      description: z.string(),
+      // the image head: a file next to index.mdx, e.g. `cover: ./cover.jpg`
+      cover: image().optional(),
+      coverAlt: z.string().default(""),
+      coverCaption: z.string().optional(),
+      tags: z.array(z.string()).optional().default([]),
+      published: z.boolean().default(true),
+      location: z.string().optional(),
+      reports: z.array(z.string()).optional().default([]),
+    }),
 });
 
-// AI reports: metadata here, the self-contained HTML lives in public/reports/<id>/index.html.
+// AI reports: metadata here; the /report skill's HTML sits next to it as <id>.html and its images and videos in public/reports/<id>/.
 const reports = defineCollection({
   loader: glob({ pattern: "*.md", base: "./content/reports" }),
   schema: z.object({
@@ -70,4 +74,15 @@ const gallery = defineCollection({
   }),
 });
 
-export const collections = { posts, reports, work, gallery };
+// Series: diary entries and AI reports that read in order. `parts` lists them first to last,
+// e.g. [{ diary: night-shift }, { report: puck-orchestration }, { diary: what-i-changed }].
+const series = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./content/series" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    parts: z.array(z.union([z.object({ diary: z.string() }), z.object({ report: z.string() })])).min(1),
+  }),
+});
+
+export const collections = { posts, reports, work, gallery, series };

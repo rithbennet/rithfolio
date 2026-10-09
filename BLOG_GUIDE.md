@@ -1,359 +1,157 @@
-# Blog Creation Guide
+# Writing a diary entry
 
-This guide explains how to create and manage blog posts for rith.dev.
+Entries live in `content/posts/<slug>/index.mdx` and are served at `https://rith.dev/blog/<slug>`.
 
-## Quick Start
+## Quick start
 
-1. Create a new folder in `content/posts/` with your post slug (URL-friendly name)
-2. Add an `index.mdx` file inside that folder
-3. Add your images to the same folder
-4. Run `pnpm dev` to see your post
+1. Make a folder `content/posts/my-entry/` (the folder name is the URL slug: lowercase, hyphenated).
+2. Add `index.mdx` with the frontmatter below.
+3. Put any images in the same folder.
+4. Run `pnpm dev` and open `/blog/my-entry`.
 
-## Quality Checks (Biome + Astro)
-
-Before publishing a post, run:
-
-```bash
-pnpm lint
-```
-
-This runs:
-
-- `biome check .` for linting/style issues
-- `astro check` for Astro and TypeScript diagnostics
-
-To auto-fix lint/style issues:
-
-```bash
-pnpm lint:fix
-pnpm format
-```
-
-## File Structure
+Before publishing, run `pnpm lint` (Biome errors plus `astro check`).
 
 ```
-content/
-└── posts/
-    └── my-awesome-post/           # Folder name = URL slug
-        ├── index.mdx              # Your blog content
-        ├── cover.jpg              # Cover image (optional)
-        ├── screenshot-1.png       # Additional images
-        └── diagram.svg            # Any image format works
-```
-
-Your post will be accessible at: `https://rith.dev/blog/my-awesome-post`
-
-## Frontmatter Template
-
-Every `index.mdx` file must start with frontmatter (YAML between `---` markers):
-
-```yaml
----
-title: "Your Post Title"
-description: "A brief description for SEO and previews (150-160 characters ideal)"
-date: "2024-01-15"
-tags:
-  - nextjs
-  - react
-  - typescript
-image: "./cover.jpg" # Optional: relative path to cover image
-published: true # Set to false to hide from listing
----
-```
-
-### Frontmatter Fields
-
-| Field         | Required | Description                                      |
-| ------------- | -------- | ------------------------------------------------ |
-| `title`       | ✅       | Post title (shown in browser tab and listings)   |
-| `description` | ✅       | SEO description and preview text                 |
-| `date`        | ✅       | Publication date (YYYY-MM-DD format)             |
-| `tags`        | ✅       | Array of lowercase tags for categorization       |
-| `image`       | ❌       | Relative path to cover image                     |
-| `published`   | ❌       | Set to `false` to hide post (defaults to `true`) |
-| `location`    | ❌       | Where you wrote it, shown in the entry header (e.g. `Kuala Lumpur`) |
-| `reports`     | ❌       | Ids of AI reports this entry discusses, e.g. `[sub-agent-fanning]` |
-
-## Referencing AI reports
-
-The blog is a diary, and some entries discuss AI reports.
-
-1. **Add the report.** Copy the self-contained HTML to `public/reports/<id>/index.html`, then add `content/reports/<id>.md` with `title`, `date`, `kind`, `model`, `readingTime`, `summary` and up to four `highlights`. It then appears on `/blog#reports` and is served at `/reports/<id>/`.
-2. **Reference it from an entry.** List the id under `reports:` in the entry's frontmatter. The report appears as a clipping under "Discussed in this entry", and the report's clipping shows "Referenced in" with a link back.
-3. **Embed it mid-entry (optional).** In MDX, write `<Report id="<id>" compact />` wherever you want the clipping.
-
-Read reports for internal details before publishing. They're published as is.
-
-## Writing Content
-
-After the frontmatter, write your content using MDX (Markdown + JSX):
-
-````mdx
----
-title: "Building a REST API with Node.js"
-description: "Learn how to build a scalable REST API using Node.js and Express"
-date: "2024-01-15"
-tags:
-  - nodejs
-  - api
-  - tutorial
-image: "./cover.png"
-published: true
----
-
-Welcome to this tutorial! Let's build something amazing.
-
-## Introduction
-
-This is a paragraph with **bold** and _italic_ text.
-
-## Code Examples
-
-Here's some JavaScript:
-
-\`\`\`javascript title="server.js"
-const express = require('express');
-const app = express();
-
-app.get('/api/hello', (req, res) => {
-res.json({ message: 'Hello World!' });
-});
-
-app.listen(3000);
-\`\`\`
-
-## Adding Images
-
-![Screenshot of the app](./screenshot-1.png)
-
-## Links
-
-Check out [Next.js docs](https://nextjs.org/docs) for more info.
-
-## Linking To Other Posts
-
-You can link to other posts in a few simple ways:
-
-- Direct link using the post slug:
-
-  ```mdx
-  See my previous post on [TypeScript tips](/blog/typescript-tips).
-  ```
-````
-
-- Relative links also work from anywhere:
-
-  ```mdx
-  Read more in [Hello World](/blog/hello-world).
-  ```
-
-- Use tags pages to cross-reference topics:
-
-  ```mdx
-  Explore more posts tagged **nextjs** at [/blog/tag/nextjs](/blog/tag/nextjs).
-  ```
-
-Tips:
-
-- Keep slugs lowercase and hyphenated (`my-awesome-post`).
-- Verify target post exists and is `published: true`.
-- For long series, add a "Series" section linking parts 1, 2, 3.
-
-`````
-
-## Code Block Features
-
-### Syntax Highlighting
-
-Specify the language after the opening backticks:
-
-````mdx
-```typescript
-const greeting: string = "Hello, World!";
-`````
-
-`````
-
-Supported languages: `javascript`, `typescript`, `jsx`, `tsx`, `python`, `bash`, `json`, `css`, `html`, `sql`, `go`, `rust`, and many more.
-
-### Adding a Title
-
-Add `title="filename.ts"` to show a filename header:
-
-````mdx
-```typescript title="utils.ts"
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString();
-}
-```
-`````
-
-### Highlighting Lines
-
-Highlight specific lines with `{1,3-5}`:
-
-````mdx
-```javascript {1,3-5}
-import express from "express"; // highlighted
-const app = express();
-app.get("/", (req, res) => {
-  // highlighted
-  res.send("Hello"); // highlighted
-}); // highlighted
-```
-````
-
-## Image Guidelines
-
-### Recommended Sizes
-
-| Image Type     | Recommended Size        | Notes                                                  |
-| -------------- | ----------------------- | ------------------------------------------------------ |
-| Cover/OG Image | **1200 × 630 px**       | Used for social sharing (Twitter, LinkedIn, etc.)      |
-| Content Images | **800 - 1200 px** width | Max width in blog is ~768px, but provide 2x for retina |
-| Screenshots    | **1600 px** max width   | Retina-ready, will be scaled down                      |
-| Diagrams/SVGs  | Any size                | SVGs scale perfectly                                   |
-
-### Image Formats
-
-- **JPG**: Best for photos, smaller file size
-- **PNG**: Best for screenshots, diagrams with text
-- **WebP**: Best compression, modern format
-- **SVG**: Best for diagrams, icons, logos
-
-### Using Images
-
-**Option 1: Markdown syntax (simple)**
-
-```mdx
-![Alt text description](./my-image.png)
-```
-
-**Option 2: Next.js Image component (optimized)**
-
-```mdx
-import Image from "next/image";
-import screenshot from "./screenshot.png";
-
-<Image
-  src={screenshot}
-  alt="Description of the image"
-  width={800}
-  height={450}
-  placeholder="blur"
-/>
-```
-
-### Image Optimization Tips
-
-1. **Compress images** before adding them (use [squoosh.app](https://squoosh.app))
-2. **Use WebP format** for best compression
-3. **Keep file sizes under 500KB** ideally
-4. **Always add alt text** for accessibility and SEO
-
-## Tags Best Practices
-
-- Use lowercase, single-word tags: `react`, `nextjs`, `typescript`
-- Use hyphens for multi-word concepts: `machine-learning`, `web-development`
-- Be consistent: always use `nextjs` not sometimes `next.js` or `Next`
-- Limit to 3-5 tags per post
-
-### Common Tags
-
-```yaml
-tags:
-  - react
-  - nextjs
-  - typescript
-  - javascript
-  - nodejs
-  - css
-  - tailwindcss
-  - tutorial
-  - guide
-  - web-development
-  - api
-  - database
-  - devops
-  - productivity
-```
-
-## SEO Checklist
-
-- [ ] Title is under 60 characters
-- [ ] Description is 150-160 characters
-- [ ] Cover image is 1200×630 px
-- [ ] All images have alt text
-- [ ] Post has 3-5 relevant tags
-- [ ] URL slug is descriptive and short
-- [ ] Content has proper heading hierarchy (H2, H3, etc.)
-
-## Draft Posts
-
-To save a draft without publishing:
-
-```yaml
----
-title: "Work in Progress"
-published: false
----
-```
-
-The post won't appear in listings but can be previewed at its direct URL during development.
-
-## Example Post Structure
-
-```
-content/posts/building-a-blog-with-nextjs/
+content/posts/my-entry/
 ├── index.mdx
-├── cover.png           # 1200x630 for social sharing
-├── architecture.svg    # Diagram
-├── screenshot-1.png    # Demo screenshot
-└── screenshot-2.png    # Another screenshot
+├── cover.jpg        # the image head (optional)
+└── screenshot.png   # images used in the text
 ```
 
-```mdx
+## Frontmatter
+
+```yaml
 ---
-title: "Building a Blog with Next.js and Contentlayer"
-description: "Learn how to create a modern MDX blog with Next.js 15, Contentlayer, and Tailwind CSS"
-date: "2024-01-20"
-tags:
-  - nextjs
-  - mdx
-  - tutorial
-image: "./cover.png"
+title: "A week of letting agents run the night shift"
+description: "One or two sentences. Shown under the title, in the feed and in link previews."
+date: 2026-10-08
+cover: ./cover.jpg
+coverAlt: "What the image shows, for screen readers"
+coverCaption: "Optional line under the image"
+location: "Kuala Lumpur"
+tags: [agents, dagangnow]
+reports: [puck-orchestration]
 published: true
 ---
-
-Your amazing content here...
-
-![Architecture Overview](./architecture.svg)
-
-More content...
-
-![Final Result](./screenshot-1.png)
 ```
+
+| Field          | Required | What it does                                                                 |
+| -------------- | -------- | ---------------------------------------------------------------------------- |
+| `title`        | yes      | Entry title                                                                  |
+| `description`  | yes      | The standfirst under the title, the feed text and the SEO description        |
+| `date`         | yes      | `YYYY-MM-DD`                                                                 |
+| `cover`        | no       | Image head, relative to the entry folder. Also used as the link-preview image |
+| `coverAlt`     | no       | Alt text for the cover. Leave empty only if the image is purely decorative   |
+| `coverCaption` | no       | Small mono caption under the cover                                           |
+| `location`     | no       | Shown in the header row                                                      |
+| `tags`         | no       | Lowercase, hyphenated (`machine-learning`). Shown under the header image; each gets a `/blog/tag/<tag>` page listing entries and reports |
+| `reports`      | no       | Ids of AI reports this entry discusses                                       |
+| `published`    | no       | `false` keeps it out of the feed and the build. Drafts still open at their URL in `pnpm dev` |
+
+The header is one row, `Diary · date · reading time · location`, above the title. Tags and the series line sit under the header image, or under the header when there's no image. Reading time is calculated. AI reports use the same header and layout.
+
+## Image heads
+
+Add `cover: ./cover.jpg`. The cover sits under the header at the width of the text and is always cropped to 16:9 from the centre. The latest entry's cover on `/blog` uses the same crop.
+
+- Use a landscape 16:9 image at least **1400 px wide**. Astro resizes it and serves WebP, so the original can be larger.
+- Keep the subject near the middle; the edges are what get cropped. The link-preview copy is 1200 px wide.
+
+## Writing
+
+Diary entries and AI reports share one layout and one set of components, so anything a report shows can go in an entry too.
+
+- `##` headings become numbered sections (`01`, `02`, …) and fill the contents rail on the left. The rail appears once an entry has two or more `##` headings. Use `###` for sub-points; they aren't numbered.
+- Numbered lists get `01`-style markers.
+- Tables are plain Markdown and get the reports' styling. Wide ones scroll on small screens.
+- Images in the text: `![Alt text](./screenshot.png)`. Astro optimises these too.
+- Code blocks: put the language after the backticks (```` ```ts ````). Add `title="file.ts"` for a filename and `{1,3-5}` to highlight lines.
+- On wide screens, tables, cards and side-by-side cards stretch into the empty right margin.
+
+### Components
+
+No imports needed:
+
+```mdx
+<KeyPoints>
+1. **Cost.** The night cost about $147 at API list prices.
+2. **Delivered.** Three of 31 tasks merged.
+</KeyPoints>
+
+<Note kind="key" label="Takeaway">The weekly limit decides how fast this goes.</Note>
+
+<Stats items={[
+  { label: "Tasks merged", value: "3 of 31", note: "the rest waited on review" },
+  { label: "Output tokens", value: "2.21M" },
+]} />
+
+<Card title="Spend by agent" sub="API-equivalent, sorted by cost">
+  <Bars items={[
+    { label: "Orchestrator", note: "Opus 5.5", value: 90.17, display: "$90.17", color: "c1" },
+    { label: "Coders", note: "Sonnet 5.5", value: 27.71, display: "$27.71", color: "c2" },
+  ]} />
+  <Data>
+
+| Group | Calls | Cost |
+| --- | --- | --- |
+| Orchestrator | 681 | $90.17 |
+
+  </Data>
+</Card>
+
+<Report id="puck-orchestration" />
+```
+
+| Component   | What it is                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| `KeyPoints` | Wraps a Markdown list as numbered rows between rules, like a report's "Bottom line"                  |
+| `Note`      | A side note with a rule down the left. `kind`: `plain` (default), `key`, `warn` or `bad`. `label` is optional |
+| `Stats`     | Headline numbers as tiles. `cols` sets tiles per row (default 4)                                     |
+| `Bars`      | Horizontal bars scaled to the largest value (or `max`). `color`: `c1`–`c5` or `neutral`              |
+| `Card`      | A boxed figure with an optional `title` and `sub`. Put two in `<div class="grid2">` to sit them side by side |
+| `Data`      | A collapsed "View the data" section (`label` to rename it). Leave blank lines around Markdown inside |
+| `Report`    | An AI report as a taped clipping                                                                     |
+
+The reports' own HTML classes (`.finding`, `.recs`, `.pill`, `.legend`, …) also work in MDX if you need something the components don't cover. Line charts are the one thing that only reports have so far.
+
+## AI reports
+
+Reports render on the same layout as entries, in the site's fonts and colours.
+
+1. **Add the report.** Save the `/report` skill's HTML as `content/reports/<id>.html`. Put any images and videos it links to in `public/reports/<id>/`. Then add `content/reports/<id>.md` with `title`, `date`, `kind`, `model`, `readingTime`, `summary`, up to four `highlights` and `tags`. It's served at `/reports/<id>/`, shows on `/blog#reports` and appears on its tag pages.
+2. **Reference it from an entry.** List the id under `reports:`. The clipping appears under "Discussed in this entry", and the report page lists the entry under "Referenced in".
+3. **Embed it mid-entry (optional).** `<Report id="<id>" />` wherever it belongs.
+
+The page takes the report's title, standfirst, reading time and body from the HTML. The skill's Dracula colours are swapped for the site's, so the HTML doesn't need editing.
+
+Reports are published as is, so read them for internal details first.
+
+## Series
+
+When entries and reports belong together in order (a diary entry, the report it led to, then a follow-up), make a series:
+
+```yaml
+# content/series/night-shift.md
+---
+title: "The night shift"
+description: "Letting agents run DagangNow overnight, the report on what happened, and what I changed."
+parts:
+  - diary: night-shift
+  - report: puck-orchestration
+  - diary: what-i-changed
+---
+```
+
+`parts` is the reading order: `diary:` takes an entry's folder name and `report:` a report id. Nothing changes in the entries themselves. Each part then shows:
+
+- "Part 2 of 3 · The night shift →" under the header, linking to the series page at `/blog/series/<id>`
+- the full list of parts in the left rail, with the current one highlighted
+- links to the previous and next part at the end
+
+Drafts drop out of the numbering until they're published. A misspelt id fails the build with the series name in the error.
 
 ## Troubleshooting
 
-### Post not showing up?
-
-1. Check `published: true` in frontmatter
-2. Verify the date format is correct (YYYY-MM-DD)
-3. Restart the dev server (`pnpm dev`)
-
-### Images not loading?
-
-1. Verify the path is relative (`./image.png`)
-2. Check the file exists in the post folder
-3. File names are case-sensitive
-
-### Build errors?
-
-1. Check frontmatter syntax (proper YAML)
-2. Ensure all required fields are present
-3. Run `pnpm lint` for detailed diagnostics
-
----
-
-Happy writing! 🚀
+- **Entry not listed:** check `published` and the date format, then restart `pnpm dev`.
+- **Image not found:** paths are relative to the entry folder (`./cover.jpg`) and case-sensitive.
+- **Build error on frontmatter:** run `pnpm lint`. The schema is in `src/content.config.ts`.

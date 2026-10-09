@@ -1,0 +1,13 @@
+---
+// A collapsed "view the data" section, as in the AI reports. Put a table or the raw numbers inside.
+// <Data label="View the data">…</Data>
+interface Props {
+  label?: string;
+}
+const { label = "View the data" } = Astro.props;
+---
+
+<details class="tv">
+  <summary>{label}</summary>
+  <slot />
+</details>

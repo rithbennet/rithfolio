@@ -1,0 +1,15 @@
+---
+// A boxed figure with notched corners, as in the AI reports. Wrap two or three in <div class="grid2"> to sit them side by side.
+// <Card title="Where the money went" sub="API list prices">…</Card>
+interface Props {
+  title?: string;
+  sub?: string;
+}
+const { title, sub } = Astro.props;
+---
+
+<div class="card">
+  {title && <h3>{title}</h3>}
+  {sub && <p class="small">{sub}</p>}
+  <slot />
+</div>

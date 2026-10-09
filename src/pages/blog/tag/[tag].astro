@@ -1,36 +1,38 @@
 ---
+// Everything tagged with one tag: diary entries and AI reports together, newest first.
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
 import { format } from "date-fns";
 import { slugify } from "../../../lib/utils";
+import { getFeed } from "../../../lib/feed";
 import { site } from "../../../data/site";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts", ({ data }) => data.published);
-  const tags = new Map<string, string>();
-  posts.forEach((p) => p.data.tags.forEach((t) => tags.set(slugify(t), t)));
-  return [...tags].map(([tag, label]) => ({ params: { tag }, props: { label } }));
+  const tags = new Set((await getFeed()).flatMap((item) => item.tags.map(slugify)));
+  return [...tags].map((tag) => ({ params: { tag } }));
 }
 
 const { tag } = Astro.params;
-const { label } = Astro.props;
-const posts = (await getCollection("posts", ({ data }) => data.published))
-  .filter((p) => p.data.tags.some((t) => slugify(t) === tag))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const items = (await getFeed()).filter((item) => item.tags.some((t) => slugify(t) === tag));
 ---
 
-<BaseLayout title={`#${label}`} description={`Diary entries tagged ${label}.`} canonical={`${site.url}/blog/tag/${tag}`}>
+<BaseLayout
+  title={`#${tag}`}
+  description={`Diary entries and AI reports tagged ${tag}.`}
+  canonical={`${site.url}/blog/tag/${tag}`}
+>
   <div class="page col">
-    <p class="eyebrow"><a href="/blog">Diary</a> · Tag</p>
-    <h1 class="h1">#{label}</h1>
+    <p class="eyebrow"><a href="/blog">Blog</a> · Tag</p>
+    <h1 class="h1">#{tag}</h1>
     <ul class="rows list">
       {
-        posts.map((p) => (
+        items.map((item) => (
           <li>
-            <a class="row entry" href={`/blog/${p.id.replace(/\/index$/, "")}`}>
-              <time datetime={p.data.date.toISOString()}>{format(p.data.date, "d MMM yy")}</time>
-              <span class="row-name">{p.data.title}</span>
-              <span />
+            <a class="row" href={item.href}>
+              <span class="row-name">{item.title}</span>
+              <span class="row-cat">{item.kind}</span>
+              <time class="row-year" datetime={item.date.toISOString()}>
+                {format(item.date, "d MMM")}
+              </time>
             </a>
           </li>
         ))
@@ -45,14 +47,5 @@ const posts = (await getCollection("posts", ({ data }) => data.published))
   }
   .list {
     margin-top: 40px;
-  }
-  .row.entry {
-    grid-template-columns: 84px 1fr auto;
-  }
-  .row.entry time {
-    font: 10px var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
   }
 </style>

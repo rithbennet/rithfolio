@@ -1,0 +1,89 @@
+---
+// An AI report, on the same layout as the diary. The body comes from the /report skill's HTML
+// (content/reports/<id>.html) and is restyled by src/styles/article.css.
+import ArticleLayout from "../../layouts/ArticleLayout.astro";
+import { getCollection } from "astro:content";
+import { format } from "date-fns";
+import { readReportHtml } from "../../lib/report-html";
+import { getSeriesFor } from "../../lib/series";
+import { site } from "../../data/site";
+
+export async function getStaticPaths() {
+  const reports = await getCollection("reports", ({ data }) => data.published);
+  return reports.map((report) => ({ params: { id: report.id }, props: { report } }));
+}
+
+const { report } = Astro.props;
+const { title, date, model, summary, tags } = report.data;
+const html = readReportHtml(report.id);
+const url = `${site.url}/reports/${report.id}`;
+const series = await getSeriesFor(`report:${report.id}`);
+
+const readingTime = html.facts.find((f) => f.label === "Reading time")?.value;
+const meta = [
+  { text: `AI report · ${html.kind}` },
+  { text: model },
+  { text: format(date, "d MMM yyyy"), datetime: date.toISOString() },
+  ...(readingTime ? [{ text: `${readingTime.replace(/ read$/, "")} read` }] : []),
+];
+
+const referenced = (
+  await getCollection("posts", ({ data }) => data.published && data.reports.includes(report.id))
+).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Report",
+  headline: title,
+  datePublished: date.toISOString(),
+  description: summary,
+  url,
+  publisher: { "@type": "Person", name: site.fullName, url: site.url },
+};
+---
+
+<ArticleLayout
+  title={title}
+  description={summary}
+  url={url}
+  jsonLd={jsonLd}
+  meta={meta}
+  standfirst={html.standfirst}
+  toc={html.toc}
+  tags={tags}
+  series={series}
+>
+  <Fragment set:html={html.body} />
+  {html.css.trim() && <style is:inline set:html={html.css} />}
+  <Fragment set:html={html.scripts} />
+
+  {
+    referenced.length > 0 && (
+      <section class="referenced" slot="after" aria-labelledby="referenced-h">
+        <p class="eyebrow" id="referenced-h">
+          Referenced in
+        </p>
+        <ul class="rows">
+          {referenced.map((p) => (
+            <li>
+              <a class="row" href={`/blog/${p.id.replace(/\/index$/, "")}`}>
+                <span class="row-name">{p.data.title}</span>
+                <span class="row-cat">Diary</span>
+                <span class="row-year">{format(p.data.date, "d MMM")}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</ArticleLayout>
+
+<style>
+  .referenced {
+    margin-top: 48px;
+  }
+  .referenced .rows {
+    margin-top: 12px;
+  }
+</style>
