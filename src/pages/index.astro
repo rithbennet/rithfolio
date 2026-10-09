@@ -17,14 +17,49 @@ const [latestReport] = (await getCollection("reports", ({ data }) => data.publis
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 
+// WebSite names the site in search results; Person ties the name to the photo and the profiles in sameAs.
+// Facts come from docs/bio.md.
+const person = `${site.url}/#person`;
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: site.fullName,
-  url: site.url,
-  jobTitle: "CEO, DagangNow",
-  address: { "@type": "PostalAddress", addressLocality: "Kuala Lumpur", addressCountry: "MY" },
-  sameAs: socials.map((s) => s.href),
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      url: site.url,
+      name: site.fullName,
+      alternateName: [site.domain, site.name],
+      publisher: { "@id": person },
+    },
+    {
+      "@type": "ProfilePage",
+      url: site.url,
+      name: `${site.fullName} · ${site.tagline}`,
+      mainEntity: { "@id": person },
+    },
+    {
+      "@type": "Person",
+      "@id": person,
+      name: site.fullName,
+      givenName: "Harith",
+      familyName: "Bennet",
+      // "Bennett" is a common misspelling (and how the email spells it)
+      alternateName: [site.name, "Harith Bennett", "rithbennet"],
+      url: site.url,
+      image: `${site.url}${site.photo}`,
+      description: site.description,
+      jobTitle: "Founder and CEO",
+      worksFor: {
+        "@type": "Organization",
+        name: "DagangNow",
+        legalName: "Daganoss Sdn. Bhd.",
+        url: "https://dagangnow.com",
+      },
+      alumniOf: { "@type": "CollegeOrUniversity", name: "Universiti Teknologi Malaysia" },
+      address: { "@type": "PostalAddress", addressLocality: "Kuala Lumpur", addressCountry: "MY" },
+      sameAs: [...socials.map((s) => s.href), site.photography],
+    },
+  ],
 };
 ---
 

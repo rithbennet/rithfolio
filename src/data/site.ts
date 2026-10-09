@@ -6,9 +6,11 @@ export const site = {
   url: "https://rith.dev",
   tagline: "founder and tech nerd",
   description:
-    "Harith is a founder and tech nerd in Kuala Lumpur, building DagangNow. Work, a diary, AI reports and photographs.",
+    "Harith Bennet is a founder and tech nerd in Kuala Lumpur, building DagangNow. Work, a diary, AI reports and photographs.",
   email: "harith.bennett@gmail.com",
   location: "Kuala Lumpur",
+  // the share card and the photo search engines attach to the name; a 1200px copy of public/pfp.jpg
+  photo: "/harith-bennet.jpg",
   photography: "https://www.instagram.com/rith_bennet/",
   repo: "https://github.com/rithbennet/rithfolio",
   // To update the resume, replace public/resume.pdf. The link stays the same.

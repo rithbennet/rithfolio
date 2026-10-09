@@ -34,14 +34,17 @@ const {
   ogType = "website",
   ogUrl,
   ogImage,
-  twitterCard = "summary_large_image",
+  // pages without their own image fall back to the square portrait, which suits the small card
+  twitterCard = ogImage ? "summary_large_image" : "summary",
   twitterTitle,
   twitterDescription,
   twitterImage,
   jsonLd,
 } = Astro.props;
 
-const resolvedTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.tagline}`;
+// the full name goes in every title so a search for it finds the site
+const resolvedTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.tagline}`;
+const image = ogImage || `${site.url}${site.photo}`;
 ---
 
 <!doctype html>
@@ -56,20 +59,21 @@ const resolvedTitle = title ? `${title} · ${site.name}` : `${site.name} · ${si
 
     <title>{resolvedTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={site.fullName} />
     {canonical && <link rel="canonical" href={canonical} />}
 
     <meta property="og:title" content={ogTitle || resolvedTitle} />
     <meta property="og:description" content={ogDescription || description} />
     <meta property="og:type" content={ogType} />
     {ogUrl && <meta property="og:url" content={ogUrl} />}
-    <meta property="og:site_name" content={site.domain} />
+    <meta property="og:site_name" content={site.fullName} />
     <meta property="og:locale" content="en_US" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={image} />
 
     <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={twitterTitle || ogTitle || resolvedTitle} />
     <meta name="twitter:description" content={twitterDescription || ogDescription || description} />
-    {(twitterImage || ogImage) && <meta name="twitter:image" content={twitterImage || ogImage} />}
+    <meta name="twitter:image" content={twitterImage || image} />
 
     <meta name="robots" content="index, follow" />
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
