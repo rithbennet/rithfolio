@@ -8,7 +8,8 @@ import { site } from "../../data/site";
 const all = (await getCollection("work", ({ data }) => data.published)).sort((a, b) => a.data.order - b.data.order);
 const featured = all.find((w) => w.data.featured);
 const experience = all.filter((w) => !w.data.featured && (w.data.kind === "role" || w.data.kind === "community"));
-const projects = all.filter((w) => w.data.kind === "project");
+const projects = all.filter((w) => w.data.kind === "project" && !w.data.archived);
+const archive = all.filter((w) => w.data.kind === "project" && w.data.archived);
 const host = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 
 const education = [
@@ -146,6 +147,31 @@ const education = [
           ))
         }
       </ul>
+
+      {
+        archive.length > 0 && (
+          <details class="archive">
+            <summary>
+              Archive <span class="count">{archive.length}</span>
+            </summary>
+            <ul class="rows">
+              {archive.map((w) => (
+            <li>
+              <a class="row" href={w.data.repo ?? w.data.link} target="_blank" rel="noopener">
+                <div class="row-name">
+                  {w.data.title}
+                  <span class="row-note">{w.data.summary}</span>
+                  <TechStack items={w.data.stack} />
+                </div>
+                <span class="row-cat">{w.data.category}</span>
+                <span class="row-year">Code ↗</span>
+              </a>
+            </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
     </section>
   </div>
 </BaseLayout>
@@ -214,6 +240,29 @@ const education = [
   }
   .block .h3 {
     margin-bottom: 14px;
+  }
+  .archive {
+    margin-top: 28px;
+  }
+  .archive summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .archive summary:hover {
+    color: var(--ink);
+  }
+  .archive .count {
+    color: var(--faint, var(--muted));
+  }
+  .archive[open] summary {
+    margin-bottom: 8px;
   }
   .role {
     font-weight: 400;

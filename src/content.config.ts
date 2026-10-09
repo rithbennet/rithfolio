@@ -53,6 +53,8 @@ const work = defineCollection({
     link: z.string().url().optional(),
     repo: z.string().url().optional(),
     featured: z.boolean().default(false),
+    // projects no longer being worked on sit in a collapsed archive
+    archived: z.boolean().default(false),
     order: z.number().default(100),
     published: z.boolean().default(true),
   }),

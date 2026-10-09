@@ -1,0 +1,579 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator" content="Astro v5.17.3"><meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1f2029" media="(prefers-color-scheme: dark)"><title>Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder&#39;s pace · Harith Bennet</title><meta name="description" content="A Fable 5.1 orchestrator ran Opus and Sonnet builders and two GPT-6 reviewers overnight on DagangNow's Puck store builder, and merged 3 of 31 tasks. A replay of the night, opening with a fan-out tree, shows where the tokens and the hours went: Claude and Codex never worked at the same time."><meta name="author" content="Harith Bennet"><link rel="canonical" href="https://rith.dev/reports/puck-orchestration"><meta property="og:title" content="Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder's pace · Harith Bennet"><meta property="og:description" content="A Fable 5.1 orchestrator ran Opus and Sonnet builders and two GPT-6 reviewers overnight on DagangNow's Puck store builder, and merged 3 of 31 tasks. A replay of the night, opening with a fan-out tree, shows where the tokens and the hours went: Claude and Codex never worked at the same time."><meta property="og:type" content="article"><meta property="og:url" content="https://rith.dev/reports/puck-orchestration"><meta property="og:site_name" content="Harith Bennet"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://rith.dev/harith-bennet.jpg"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder's pace · Harith Bennet"><meta name="twitter:description" content="A Fable 5.1 orchestrator ran Opus and Sonnet builders and two GPT-6 reviewers overnight on DagangNow's Puck store builder, and merged 3 of 31 tasks. A replay of the night, opening with a fan-out tree, shows where the tokens and the hours went: Claude and Codex never worked at the same time."><meta name="twitter:image" content="https://rith.dev/harith-bennet.jpg"><meta name="robots" content="index, follow"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Report","headline":"Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder's pace","datePublished":"2026-10-07T00:00:00.000Z","description":"A Fable 5.1 orchestrator ran Opus and Sonnet builders and two GPT-6 reviewers overnight on DagangNow's Puck store builder, and merged 3 of 31 tasks. A replay of the night, opening with a fan-out tree, shows where the tokens and the hours went: Claude and Codex never worked at the same time.","url":"https://rith.dev/reports/puck-orchestration","publisher":{"@type":"Person","name":"Harith Bennet","url":"https://rith.dev"}}</script><!-- set the theme before paint so there is no flash --><script>
+      (function () {
+        var saved = localStorage.getItem("theme");
+        var dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
+    </script><link rel="stylesheet" href="/_astro/_slug_.dKPLueH6.css">
+<link rel="stylesheet" href="/_astro/_slug_.czvKnBOu.css">
+<style>.referenced[data-astro-cid-sm4ptp4b]{margin-top:48px}.referenced[data-astro-cid-sm4ptp4b] .rows[data-astro-cid-sm4ptp4b]{margin-top:12px}
+</style></head> <body> <a class="skip-link" href="#main">Skip to content</a> <header class="site-header" data-astro-cid-r7uuxm25> <a class="mark" href="/" aria-label="Harith, home" data-astro-cid-r7uuxm25> <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-r7uuxm25> <path d="M13 12v24M35 12v24M13 24.5c6-2.2 14-2.2 22 0" data-astro-cid-r7uuxm25></path> </svg> </a> <nav class="nav" aria-label="Primary" data-astro-cid-r7uuxm25> <a href="/about" data-astro-cid-r7uuxm25>About</a><a href="/work" data-astro-cid-r7uuxm25>Work</a><a href="/blog" data-astro-cid-r7uuxm25>Blog</a><a href="/gallery" data-astro-cid-r7uuxm25>Gallery</a> </nav> <div class="socials" data-astro-cid-r7uuxm25> <a class="icon-btn" href="https://x.com/rithbennet" aria-label="X" rel="me noopener" target="_blank" data-astro-cid-r7uuxm25> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-r7uuxm25><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"/></svg> </a><a class="icon-btn" href="https://www.instagram.com/rithbn_/" aria-label="Instagram" rel="me noopener" target="_blank" data-astro-cid-r7uuxm25> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-r7uuxm25><path fill="currentColor" d="M7.03.084c-1.277.06-2.149.264-2.91.563a5.9 5.9 0 0 0-2.124 1.388a5.9 5.9 0 0 0-1.38 2.127C.321 4.926.12 5.8.064 7.076s-.069 1.688-.063 4.947s.021 3.667.083 4.947c.061 1.277.264 2.149.563 2.911c.308.789.72 1.457 1.388 2.123a5.9 5.9 0 0 0 2.129 1.38c.763.295 1.636.496 2.913.552c1.278.056 1.689.069 4.947.063s3.668-.021 4.947-.082c1.28-.06 2.147-.265 2.91-.563a5.9 5.9 0 0 0 2.123-1.388a5.9 5.9 0 0 0 1.38-2.129c.295-.763.496-1.636.551-2.912c.056-1.28.07-1.69.063-4.948c-.006-3.258-.02-3.667-.081-4.947c-.06-1.28-.264-2.148-.564-2.911a5.9 5.9 0 0 0-1.387-2.123a5.9 5.9 0 0 0-2.128-1.38c-.764-.294-1.636-.496-2.914-.55C15.647.009 15.236-.006 11.977 0S8.31.021 7.03.084m.14 21.693c-1.17-.05-1.805-.245-2.228-.408a3.7 3.7 0 0 1-1.382-.895a3.7 3.7 0 0 1-.9-1.378c-.165-.423-.363-1.058-.417-2.228c-.06-1.264-.072-1.644-.08-4.848c-.006-3.204.006-3.583.061-4.848c.05-1.169.246-1.805.408-2.228c.216-.561.477-.96.895-1.382a3.7 3.7 0 0 1 1.379-.9c.423-.165 1.057-.361 2.227-.417c1.265-.06 1.644-.072 4.848-.08c3.203-.006 3.583.006 4.85.062c1.168.05 1.804.244 2.227.408c.56.216.96.475 1.382.895s.681.817.9 1.378c.165.422.362 1.056.417 2.227c.06 1.265.074 1.645.08 4.848c.005 3.203-.006 3.583-.061 4.848c-.051 1.17-.245 1.805-.408 2.23c-.216.56-.477.96-.896 1.38a3.7 3.7 0 0 1-1.378.9c-.422.165-1.058.362-2.226.418c-1.266.06-1.645.072-4.85.079s-3.582-.006-4.848-.06m9.783-16.192a1.44 1.44 0 1 0 1.437-1.442a1.44 1.44 0 0 0-1.437 1.442M5.839 12.012a6.161 6.161 0 1 0 12.323-.024a6.162 6.162 0 0 0-12.323.024M8 12.008A4 4 0 1 1 12.008 16A4 4 0 0 1 8 12.008"/></svg> </a><a class="icon-btn" href="https://www.tiktok.com/@rithbennet" aria-label="TikTok" rel="me noopener" target="_blank" data-astro-cid-r7uuxm25> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-r7uuxm25><path fill="currentColor" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93c-.01 2.92.01 5.84-.02 8.75c-.08 1.4-.54 2.79-1.35 3.94c-1.31 1.92-3.58 3.17-5.91 3.21c-1.43.08-2.86-.31-4.08-1.03c-2.02-1.19-3.44-3.37-3.65-5.71c-.02-.5-.03-1-.01-1.49c.18-1.9 1.12-3.72 2.58-4.96c1.66-1.44 3.98-2.13 6.15-1.72c.02 1.48-.04 2.96-.04 4.44c-.99-.32-2.15-.23-3.02.37c-.63.41-1.11 1.04-1.36 1.75c-.21.51-.15 1.07-.14 1.61c.24 1.64 1.82 3.02 3.5 2.87c1.12-.01 2.19-.66 2.77-1.61c.19-.33.4-.67.41-1.06c.1-1.79.06-3.57.07-5.36c.01-4.03-.01-8.05.02-12.07"/></svg> </a><a class="icon-btn" href="https://www.linkedin.com/in/harith-bennet/" aria-label="LinkedIn" rel="me noopener" target="_blank" data-astro-cid-r7uuxm25> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-r7uuxm25><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z"/></svg> </a><a class="icon-btn" href="https://github.com/rithbennet" aria-label="GitHub" rel="me noopener" target="_blank" data-astro-cid-r7uuxm25> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-r7uuxm25><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a10.9 10.9 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg> </a> <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to dark mode" data-astro-cid-r7uuxm25> <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-r7uuxm25> <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" data-astro-cid-r7uuxm25></path> </svg> <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-r7uuxm25> <circle cx="12" cy="12" r="4" data-astro-cid-r7uuxm25></circle> <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-r7uuxm25></path> </svg> </button> </div> </header> <script type="module">const e=document.querySelector("[data-theme-toggle]"),a=()=>{const t=document.documentElement.dataset.theme==="dark";e?.setAttribute("aria-label",t?"Switch to light mode":"Switch to dark mode")};a();e?.addEventListener("click",()=>{const t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t,localStorage.setItem("theme",t),a()});</script>  <main id="main">  <article class="entry" data-astro-cid-zm77yjld> <header class="entry-hero" data-astro-cid-zm77yjld> <p class="eyebrow" data-astro-cid-zm77yjld> AI report · Findings · Claude Opus 5.5 · <time datetime="2026-10-07T00:00:00.000Z" data-astro-cid-zm77yjld>7 Oct 2026</time> · 19 min read </p> <h1 class="h1 entry-title" data-astro-cid-zm77yjld>Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder&#39;s pace</h1> <p class="standfirst" data-astro-cid-zm77yjld>What one overnight agent orchestration spent, where the tokens and the hours went, and what to change so a night produces more. With a replay of the whole night.</p> </header>  <div class="head-foot" data-astro-cid-zm77yjld> <p class="tags" data-astro-cid-zm77yjld> <a href="/blog/tag/agents" data-astro-cid-zm77yjld>#agents</a><a href="/blog/tag/orchestration" data-astro-cid-zm77yjld>#orchestration</a><a href="/blog/tag/dagangnow" data-astro-cid-zm77yjld>#dagangnow</a> </p>  </div> <div class="entry-grid" data-astro-cid-zm77yjld> <aside class="rail" aria-label="Contents" data-astro-cid-zm77yjld> <a class="rail-back" href="/blog" data-astro-cid-zm77yjld>← All entries</a> <p class="rail-title" id="rail-title" aria-hidden="true" data-astro-cid-zm77yjld>Revise the loop: the Claude weekly limit, not the 5-hour one, sets the Puck builder&#39;s pace</p>  <p class="rail-h" data-astro-cid-zm77yjld>Contents</p> <nav class="tree" id="entry-tree" data-astro-cid-zm77yjld> <a href="#bottom-line" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> Bottom line </a><a href="#the-night-replayed" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> The night, replayed </a><a href="#what-the-night-produced" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> What the night produced </a><a href="#the-claude-cap-is-about-730k-output-tokens-per-window" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> The Claude cap is about 730k output tokens per window </a><a href="#where-the-output-goes" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> Where the output goes </a><a href="#reviews-and-fix-rounds" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> Reviews and fix rounds </a><a href="#the-stall-reviews-wait-for-claude" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> The stall: reviews wait for Claude </a><a href="#verdict-keep-the-shape-change-the-dials-and-the-coupling" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> Verdict: keep the shape, change the dials and the coupling </a><a href="#method-and-caveats" data-astro-cid-zm77yjld> <span class="br" aria-hidden="true" data-astro-cid-zm77yjld>└</span> Method and caveats </a> </nav>   <p class="prog" id="entry-prog" aria-hidden="true" data-astro-cid-zm77yjld> <b data-astro-cid-zm77yjld></b><span class="tr" data-astro-cid-zm77yjld></span><span class="pct" data-astro-cid-zm77yjld>00%</span> </p> </aside> <div class="entry-body" data-astro-cid-zm77yjld> <div class="prose entry-prose" id="entry-prose" data-astro-cid-zm77yjld>  
+<h2 id="bottom-line">Bottom line</h2>
+<ol class="summary">
+<li><b>Revise it. This Claude account has 4% of its week left.</b> The three 5-hour windows since the weekly reset at 21:00 on 6 Oct used 96%, about a third each, so the account gives about three windows a week. That makes Claude, not Codex, the limit. At current settings the 27 open tasks would finish around Wed 18 Nov <span class="est">estimate</span>; with changes 1 to 6, around Wed 28 Oct; with those changes and a second account of the same size, around Wed 21 Oct.</li>
+<li><b>Claude's 5-hour limit hit at almost the same output every time: 724k to 762k tokens.</b> That held with one builder or four. Four parallel builders reached it in 62 minutes, serial work in about 3 hours. On one account, fan-out buys speed inside a window, not more tasks per week.</li>
+<li><b>39% of Claude's output was thinking, with every agent on xhigh effort.</b> The code itself was 32%. Anthropic's default for Opus 5.5 and Sonnet 5.5 is medium.</li>
+<li><b>No task passed its first review.</b> The three merged tasks needed 10 review rounds between them. Their fix rounds, two per task, used 21% of Claude's output. Each review round cost about 1.7% of the Codex week, at high and at xhigh alike.</li>
+<li><b>Reviews stop when Claude stops.</b> Only the Fable orchestrator can launch Astra and Sol, so four committed tasks waited from 09:39 while 45% of the Codex week sat unused. At 10:55 a second thread on a separate quota launched all eight reviews, and they were back in 26 minutes.</li>
+<li><b>The replay shows the two quotas never worked at once.</b> Builders ran for 274 minutes and reviewers for 103, with 0 minutes of overlap. Every merged task spent longer in review and fix rounds than in its first build: 199 minutes against 131.</li>
+</ol>
+
+<div class="kpis">
+<div class="tile"><div class="k">Tasks merged</div><div class="v">3 <small>/ 31</small></div><div class="s">4 more built, each needs a fix</div></div>
+<div class="tile"><div class="k">Claude output</div><div class="v">2.21M</div><div class="s">39% thinking · 1,922 calls</div></div>
+<div class="tile"><div class="k">Output at each limit</div><div class="v">724k–762k</div><div class="s">3 windows, 1 to 4 builders</div></div>
+<div class="tile"><div class="k">At API list prices</div><div class="v">$208</div><div class="s">equivalent, not billed</div></div>
+<div class="tile"><div class="k">Codex week used</div><div class="v">38% → 55%</div><div class="s">10 review rounds</div></div>
+<div class="tile"><div class="k">Review rounds per task</div><div class="v">3.3</div><div class="s">0 of 3 passed first time</div></div>
+<div class="tile"><div class="k">Loop working</div><div class="v">6h 57m</div><div class="s">46% of 15h 02m</div></div>
+<div class="tile"><div class="k">Finish as is</div><div class="v">~18 Nov</div><div class="s">estimate · one Claude account</div></div>
+</div>
+
+<h2 id="the-night-replayed"><span class="no">01</span>The night, replayed</h2>
+<p class="lede">The sections below are totals. This replay puts every agent back on the clock, from the planning chat at 18:15 to the last review at 11:21, so you can watch the loop work and stall. It shows something the totals hide: Claude and Codex took turns all night.</p>
+
+<figure class="card vid">
+<h3 data-toc="no" id="how-it-all-started-fan-out-and-loops">How it all started: fan-out and loops</h3>
+<div class="small">One person, three threads. Each branch is a model session, and each loop is a review round. A 17-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="/reports/puck-orchestration/tree-poster.jpg" aria-label="Animated tree: you start a planning thread that fans out ten sub-agents and writes a spec, ledger and start prompt; Fable reads them and runs four workflow batches; each task loops between a builder and the Astra and Sol reviewers; a second thread launches the last eight reviews."><source src="/reports/puck-orchestration/tree.mp4" type="video/mp4"></video>
+<div class="note">Read it left to right. The planning thread fanned out ten sub-agents, then wrote the spec, the ledger and the start prompt. Fable read them and ran four workflow batches. Each task then looped between its builder and the two GPT reviewers until both passed: three rounds for R1-01 and R1-02, four for R1-03. When Fable ran out of Claude, a second thread on another quota launched the last eight reviews.</div>
+</figure>
+
+<figure class="card vid">
+<h3 data-toc="no" id="the-replay">The replay</h3>
+<div class="small">2 min 15 s. While agents work, 1 second is about 8 minutes of the night, and the long waits are skipped. Every bar, counter and verdict comes from the session logs.</div>
+<video id="replay" controls preload="metadata" playsinline poster="/reports/puck-orchestration/replay-poster.jpg"><source src="/reports/puck-orchestration/replay.mp4" type="video/mp4"></video>
+<div class="chapters" aria-label="Chapters"><button type="button" data-seek="0"><span>0:00</span> The cast</button><button type="button" data-seek="6.5"><span>0:06</span> How it was wired</button><button type="button" data-seek="23.5"><span>0:23</span> Before the night</button><button type="button" data-seek="36"><span>0:36</span> R1-01 and the relay problem</button><button type="button" data-seek="61.4"><span>1:01</span> First limit</button><button type="button" data-seek="66.7"><span>1:07</span> Contract and migration</button><button type="button" data-seek="90.5"><span>1:30</span> Fan-out</button><button type="button" data-seek="105.4"><span>1:45</span> Reviews on another quota</button><button type="button" data-seek="121.2"><span>2:01</span> What it shows</button></div>
+<details class="tv"><summary>What's on screen</summary>
+<ul>
+<li><b>Top left, orchestrator:</b> Fable, what it says it is doing, and the 31-task ledger. Cells turn orange while a task builds, cyan while it is in review and green when it merges.</li>
+<li><b>Middle, Claude quota:</b> four worktrees. Each builder shows its model, its output so far and the share of that output spent thinking. The 5-hour meter fills toward the ≈730k cap; the week bar under it is an estimate.</li>
+<li><b>Right, Codex quota:</b> Astra (code review) and Sol (checks and browser tests), their round, and their verdict. The meter is the Codex weekly limit as the rollouts recorded it.</li>
+<li><b>Bottom, swimlanes:</b> every Fable call, builder, fix round, review and wait on one time axis, revealed as the clock moves.</li>
+</ul></details>
+</figure>
+
+<p><b>Who's who.</b> The orange mascots are Claude: the one with a crown is Fable 5.1, the orchestrator. Builders wear a hard hat, yellow for Opus 5.5 and pink for Sonnet 5.5. The white robots run on Codex: the star is GPT-6 Astra, which reviews the diff against the spec, and the sun is GPT-6.1 Sol, which runs the checks and browser tests. The pixel person is you. The Claude mascot is drawn from the Claude Code terminal logo. The GPT robot is an original drawing, not OpenAI's logo.</p>
+<img class="cast" src="/reports/puck-orchestration/cast.png" alt="The cast: Fable 5.1 with a crown, an Opus 5.5 builder with a yellow hard hat, a Sonnet 5.5 builder with a pink hard hat, GPT-6 Astra with a star and magnifier, and GPT-6.1 Sol with a sun and clipboard." width="1600" height="367" loading="lazy">
+
+<p><b>Before the loop.</b> One Opus 5.5 thread at xhigh ran from 18:15 to 20:44. It researched the platform's page builder with ten sub-agents: nine on Sonnet, plus one Opus agent that built a working Puck trial on a real store in 32 minutes. It shipped a phase 1 editor, then grilled the plan through 31 questions. Out of that came the spec, the 31-task ledger and the start prompt Fable followed from 20:58.</p>
+
+<h3 id="what-the-replay-shows">What the replay shows</h3>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-1</span></div>
+<p><b>Claude and Codex never worked at the same time.</b> In the 417 working minutes, builders ran for 274 and reviewers for 103, with 0 minutes of overlap. Fable on its own filled the other 35. Each quota sat idle while the other worked, so the night's wall clock was the sum of the two, not the longer of them.</p>
+<div class="ev">first-to-last model call per builder and fix agent vs Codex rollout start and end · 20:58–09:39</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-2</span></div>
+<p><b>Review and fix rounds took longer than the build.</b> From first review to merge took 72, 78 and 49 minutes for R1-01, R1-02 and R1-03, against first builds of 27, 75 and 29 minutes: 199 minutes against 131. Of those 199 minutes, 103 were reviews and 81 were fix agents.</p>
+<div class="ev">merge times from the ledger · review rounds matched to Codex rollouts</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-3</span></div>
+<p><b>Sol set the pace of every round.</b> Astra's median review took 5 minutes, Sol's 11, and 25 on R1-01's last round with browser checks. In the 7 rounds where Astra had already failed the task, Fable waited another 28 minutes for Sol before it sent the fix round.</p>
+<div class="ev">10 Astra and 9 Sol sessions, 21:44–05:02 · Astra's sub-reviews excluded</div>
+</div>
+<div class="finding">
+<div class="fhd"><span class="fid">RPL-4</span></div>
+<p><b>A second quota unblocked the reviews at once.</b> Launched at 10:55 from a second thread, all eight reviews of R1-04 to R1-07 ran side by side and were back in 26 minutes, while Claude was still out. The night's ten review rounds had run one at a time, 103 minutes in total. The Codex week went from 55% to 61%.</p>
+<div class="ev">8 Codex rollouts, 10:55–11:21 · rate_limits.primary.used_percent</div>
+</div>
+
+<div class="note key"><b>Update, 11:21.</b> The rest of this report was written at 09:52, with four tasks waiting for review. At 10:55 a second thread on a separate quota launched those reviews. All four tasks need one fix round: Astra failed three of them, and Sol found a 500 error on one store's About page in the fourth. R1-01 to R1-03 were pushed to staging at 11:19.</div>
+
+<h2 id="what-the-night-produced"><span class="no">02</span>What the night produced</h2>
+<p class="lede">Three tasks are merged into the integration branch, and four more are built and committed. At 09:52 nothing from this loop was in staging or production git; R1-01 to R1-03 reached staging at 11:19. The new document tables are applied to the staging database.</p>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Task</th><th>What it is</th><th>State</th><th>Commits</th></tr></thead>
+<tbody>
+<tr><td data-l="Task">R1&#8209;01</td><td data-l="What it is">Phase 1 gaps: hero hash, block insert on http, page create, delete and reorder</td><td data-l="State">Merged 6 Oct 22:57</td><td data-l="Commits"><code>afb6f04c0</code></td></tr>
+<tr><td data-l="Task">R1&#8209;02</td><td data-l="What it is">Release 1 contract: page and site documents, block registry, schemas</td><td data-l="State">Merged 7 Oct 03:44</td><td data-l="Commits"><code>5a873fb09</code></td></tr>
+<tr><td data-l="Task">R1&#8209;03</td><td data-l="What it is">Migration <code>0119</code> and the store-document repository, applied to staging</td><td data-l="State">Merged 7 Oct 05:03</td><td data-l="Commits"><code>d48747a90</code></td></tr>
+<tr><td data-l="Task">R1&#8209;03b</td><td data-l="What it is">Test-harness hardening</td><td data-l="State">Deferred</td><td data-l="Commits">—</td></tr>
+<tr><td data-l="Task">R1&#8209;04</td><td data-l="What it is">Backfill script</td><td data-l="State">Built 09:08, waiting for review</td><td data-l="Commits"><code>fee885107</code> <code>800a8fd3e</code></td></tr>
+<tr><td data-l="Task">R1&#8209;05</td><td data-l="What it is">Public store renders the new format</td><td data-l="State">Built 09:38, waiting for review</td><td data-l="Commits"><code>6fd891c02</code></td></tr>
+<tr><td data-l="Task">R1&#8209;06</td><td data-l="What it is">Editor on the new format</td><td data-l="State">Built 09:32, waiting for review</td><td data-l="Commits"><code>35628f774</code> <code>9c30b64f5</code></td></tr>
+<tr><td data-l="Task">R1&#8209;07</td><td data-l="What it is">MCP on the new format</td><td data-l="State">Built 09:13, waiting for review</td><td data-l="Commits"><code>47ac23831</code> <code>a40c73349</code> <code>825fe5bb1</code></td></tr>
+</tbody>
+</table></div>
+
+<p>All four builders started at 08:37 and returned their results between 09:08 and 09:38. Their worktrees are clean. Fable hit the limit at 09:39 while it was taking in those results, so the reviews wait for Claude quota. Twenty-three tasks have not started.</p>
+
+<figure class="card">
+<h3 data-toc="no" id="the-15-hours-in-three-blocks">The 15 hours, in three blocks</h3>
+<div class="small">From 8:58pm on 6 Oct to the 12:00 reset on 7 Oct. The last wait is still running at 9:52am.</div>
+<div class="legend">
+<span><i style="background:var(--c1)"></i>Loop working</span>
+<span><i style="background:var(--neutral)"></i>Waiting for the Claude limit</span>
+<span><i style="background:var(--c3)"></i>You were out</span>
+</div>
+<div class="rows">
+<div class="row"><div class="lab">15h 02m</div>
+<div class="track">
+<div class="seg" style="--v:46.2%;--fill:var(--c1)" data-tip="Loop working&#10;6h 57m · 46%&#10;20:58–23:49, 02:00–05:04, 08:37–09:39" tabindex="0"></div>
+<div class="seg" style="--v:43.0%;--fill:var(--neutral)" data-tip="Waiting for the Claude limit&#10;6h 28m · 43%&#10;23:49–02:00, 05:04–07:00, 09:39–12:00" tabindex="0"></div>
+<div class="seg" style="--v:10.8%;--fill:var(--c3)" data-tip="You were out&#10;1h 37m · 11%&#10;07:00–08:37" tabindex="0"></div>
+</div>
+<div class="val">46% <small>working</small></div>
+</div>
+</div>
+<div class="note">The loop worked for less than half of the 15 hours. Most of the rest was spent waiting for Claude's limit to reset.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class="stack">
+<thead><tr><th>Block</th><th>Clock</th><th class="n">Minutes</th><th class="n">Share</th></tr></thead>
+<tbody>
+<tr><td data-l="Block">Loop working</td><td data-l="Clock">20:58–23:49, 02:00–05:04, 08:37–09:39</td><td data-l="Minutes" class="n">417</td><td data-l="Share" class="n">46%</td></tr>
+<tr><td data-l="Block">Waiting for the Claude limit</td><td data-l="Clock">23:49–02:00, 05:04–07:00, 09:39–12:00</td><td data-l="Minutes" class="n">388</td><td data-l="Share" class="n">43%</td></tr>
+<tr><td data-l="Block">You were out</td><td data-l="Clock">07:00–08:37</td><td data-l="Minutes" class="n">97</td><td data-l="Share" class="n">11%</td></tr>
+<tr class="tot"><td data-l="Block">Total</td><td data-l="Clock">20:58–12:00</td><td data-l="Minutes" class="n">902</td><td data-l="Share" class="n">100%</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="note warn">Two claims in the earlier draft of this page were wrong. The builders do not run as separate sessions: they run inside Fable's process as workflow agents. And Fable was not spending tokens while it waited: it made no model calls from 08:38 until 09:38, while the builders worked.</div>
+
+<h2 id="the-claude-cap-is-about-730k-output-tokens-per-window"><span class="no">03</span>The Claude cap is about 730k output tokens per window</h2>
+<p class="lede">Each 5-hour window ended at nearly the same output, while the list-price cost of the same windows rose by 70%. The cap tracks output tokens, which include thinking, much more closely than it tracks dollars.</p>
+
+<figure class="card">
+<h3 data-toc="no" id="claude-output-since-the-loop-started">Claude output since the loop started</h3>
+<div class="small">Cumulative output tokens across Fable and every workflow agent, sampled every 10 minutes. The flat stretches are the waits.</div>
+<div class="legend"><span><i class="ln" style="background:var(--c1)"></i>Claude output</span></div>
+<div class="chart"><script type="application/json">
+{"title":"Claude output","xtype":"time","tz":8,"yfmt":"tok","ymin":0,"labels":true,"height":240,
+ "x":["2026-10-06T12:50:00Z","2026-10-06T13:00:00Z","2026-10-06T13:10:00Z","2026-10-06T13:20:00Z","2026-10-06T13:30:00Z","2026-10-06T13:40:00Z","2026-10-06T13:50:00Z","2026-10-06T14:00:00Z","2026-10-06T14:10:00Z","2026-10-06T14:20:00Z","2026-10-06T14:30:00Z","2026-10-06T14:40:00Z","2026-10-06T14:50:00Z","2026-10-06T15:00:00Z","2026-10-06T15:10:00Z","2026-10-06T15:20:00Z","2026-10-06T15:30:00Z","2026-10-06T15:40:00Z","2026-10-06T15:50:00Z","2026-10-06T16:00:00Z","2026-10-06T16:10:00Z","2026-10-06T16:20:00Z","2026-10-06T16:30:00Z","2026-10-06T16:40:00Z","2026-10-06T16:50:00Z","2026-10-06T17:00:00Z","2026-10-06T17:10:00Z","2026-10-06T17:20:00Z","2026-10-06T17:30:00Z","2026-10-06T17:40:00Z","2026-10-06T17:50:00Z","2026-10-06T18:00:00Z","2026-10-06T18:10:00Z","2026-10-06T18:20:00Z","2026-10-06T18:30:00Z","2026-10-06T18:40:00Z","2026-10-06T18:50:00Z","2026-10-06T19:00:00Z","2026-10-06T19:10:00Z","2026-10-06T19:20:00Z","2026-10-06T19:30:00Z","2026-10-06T19:40:00Z","2026-10-06T19:50:00Z","2026-10-06T20:00:00Z","2026-10-06T20:10:00Z","2026-10-06T20:20:00Z","2026-10-06T20:30:00Z","2026-10-06T20:40:00Z","2026-10-06T20:50:00Z","2026-10-06T21:00:00Z","2026-10-06T21:10:00Z","2026-10-06T21:20:00Z","2026-10-06T21:30:00Z","2026-10-06T21:40:00Z","2026-10-06T21:50:00Z","2026-10-06T22:00:00Z","2026-10-06T22:10:00Z","2026-10-06T22:20:00Z","2026-10-06T22:30:00Z","2026-10-06T22:40:00Z","2026-10-06T22:50:00Z","2026-10-06T23:00:00Z","2026-10-06T23:10:00Z","2026-10-06T23:20:00Z","2026-10-06T23:30:00Z","2026-10-06T23:40:00Z","2026-10-06T23:50:00Z","2026-10-07T00:00:00Z","2026-10-07T00:10:00Z","2026-10-07T00:20:00Z","2026-10-07T00:30:00Z","2026-10-07T00:40:00Z","2026-10-07T00:50:00Z","2026-10-07T01:00:00Z","2026-10-07T01:10:00Z","2026-10-07T01:20:00Z","2026-10-07T01:30:00Z","2026-10-07T01:40:00Z","2026-10-07T01:50:00Z"],
+ "series":[{"name":"Claude output","short":"Output","color":"c1","values":[0,2000,46000,135000,179000,236000,290000,296000,364000,397000,422000,428000,428000,445000,494000,561000,616000,666000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,728000,792000,843000,873000,888000,947000,1005000,1022000,1049000,1109000,1122000,1158000,1244000,1296000,1311000,1348000,1363000,1426000,1441000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1452000,1502000,1755000,1962000,2046000,2140000,2197000,2214000,2214000]}],
+ "events":[
+   {"x":"2026-10-06T15:49:00Z","label":"Limit hit, resets 2:00am"},
+   {"x":"2026-10-06T21:04:00Z","label":"Limit hit, resets 7:00am"},
+   {"x":"2026-10-07T00:37:00Z","label":"You restarted the loop"},
+   {"x":"2026-10-07T01:39:00Z","label":"Limit hit, resets 12:00pm"}
+ ]}
+</script></div>
+<div class="note">Three climbs of about 730k each. The third is the four parallel builders, and it is three times steeper than the first two.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class="stack">
+<thead><tr><th>Window</th><th>Work before the limit</th><th class="n">Builders at once</th><th class="n">Output</th><th class="n">Cumulative</th><th class="n">Thinking</th><th class="n">Cache reads</th><th class="n">At list prices</th><th class="n">Output per working hour</th></tr></thead>
+<tbody>
+<tr><td data-l="Window">21:00–02:00</td><td data-l="Work before the limit">2h 51m, limit at 23:49</td><td data-l="Builders at once" class="n">1</td><td data-l="Output" class="n">728k</td><td data-l="Cumulative" class="n">728k</td><td data-l="Thinking" class="n">292k</td><td data-l="Cache reads" class="n">132M</td><td data-l="At list prices" class="n">$54</td><td data-l="Output per working hour" class="n">255k</td></tr>
+<tr><td data-l="Window">02:00–07:00</td><td data-l="Work before the limit">3h 04m, limit at 05:04</td><td data-l="Builders at once" class="n">1</td><td data-l="Output" class="n">724k</td><td data-l="Cumulative" class="n">1,452k</td><td data-l="Thinking" class="n">298k</td><td data-l="Cache reads" class="n">138M</td><td data-l="At list prices" class="n">$63</td><td data-l="Output per working hour" class="n">236k</td></tr>
+<tr><td data-l="Window">07:00–12:00</td><td data-l="Work before the limit">1h 02m, limit at 09:39</td><td data-l="Builders at once" class="n">4</td><td data-l="Output" class="n">762k</td><td data-l="Cumulative" class="n">2,214k</td><td data-l="Thinking" class="n">278k</td><td data-l="Cache reads" class="n">214M</td><td data-l="At list prices" class="n">$92</td><td data-l="Output per working hour" class="n">738k</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="grid2">
+<figure class="card">
+<h3 data-toc="no" id="output-when-the-limit-hit">Output when the limit hit</h3>
+<div class="small">Claude output tokens per window.</div>
+<div class="rows">
+<div class="row"><div class="lab">21:00–02:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:95.5%;--fill:var(--c1)" data-tip="21:00–02:00&#10;728k output" tabindex="0"></div></div><div class="val">728k</div></div>
+<div class="row"><div class="lab">02:00–07:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:95.0%;--fill:var(--c1)" data-tip="02:00–07:00&#10;724k output" tabindex="0"></div></div><div class="val">724k</div></div>
+<div class="row"><div class="lab">07:00–12:00<small>4 builders</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c1)" data-tip="07:00–12:00&#10;762k output" tabindex="0"></div></div><div class="val">762k</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Window</th><th class="n">Output</th></tr></thead><tbody>
+<tr><td>21:00–02:00</td><td class="n">728k</td></tr><tr><td>02:00–07:00</td><td class="n">724k</td></tr><tr><td>07:00–12:00</td><td class="n">762k</td></tr>
+</tbody></table></div></details>
+</figure>
+<figure class="card">
+<h3 data-toc="no" id="list-price-cost-of-the-same-windows">List-price cost of the same windows</h3>
+<div class="small">Output, cache reads and cache writes at API list prices.</div>
+<div class="rows">
+<div class="row"><div class="lab">21:00–02:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:58.7%;--fill:var(--c2)" data-tip="21:00–02:00&#10;$54 · reads $27, writes $11, output $15" tabindex="0"></div></div><div class="val">$54</div></div>
+<div class="row"><div class="lab">02:00–07:00<small>1 builder</small></div><div class="track"><div class="bar" style="--v:68.5%;--fill:var(--c2)" data-tip="02:00–07:00&#10;$63 · reads $30, writes $18, output $15" tabindex="0"></div></div><div class="val">$63</div></div>
+<div class="row"><div class="lab">07:00–12:00<small>4 builders</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c2)" data-tip="07:00–12:00&#10;$92 · reads $43, writes $36, output $13" tabindex="0"></div></div><div class="val">$92</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Window</th><th class="n">Cache reads</th><th class="n">Cache writes</th><th class="n">Output</th><th class="n">Total</th></tr></thead><tbody>
+<tr><td>21:00–02:00</td><td class="n">$27</td><td class="n">$11</td><td class="n">$15</td><td class="n">$54</td></tr>
+<tr><td>02:00–07:00</td><td class="n">$30</td><td class="n">$18</td><td class="n">$15</td><td class="n">$63</td></tr>
+<tr><td>07:00–12:00</td><td class="n">$43</td><td class="n">$36</td><td class="n">$13</td><td class="n">$92</td></tr>
+</tbody></table></div></details>
+</figure>
+</div>
+
+<figure class="card vid">
+<h3 data-toc="no" id="same-window-spent-faster">Same window, spent faster</h3>
+<div class="small">The 02:00 window with one builder at a time, against the 07:00 window with four at once, on a shared clock. A 12-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="/reports/puck-orchestration/loop-fanout.jpg" aria-label="Two buckets fill toward the same 730k limit: one builder at a time takes 3 h 04 min to reach 724k; four builders at once reach 762k in 1 h 02 min, then sleep until the reset."><source src="/reports/puck-orchestration/loop-fanout.mp4" type="video/mp4"></video>
+</figure>
+
+<div class="finding">
+<div class="fhd"><span class="fid">FAN-1</span></div>
+<p><b>Fan-out made the batch three times faster, not cheaper.</b> The four parallel builders produced 738k output per working hour, against 236k to 255k for serial work. They hit the same cap, and then the loop sat idle for 2 hours 21 minutes. Their first builds averaged 189k output each (105k to 253k), in line with the serial first builds, so running in parallel did not make each task cost more.</p>
+<div class="ev">wf_a6d7d0b3 journal: 4 results at 09:08, 09:13, 09:32 and 09:38 · limit at 09:39 "resets 12pm"</div>
+</div>
+
+<p>For overnight runs this sets the ceiling. One Claude account gets about two windows a night, which is about 1.5M output tokens. At current settings that is three to four tasks a night <span class="est">estimate</span>, however wide the fan-out. More builders only help if they draw on separate quotas.</p>
+
+<div class="note key">Anthropic does not publish how the limit is calculated. Its cost docs say thinking is billed as output, and that long contexts draw usage on every request through cache reads. Three windows is a small sample, but here cache reads rose 62% from the first window to the third without the cap moving.</div>
+
+<h2 id="where-the-output-goes"><span class="no">04</span>Where the output goes</h2>
+<p class="lede">Thinking is the biggest share at 39%, then the code itself at 32%. Most of the other suspects turned out to be small.</p>
+
+<figure class="card">
+<h3 data-toc="no" id="claude-output-by-what-it-was-spent-on">Claude output by what it was spent on</h3>
+<div class="small">2.21M output tokens, all agents. Thinking is measured exactly. The rest is split by the size of each response's text and tool inputs.</div>
+<div class="rows">
+<div class="row"><div class="lab">Thinking<small>all agents on xhigh</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c1)" data-tip="Thinking&#10;868k · 39%" tabindex="0"></div></div><div class="val">868k <small>39%</small></div></div>
+<div class="row"><div class="lab">Code written<small>file writes and patch scripts</small></div><div class="track"><div class="bar" style="--v:80.9%;--fill:var(--c1)" data-tip="Code written&#10;702k · 32%&#10;whole-file writes 467k, patch scripts 232k" tabindex="0"></div></div><div class="val">702k <small>32%</small></div></div>
+<div class="row"><div class="lab">Shell, git, tests, probes</div><div class="track"><div class="bar" style="--v:17.1%;--fill:var(--c1)" data-tip="Shell, git, tests, probes&#10;148k · 7%" tabindex="0"></div></div><div class="val">148k <small>7%</small></div></div>
+<div class="row"><div class="lab">Reading files</div><div class="track"><div class="bar" style="--v:16.2%;--fill:var(--c1)" data-tip="Reading files&#10;141k · 6%" tabindex="0"></div></div><div class="val">141k <small>6%</small></div></div>
+<div class="row"><div class="lab">Orchestration<small>T3 calls and agent plumbing</small></div><div class="track"><div class="bar" style="--v:16.2%;--fill:var(--c1)" data-tip="Orchestration&#10;141k · 6%" tabindex="0"></div></div><div class="val">141k <small>6%</small></div></div>
+<div class="row"><div class="lab">Scratch scripts in /tmp</div><div class="track"><div class="bar" style="--v:14.4%;--fill:var(--c1)" data-tip="Scratch scripts in /tmp&#10;125k · 6%" tabindex="0"></div></div><div class="val">125k <small>6%</small></div></div>
+<div class="row"><div class="lab">Browser checks</div><div class="track"><div class="bar" style="--v:9.0%;--fill:var(--c1)" data-tip="Browser checks&#10;78k · 4%" tabindex="0"></div></div><div class="val">78k <small>4%</small></div></div>
+<div class="row"><div class="lab">Prose</div><div class="track"><div class="bar" style="--v:1.2%;--fill:var(--c1)" data-tip="Prose&#10;10k · 0.4%" tabindex="0"></div></div><div class="val">10k <small>0.4%</small></div></div>
+</div>
+<div class="note">Code is close to fixed: it is the work. Thinking is the share that the effort setting controls.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table>
+<thead><tr><th>Spent on</th><th class="n">Output</th><th class="n">Share</th></tr></thead>
+<tbody>
+<tr><td>Thinking</td><td class="n">868k</td><td class="n">39%</td></tr>
+<tr><td>Code written</td><td class="n">702k</td><td class="n">32%</td></tr>
+<tr><td>Shell, git, tests, probes</td><td class="n">148k</td><td class="n">7%</td></tr>
+<tr><td>Reading files</td><td class="n">141k</td><td class="n">6%</td></tr>
+<tr><td>Orchestration</td><td class="n">141k</td><td class="n">6%</td></tr>
+<tr><td>Scratch scripts in /tmp</td><td class="n">125k</td><td class="n">6%</td></tr>
+<tr><td>Browser checks</td><td class="n">78k</td><td class="n">4%</td></tr>
+<tr><td>Prose</td><td class="n">10k</td><td class="n">0.4%</td></tr>
+<tr class="tot"><td>Total</td><td class="n">2,214k</td><td class="n">100%</td></tr>
+</tbody></table></div></details>
+</figure>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Who</th><th class="n">Output</th><th class="n">Share</th><th class="n">Of which thinking</th><th class="n">At list prices</th></tr></thead>
+<tbody>
+<tr><td data-l="Who">First builds</td><td data-l="Output" class="n">1,474k</td><td data-l="Share" class="n">67%</td><td data-l="Of which thinking" class="n">41%</td><td data-l="At list prices" class="n">$113.34</td></tr>
+<tr><td data-l="Who">Fix rounds</td><td data-l="Output" class="n">458k</td><td data-l="Share" class="n">21%</td><td data-l="Of which thinking" class="n">44%</td><td data-l="At list prices" class="n">$25.46</td></tr>
+<tr><td data-l="Who">Fable orchestrator</td><td data-l="Output" class="n">244k</td><td data-l="Share" class="n">11%</td><td data-l="Of which thinking" class="n">27%</td><td data-l="At list prices" class="n">$68.59</td></tr>
+<tr><td data-l="Who">Relays to the reviewers</td><td data-l="Output" class="n">38k</td><td data-l="Share" class="n">2%</td><td data-l="Of which thinking" class="n">1%</td><td data-l="At list prices" class="n">$0.92</td></tr>
+<tr class="tot"><td data-l="Who">Total</td><td data-l="Output" class="n">2,214k</td><td data-l="Share" class="n">100%</td><td data-l="Of which thinking" class="n">39%</td><td data-l="At list prices" class="n">$208.31</td></tr>
+</tbody></table></div>
+
+<p>Fable produced 11% of the output but 33% of the list-price cost. Its context had a median of 422k tokens and peaked at 605k. Three wake-ups after long idles rewrote 1.5M tokens of cache, so cache writes are $41.56 of its $68.59.</p>
+
+<div class="cols">
+<div class="card"><h3 data-toc="no" id="large-levers">Large levers</h3><ul>
+<li>Thinking at xhigh: 868k, 39% of output.</li>
+<li>Fix rounds: 458k, 21% of output, plus most of the Codex use.</li>
+<li>Fable's long context: 33% of list-price cost.</li>
+</ul></div>
+<div class="card"><h3 data-toc="no" id="checked-and-small">Checked and small</h3><ul>
+<li>Rewrites: 145 file writes covered 138 files. Only 1% of the characters written were later overwritten.</li>
+<li>Builder cache misses: 3 rebuilds after waits of more than 5 minutes, 968k tokens in total.</li>
+<li>Test and check commands: 0.6% of output.</li>
+<li>Builder browser checks: 3.5% of output across 402 calls.</li>
+</ul></div>
+</div>
+
+<h2 id="reviews-and-fix-rounds"><span class="no">05</span>Reviews and fix rounds</h2>
+<p class="lede">Each merged task needed three or four review rounds. On Claude, the two fix rounds per task cost 21% of output. On Codex, each round costs about 1.7% of the week, whatever the effort level.</p>
+
+<div class="tw"><table class="stack">
+<thead><tr><th>Task</th><th class="n">Review rounds</th><th class="n">Fix rounds</th><th class="n">Claude output in fix rounds</th><th>How it ended</th></tr></thead>
+<tbody>
+<tr><td data-l="Task">R1&#8209;01</td><td data-l="Review rounds" class="n">3</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">131k</td><td data-l="How it ended">Passed on round 3</td></tr>
+<tr><td data-l="Task">R1&#8209;02</td><td data-l="Review rounds" class="n">3</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">221k</td><td data-l="How it ended">Passed on round 3. Contract frozen.</td></tr>
+<tr><td data-l="Task">R1&#8209;03</td><td data-l="Review rounds" class="n">4</td><td data-l="Fix rounds" class="n">2</td><td data-l="Claude output in fix rounds" class="n">106k</td><td data-l="How it ended">Round 3 failed on the test harness only. A scoped fourth review passed the production code. The harness work became R1-03b.</td></tr>
+<tr class="tot"><td data-l="Task">Total</td><td data-l="Review rounds" class="n">10</td><td data-l="Fix rounds" class="n">6</td><td data-l="Claude output in fix rounds" class="n">458k</td><td data-l="How it ended"></td></tr>
+</tbody></table></div>
+
+<p>Each fix round is a fresh agent. It starts at about 24k tokens of context and reads its way back in. Across the fix rounds, 140k of the 458k output (31%) came before the first code change. A workflow's <code>agent()</code> call has no option to continue an earlier agent's conversation, so a fix round cannot pick up the builder's context.</p>
+
+<figure class="card vid">
+<h3 data-toc="no" id="one-task-as-it-ran">One task, as it ran</h3>
+<div class="small">R1-02, the Release 1 contract, from first build to merge. Review rounds in cyan, fix rounds hatched. A 15-second loop.</div>
+<video data-loop muted loop playsinline preload="metadata" poster="/reports/puck-orchestration/loop-task.jpg" aria-label="R1-02's loop: a 52-minute build cut off by the limit, a 24-minute rebuild, then review, fix, review, fix and a passing third review. 624k Claude output, 221k of it in fix rounds."><source src="/reports/puck-orchestration/loop-task.mp4" type="video/mp4"></video>
+</figure>
+
+<div class="grid2">
+<figure class="card">
+<h3 data-toc="no" id="codex-week-used-per-review-round">Codex week used per review round</h3>
+<div class="small">Points of the weekly meter, by reviewer effort.</div>
+<div class="rows">
+<div class="row"><div class="lab">high<small>3 rounds · 38% → 43%</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="high effort&#10;5 points over 3 rounds · 1.7 per round" tabindex="0"></div></div><div class="val">1.7</div></div>
+<div class="row"><div class="lab">xhigh<small>7 rounds · 43% → 55%</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="xhigh effort&#10;12 points over 7 rounds · 1.7 per round" tabindex="0"></div></div><div class="val">1.7</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Effort</th><th>Tasks</th><th class="n">Rounds</th><th class="n">Meter</th><th class="n">Per round</th></tr></thead><tbody>
+<tr><td>high</td><td>R1-01</td><td class="n">3</td><td class="n">38% → 43%</td><td class="n">1.7</td></tr>
+<tr><td>xhigh</td><td>R1-02, R1-03</td><td class="n">7</td><td class="n">43% → 55%</td><td class="n">1.7</td></tr>
+</tbody></table></div></details>
+</figure>
+<figure class="card">
+<h3 data-toc="no" id="codex-tokens-by-reviewer">Codex tokens by reviewer</h3>
+<div class="small">29 sessions from 21:44 to 05:01.</div>
+<div class="rows">
+<div class="row"><div class="lab">Sol<small>9 sessions · verifier</small></div><div class="track"><div class="bar" style="--v:100%;--fill:var(--c3)" data-tip="Sol&#10;39.7M input · 181k output · 66%" tabindex="0"></div></div><div class="val">66%</div></div>
+<div class="row"><div class="lab">Astra<small>20 sessions · reviewer</small></div><div class="track"><div class="bar" style="--v:51.1%;--fill:var(--c3)" data-tip="Astra&#10;20.3M input · 95k output · 34%" tabindex="0"></div></div><div class="val">34%</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table><thead><tr><th>Reviewer</th><th class="n">Sessions</th><th class="n">Input</th><th class="n">Output</th><th class="n">Share</th></tr></thead><tbody>
+<tr><td>Sol</td><td class="n">9</td><td class="n">39.7M</td><td class="n">181k</td><td class="n">66%</td></tr>
+<tr><td>Astra</td><td class="n">20</td><td class="n">20.3M</td><td class="n">95k</td><td class="n">34%</td></tr>
+</tbody></table></div></details>
+</figure>
+</div>
+
+<p>Raising the reviewers from high to xhigh did not change the cost per round. The number of rounds is what drives Codex use. At 3.3 rounds per task, the four tasks now waiting would take the meter to about 78%, and about four more tasks would empty it before Monday's reset.</p>
+
+<h2 id="the-stall-reviews-wait-for-claude"><span class="no">06</span>The stall: reviews wait for Claude</h2>
+<p class="lede">The two quotas take turns instead of overlapping. When Claude runs out, Codex has spare capacity but nothing can launch it.</p>
+
+<div class="finding">
+<div class="fhd"><span class="sev p2">P2</span><span class="fid">ORCH-1</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>Reviews cannot start while the orchestrator is out of Claude.</b> Astra and Sol run on Codex, but only Fable's thread can launch them, and Fable shares the builders' Claude window. Four committed tasks have waited since 09:39 with 45% of the Codex week unused.</p>
+<div class="ev">builder results 09:08–09:38 · Fable "You've hit your session limit · resets 12pm" at 09:39 · Codex meter 55% at 05:01, no review since</div>
+</div>
+
+<div class="finding">
+<div class="fhd"><span class="sev p2">P2</span><span class="fid">ORCH-2</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>Builders fail at the limit instead of pausing, and nothing retries the resume.</b> The batch launched at 05:04, just as the window ran out, and all four builders failed on their first call. Claude Code pauses a workflow at the limit only in an interactive session. It does not pause under the Agent SDK or in a background session, which matches what happened here. The automatic resume at 7:07am ended with <code>ENOTFOUND</code>, and nothing retried it until you restarted the loop at 8:36am.</p>
+<div class="ev">wf_a6d7d0b3 journal: 4 × started then failed at 05:04 · code.claude.com/docs/en/workflows "When a run hits your usage limit"</div>
+</div>
+
+<div class="finding">
+<div class="fhd"><span class="sev p3">P3</span><span class="fid">ORCH-3</span><span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></div>
+<p><b>A builder cut off by the limit is relaunched as a new agent.</b> R1-02's first build wrote 294k from 22:57 until the 23:49 limit. The relaunched agent spent another 109k, from 02:01 to 02:25, to finish it.</p>
+<div class="ev">wf_b56893a9: R1-02:build:opus × 2 agents, 139 and 153 calls</div>
+</div>
+
+<h2 id="verdict-keep-the-shape-change-the-dials-and-the-coupling"><span class="no">07</span>Verdict: keep the shape, change the dials and the coupling</h2>
+<p class="lede">Keep the ledger, a worktree per task, and the two independent reviewers. Change the effort levels, the review loop, and who launches reviews. That should roughly halve Claude output per task and cut Codex use per task by half or more <span class="est">estimate</span>.</p>
+
+<ol class="recs">
+<li><b class="t">Drop builds and fixes to medium effort.</b>Thinking was 868k tokens, 39% of all output, with every agent on xhigh. Medium is Anthropic's default for Opus 5.5 and Sonnet 5.5, and its docs report Opus 5.5 at medium matching or beating Opus 5 at high on coding. Keep high for contract tasks such as R2-01. Halving the thinking would cut output by about a fifth <span class="est">estimate</span>.</li>
+<li><b class="t">Aim for one review round per task.</b>Add the night's review findings to the builder brief as a checklist, and have the builder run Sol's checks before it commits. Allow a second fix round only for a correctness failure. Ten rounds for three tasks cost 17% of the Codex week, and the fix rounds cost 458k Claude output.</li>
+<li><b class="t">Give each fix agent a map.</b>Have the builder's result list the files it touched, the decisions it made, and the commands that prove the change. Pass that to the fix agent with the findings. Fix agents spent 31% of their output, 140k, before their first code change.</li>
+<li><b class="t">Scope Sol.</b>Run Sol on tasks with a browser-visible change. On a re-review, have it check only the items that failed. Sol used 66% of the Codex tokens in 9 of the 29 sessions.</li>
+<li><b class="t">Let reviews run when Claude is out.</b>Review each task as soon as it commits. Launch reviews from a quota the builders don't use: an orchestrator on the second Claude account, or builders launched as T3 threads so the orchestrator is outside their window. Today's wait is 2h 21m with four tasks ready.</li>
+<li><b class="t">Run a smaller, fresher orchestrator.</b>Start a new orchestrator session for each batch from the ledger, on Opus 5.5 or Sonnet 5.5 at medium with a 200k context. Keep Fable for contracts and the final report. Fable's median context was 422k, and it cost 33% at list prices for 11% of the output.</li>
+<li><b class="t">Fan out across quotas, and schedule the resume.</b>More builders on one account reach the cap sooner: 62 minutes for four, about 3 hours for one. Spread lanes over separate quotas, and schedule a resume at each reset that retries if it fails. The 7:07am resume failed once and nothing retried it.</li>
+<li><b class="t">Don't hold a failed review for Sol.</b>When Astra fails a task, start the fix round on its findings and fold in Sol's when they land. In the 7 rounds Astra had already failed, Fable waited 28 more minutes for Sol (RPL-3).</li>
+</ol>
+
+<figure class="card">
+<h3 data-toc="no" id="when-the-remaining-27-tasks-could-finish">When the remaining 27 tasks could finish</h3>
+<div class="small">All rows are estimates from this night's per-task costs. They assume a Claude week gives about 2.3M output tokens, since 2.21M used 96% of it, and that this account's week resets on Tue 13 Oct at 21:00, seven days after the last reset.</div>
+<div class="tw"><table class="stack">
+<thead><tr><th>Setup</th><th class="n">Claude per task</th><th class="n">Codex per task</th><th class="n">Tasks per Claude week</th><th>Finish, one account</th><th>Finish, two accounts</th></tr></thead>
+<tbody>
+<tr><td data-l="Setup">As is</td><td data-l="Claude per task" class="n">~440k</td><td data-l="Codex per task" class="n">~5.7%</td><td data-l="Tasks per Claude week" class="n">~5</td><td data-l="Finish, one account">~Wed 18 Nov</td><td data-l="Finish, two accounts">~Wed 28 Oct</td></tr>
+<tr><td data-l="Setup">Changes 1 to 6</td><td data-l="Claude per task" class="n">~220k</td><td data-l="Codex per task" class="n">~2.5%</td><td data-l="Tasks per Claude week" class="n">~10</td><td data-l="Finish, one account">~Wed 28 Oct</td><td data-l="Finish, two accounts">~Wed 21 Oct</td></tr>
+</tbody></table></div>
+<div class="note">Codex no longer sets the pace: at 2.5% per task, a Codex week covers about 40 tasks. The two-account column assumes a second account of the same size with its full week free from 13 Oct; if it has room this week, the finish moves earlier. Builds that move to Codex would spend that spare quota instead of Claude's.</div>
+</figure>
+
+<div class="note warn">The effort saving has not been measured on this codebase. Run the next batch with changes 1 to 6, measure it with the same scripts, and keep the changes if each task uses at most about 250k Claude output and 2.5% of the Codex week without more review failures. If first-pass failures rise, put builders back on high, not xhigh.</div>
+
+<p>There is room in the plan for more parallel work now. R2-01, the Release 2 contract, needs only R1-02, which merged at 03:44. Twelve tasks wait on R2-01 directly, so starting it alongside the R1d reviews is where fan-out across quotas would pay off first.</p>
+
+<h2 id="method-and-caveats"><span class="no">08</span>Method and caveats</h2>
+<p class="lede">The token figures come from the session logs on this machine, deduplicated per API response. The projections are arithmetic on those figures, not measurements.</p>
+
+<ul>
+<li><b>Claude usage.</b> Fable's Claude Code session log plus every workflow agent transcript under it. Responses are deduplicated by <code>message.id</code>. Usage fields: <code>output_tokens</code>, <code>output_tokens_details.thinking_tokens</code>, <code>cache_read_input_tokens</code> and <code>cache_creation</code> by TTL. Windows are in MYT.</li>
+<li><b>Output split.</b> Thinking is exact. The other output of each response is split by the character size of its text and tool inputs. Builders write files with <code>cat &gt; file &lt;&lt;EOF</code> and patch scripts, so those count as code written.</li>
+<li><b>List prices.</b> From the pricing table of the earlier sub-agent fanning experiment, in USD per million tokens. Opus 5.5: $4 input, $20 output, $0.20 cache read, $5 and $8 for 5-minute and 1-hour cache writes. Sonnet 5.5: $2, $10, $0.20, $2.50 and $4. Fable 5.1: $10, $50, $0.25, $12.50 and $20. These are equivalents for comparison, not a bill.</li>
+<li><b>The cap.</b> Three windows. Anthropic does not publish the formula. Use of claude.ai on the same account would count against the same limit and is not visible here. No other Claude Code session on this machine ran in those windows. The owner's usage page showed 4% of the Claude weekly limit left at 10:46 on 7 Oct. The last weekly reset was 21:00 on 6 Oct (a Claude Code limit message from 4 Oct gives that time), and nothing else on this machine used Claude after it, so this run used about 96% in three windows. Use of claude.ai or another device would also count. The next reset date is inferred, not read.</li>
+<li><b>Codex.</b> 29 rollouts in <code>~/.codex/sessions/2026/10/0{6,7}/</code> from 21:44 to 05:01. The meter is <code>rate_limits.primary.used_percent</code> on the 10,080-minute window, on the Pro Lite plan. It moves in whole points, so per-round figures carry about ±0.5. The high and xhigh rounds were also on different tasks.</li>
+<li><b>Docs.</b> Effort defaults and the medium-versus-high result: <a href="https://code.claude.com/docs/en/model-config">model configuration</a>. Workflow cache TTL, the <code>agent()</code> options and pause-at-limit behaviour: <a href="https://code.claude.com/docs/en/workflows">workflows</a> and the 2.1.291 binary. Thinking billed as output and cache reads drawing usage: <a href="https://code.claude.com/docs/en/costs">costs</a>.</li>
+<li><b>Projections.</b> Remaining work is 27 tasks: the 4 built plus 23 not started, with R1-03b left deferred. As-is cost per task is the three merged tasks' average of 405k, plus about 35k of Fable. Revised Claude cost assumes medium halves thinking on first builds (189k → ~150k), one fix round at ~50k, and ~20k of orchestration. Revised Codex cost assumes 1 to 1.5 rounds per task with Sol scoped. Windows are 730k each, at most 4.8 a day. No allowance is made for the Claude weekly limit.</li>
+<li><b>Other quotas.</b> T3 lists a second Claude account and Cursor-billed Opus 5.5. Whether either is a separate quota from this account was not checked at 09:52. The 10:55 reviews were launched from a thread running through Cursor.</li>
+<li><b>Replay.</b> Drawn frame by frame on a canvas from the same logs: each Claude agent's model calls (time, output and thinking tokens), each Codex session's start, end and weekly meter, the ledger's merge times, and the orchestrator thread's messages for the captions. A bar runs from an agent's first call to its last. Codex sessions are matched to review rounds by launch order against T3's delegated-task list. The replay's Claude week bar is output divided by 2.31M, an estimate; the 5-hour and Codex meters are read values. The planning prologue and the tree use T3's thread list for sub-agent times. The renderer and its derived timeline are in <code>docs/reports/puck-orchestration/replay/</code> in this site's repository.</li>
+</ul>
+
+<p class="ft">Read at 9:52am on 7 Oct 2026 from the session logs, the Codex rollouts, the ledger and the four R1d worktrees; the replay, RPL findings and update cover the run to 11:21. Rebuild with <code>python3 ~/.claude/skills/report/scripts/build.py docs/reports/puck-orchestration/body.html -o content/reports/puck-orchestration.html</code>.</p>
+
+<style>
+.vid video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:var(--bg-deep);border:1px solid var(--line-soft);margin:.75rem 0}
+.chapters{display:flex;flex-wrap:wrap;gap:.4rem;margin:.25rem 0 .5rem}
+.chapters button{font:inherit;font-family:var(--mono);font-size:.72rem;color:var(--ink-2);background:transparent;border:1px solid var(--line);padding:.25rem .55rem;cursor:pointer}
+.chapters button span{color:var(--purple)}
+.chapters button:hover,.chapters button:focus-visible{color:var(--ink);border-color:var(--purple)}
+img.cast{display:block;width:100%;height:auto;margin:1rem 0 1.5rem;border:1px solid var(--line-soft)}
+</style>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const v of document.querySelectorAll('video[data-loop]')) {
+    if (reduce) { v.controls = true; v.removeAttribute('loop'); continue; }
+    v.muted = true;
+    new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.35 }).observe(v);
+  }
+  const replay = document.getElementById('replay');
+  for (const b of document.querySelectorAll('[data-seek]')) b.addEventListener('click', () => { replay.currentTime = +b.dataset.seek; replay.play().catch(() => {}); });
+})();
+</script>
+ <style>
+
+.vid video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:var(--bg-deep);border:1px solid var(--line-soft);margin:.75rem 0}
+.chapters{display:flex;flex-wrap:wrap;gap:.4rem;margin:.25rem 0 .5rem}
+.chapters button{font:inherit;font-family:var(--mono);font-size:.72rem;color:var(--ink-2);background:transparent;border:1px solid var(--line);padding:.25rem .55rem;cursor:pointer}
+.chapters button span{color:var(--purple)}
+.chapters button:hover,.chapters button:focus-visible{color:var(--ink);border-color:var(--purple)}
+img.cast{display:block;width:100%;height:auto;margin:1rem 0 1.5rem;border:1px solid var(--line-soft)}
+</style><script>/* report kit runtime: TREE scroll-spy, progress meter, up/down heading nav, tooltips, line charts. No dependencies. */
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const root=document.documentElement;
+
+/* ---------- tooltip: any element with data-tip="Title\nline\nline" ---------- */
+const tip=$('#tip')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'tip',role:'tooltip'}));
+function placeTip(x,y){const w=tip.offsetWidth,h=tip.offsetHeight;let l=x+14,t=y+14;if(l+w>innerWidth-8)l=x-w-14;if(l<8)l=8;if(t+h>innerHeight-8)t=y-h-14;if(t<8)t=8;tip.style.left=l+'px';tip.style.top=t+'px'}
+function showTip(text,x,y){tip.textContent='';const parts=String(text).split('\n');const b=document.createElement('b');b.textContent=parts[0];tip.appendChild(b);if(parts.length>1)tip.appendChild(document.createTextNode('\n'+parts.slice(1).join('\n')));tip.style.display='block';placeTip(x,y)}
+function hideTip(){tip.style.display='none'}
+document.addEventListener('pointermove',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(t)showTip(t.getAttribute('data-tip'),e.clientX,e.clientY);else if(!e.target.closest||!e.target.closest('.chart'))hideTip()});
+document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(t){const r=t.getBoundingClientRect();showTip(t.getAttribute('data-tip'),r.left+r.width/2,r.top)}});
+document.addEventListener('focusout',hideTip);
+window.ReportTip={show:showTip,hide:hideTip};
+
+/* ---------- TREE rail: active section, sub-tree, progress, rail title ---------- */
+const tree=$('#tree');
+const tops=tree?$$('a.top',tree):[];
+const all=tree?$$('a',tree):[];
+const target=a=>document.getElementById(decodeURIComponent(a.hash.slice(1)));
+const prog=$('#prog'),N=28;
+const railTitle=$('#railTitle'),h1=$('.hero h1');
+let ticking=false;
+function update(){
+  ticking=false;
+  const H=root.scrollHeight-innerHeight,p=H>0?Math.min(1,Math.max(0,scrollY/H)):0;
+  if(prog){const k=Math.round(p*N);prog.querySelector('b').textContent='█'.repeat(k);prog.querySelector('.tr').textContent='░'.repeat(N-k);prog.querySelector('.pct').textContent=String(Math.round(p*100)).padStart(2,'0')+'%'}
+  if(railTitle&&h1)railTitle.classList.toggle('on',h1.getBoundingClientRect().bottom<0);
+  if(!tops.length)return;
+  const line=Math.min(innerHeight*0.3,240),atEnd=H>0&&scrollY>=H-2;
+  let ti=-1;tops.forEach((a,i)=>{const h=target(a);if(h&&h.getBoundingClientRect().top<=line)ti=i});
+  if(atEnd)ti=tops.length-1;
+  let subOn=null;
+  tops.forEach((a,i)=>{
+    a.classList.toggle('on',i===ti);
+    const subs=a.nextElementSibling&&a.nextElementSibling.classList.contains('subs')?a.nextElementSibling:null;
+    if(!subs)return;
+    subs.classList.toggle('open',i===ti);
+    const sl=$$('a',subs);let si=-1;
+    let best=-1e9;/* side-by-side cards share a top: keep the first (left) one */
+    if(i===ti)sl.forEach((s,j)=>{const h=target(s);const t=h?h.getBoundingClientRect().top:1e9;if(t<=line&&t>best+4){si=j;best=t}});
+    sl.forEach((s,j)=>s.classList.toggle('on',j===si));
+    if(si>=0)subOn=sl[si];
+  });
+}
+function req(){if(!ticking){ticking=true;requestAnimationFrame(update)}}
+addEventListener('scroll',req,{passive:true});addEventListener('resize',req);update();
+
+/* ---------- up/down steps through headings (h2 + h3) ---------- */
+const smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+const heads=()=>$$('.prose h2[id], .prose h3[id]').filter(h=>h.offsetParent!==null);
+addEventListener('keydown',e=>{
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||e.defaultPrevented)return;
+  const a=document.activeElement;
+  if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.closest('.chart')))return;
+  const hs=heads();if(!hs.length)return;
+  const pad=parseFloat(getComputedStyle(hs[0]).scrollMarginTop)||32;
+  let t;
+  if(e.key==='ArrowDown')t=hs.find(h=>h.getBoundingClientRect().top>pad+4);
+  else t=hs.slice().reverse().find(h=>h.getBoundingClientRect().top<pad-4);
+  if(e.key==='ArrowUp'&&!t){e.preventDefault();scrollTo({top:0,behavior:smooth});return}
+  if(!t)return;
+  e.preventDefault();t.scrollIntoView({behavior:smooth,block:'start'});
+});
+
+/* ---------- line charts: a div.chart holding one script[type="application/json"] with cfg ----------
+   cfg: {x:[...], xtype:"time"|"num"|"cat", tz:<hours offset for time labels, default local>,
+         series:[{name, short?, color:"c1".."c5"|"ink"|"#hex", values:[...]}],
+         yfmt:"num"|"int"|"usd"|"pct"|"tok"|"dur", ymin?, ymax?, height?, area?, step?, labels?, sum?,
+         events?:[{x, label}] (numbered markers + a key under the chart; key:false hides the key),
+         brk?:[x0, x1] (compress an idle stretch to a narrow band; brkLabel?, brkTip?), title} */
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(root).getPropertyValue(n).trim();
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+const FMT={
+  num:v=>Math.abs(v)>=1000?v.toLocaleString('en-US',{maximumFractionDigits:0}):(+v.toFixed(2)).toString(),
+  int:v=>Math.round(v).toLocaleString('en-US'),
+  usd:v=>(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',Number.isInteger(+(+v).toFixed(2))?{maximumFractionDigits:0}:{minimumFractionDigits:2,maximumFractionDigits:2}),
+  pct:v=>(+v.toFixed(1))+'%',
+  tok:v=>v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'k':''+Math.round(v),
+  dur:v=>v>=60?Math.floor(v/60)+'h '+String(Math.round(v%60)).padStart(2,'0')+'m':Math.round(v)+'m'};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function nice(span,n){const raw=span/n||1,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+function color(c){if(!c)return css('--c1');if(c[0]==='#')return c;return css(c.startsWith('--')?c:'--'+c)}
+function draw(host,cfg){
+  host.querySelectorAll('svg,.elist[data-auto]').forEach(s=>s.remove());
+  const isTime=cfg.xtype==='time'||(cfg.xtype!=='num'&&cfg.xtype!=='cat'&&typeof cfg.x[0]==='string'&&!isNaN(Date.parse(cfg.x[0])));
+  const isCat=cfg.xtype==='cat';
+  const xs=cfg.x.map((v,i)=>isCat?i:isTime?(typeof v==='number'?v:Date.parse(v)):+v);
+  const off=cfg.tz!=null?cfg.tz*36e5:null;
+  const loc=t=>off==null?new Date(t):new Date(t+off);
+  const g=(d,k)=>off==null?d['get'+k]():d['getUTC'+k]();
+  const hhmm=t=>{const d=loc(t);return String(g(d,'Hours')).padStart(2,'0')+':'+String(g(d,'Minutes')).padStart(2,'0')};
+  const day=t=>{const d=loc(t);return g(d,'Date')+' '+MON[g(d,'Month')]};
+  const span=xs[xs.length-1]-xs[0];
+  const midnight=t=>{const d=loc(t);return g(d,'Hours')===0&&g(d,'Minutes')===0};
+  const xlab=t=>isCat?String(cfg.x[t]):isTime?(span>2*864e5||midnight(t)?day(t):hhmm(t)):FMT.num(t);
+  const xtip=t=>isCat?String(cfg.x[t]):isTime?hhmm(t)+' · '+day(t):FMT.num(t);
+  const W=Math.max(host.clientWidth,260),narrow=W<520;
+  const ink=css('--ink'),ink2=css('--ink-2'),muted=css('--ink-3'),grid=css('--grid'),axis=css('--axis'),bg=css('--bg');
+  const yf=FMT[cfg.yfmt||'num'];
+  const pl=narrow?44:56,pr=(cfg.labels&&!narrow)?150:12,pb=26;
+  const ev=(cfg.events||[]).map((e,i)=>({...e,n:e.n||i+1}));
+  const x0=xs[0],x1=xs[xs.length-1]===x0?x0+1:xs[xs.length-1],plotW=W-pl-pr;
+  const bk=cfg.brk?cfg.brk.map(v=>isTime&&typeof v==='string'?Date.parse(v):+v):null,bw=bk?22:0;
+  const act=bk?(bk[0]-x0)+(x1-bk[1]):(x1-x0),kx=(plotW-bw)/act;
+  const X=t=>!bk||t<=bk[0]?pl+(t-x0)*kx:t>=bk[1]?pl+(bk[0]-x0)*kx+bw+(t-bk[1])*kx:pl+(bk[0]-x0)*kx+bw*(t-bk[0])/(bk[1]-bk[0]);
+  let rows=0;const last=[];
+  ev.forEach(e=>{e.t=isCat?e.x:isTime&&typeof e.x==='string'?Date.parse(e.x):+e.x;e.px=X(e.t);let r=0;while(last[r]!==undefined&&e.px-last[r]<22)r++;e.row=r;last[r]=e.px;rows=Math.max(rows,r+1)});
+  const pt=ev.length?14+rows*22:14,H=cfg.height||(narrow?220:280),ph=H-pt-pb;
+  const vals=cfg.series.flatMap(s=>s.values.filter(v=>v!=null));
+  let ymin=cfg.ymin!=null?cfg.ymin:Math.min(0,...vals),ymax=cfg.ymax!=null?cfg.ymax:Math.max(...vals);
+  if(cfg.ymax==null){const st=nice((ymax-ymin)*1.04,4);ymax=Math.ceil((ymax-ymin)/st)*st+ymin}
+  let step=nice(ymax-ymin,4);if(cfg.yfmt==='int'&&step%1)step=Math.ceil(step);
+  const Y=v=>pt+ph-(v-ymin)/(ymax-ymin||1)*ph;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,height:H,role:'img','aria-label':cfg.title||''},host);
+  for(let v=ymin;v<=ymax+1e-9;v+=step){el('line',{x1:pl,x2:W-pr,y1:Y(v),y2:Y(v),stroke:v===ymin?axis:grid,'stroke-width':1},svg);el('text',{x:pl-8,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:muted},svg).textContent=yf(v)}
+  /* x ticks */
+  const nt=Math.max(2,Math.floor(plotW/(isTime&&span<=2*864e5?70:90)));
+  let ticks=[];
+  if(isCat){const every=Math.ceil(xs.length/nt);ticks=xs.filter((_,i)=>i%every===0)}
+  else if(isTime&&span<=2*864e5){const mins=[5,10,15,30,60,120,180,240,360,720].find(m=>act/(m*6e4)<=nt)||1440;const sm=mins*6e4,o=off==null?-new Date(x0).getTimezoneOffset()*6e4:off;for(let t=Math.ceil((x0+o)/sm)*sm-o;t<=x1;t+=sm)ticks.push(t)}
+  else if(isTime){const d=864e5,days=Math.max(1,Math.ceil(span/d/nt));for(let t=Math.ceil(x0/d)*d;t<=x1;t+=days*d)ticks.push(t)}
+  else{const st=nice(x1-x0,nt);for(let t=Math.ceil(x0/st)*st;t<=x1+1e-9;t+=st)ticks.push(t)}
+  ticks.forEach(t=>{const x=X(t);if(x<pl-1||x>W-pr+1)return;if(bk&&t>bk[0]-.03*act&&t<bk[1]+.03*act)return;el('line',{x1:x,x2:x,y1:pt+ph,y2:pt+ph+4,stroke:axis},svg);el('text',{x,y:pt+ph+18,'text-anchor':'middle','font-size':11,fill:muted},svg).textContent=xlab(t)});
+  if(bk){const a=X(bk[0]),b=X(bk[1]),cx=(a+b)/2,cy=pt+ph*.25;el('rect',{x:a,y:pt,width:b-a,height:ph,fill:grid,'data-tip':cfg.brkTip||'Nothing ran here\nthe time axis is compressed',tabindex:0},svg);el('text',{x:cx,y:cy,'text-anchor':'middle','font-size':10.5,fill:muted,transform:`rotate(-90 ${cx} ${cy})`,'pointer-events':'none'},svg).textContent=cfg.brkLabel||'idle'}
+  ev.forEach(e=>el('line',{x1:e.px,x2:e.px,y1:14+e.row*22,y2:pt+ph,stroke:axis,'stroke-width':1,'stroke-dasharray':'2 3'},svg));
+  const cols=cfg.series.map(s=>color(s.color));
+  cfg.series.forEach((s,i)=>{
+    let d='',first=true,prevY=null;
+    xs.forEach((t,j)=>{const v=s.values[j];if(v==null)return;const x=X(t),y=Y(v);if(first){d+=`M${x},${y}`;first=false}else if(cfg.step)d+=`L${x},${prevY}L${x},${y}`;else d+=`L${x},${y}`;prevY=y});
+    if(cfg.area)el('path',{d:d+`L${X(xs[xs.length-1])},${Y(ymin)}L${X(xs[0])},${Y(ymin)}Z`,fill:cols[i],opacity:cfg.areaOpacity||.12},svg);
+    el('path',{d,fill:'none',stroke:cols[i],'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+  });
+  const ends=cfg.series.map((s,i)=>{let j=s.values.length-1;while(j>0&&s.values[j]==null)j--;return{i,x:X(xs[j]),y:Y(s.values[j]),v:s.values[j]}});
+  ends.forEach(e=>el('circle',{cx:e.x,cy:e.y,r:4,fill:cols[e.i],stroke:bg,'stroke-width':2},svg));
+  if(cfg.labels&&!narrow){
+    const L=ends.slice().sort((a,b)=>a.y-b.y);let prev=-1e9;L.forEach(e=>{e.ly=Math.max(e.y,prev+17);prev=e.ly});
+    const over=L[L.length-1].ly-(pt+ph);if(over>0)L.forEach(e=>e.ly-=over);
+    L.forEach(e=>{const lx=W-pr+14;el('polyline',{points:`${e.x+5},${e.y} ${W-pr+6},${e.y} ${lx-4},${e.ly}`,fill:'none',stroke:axis,'stroke-width':1},svg);const t=el('text',{x:lx,y:e.ly+4,'font-size':11.5,fill:ink},svg);el('tspan',{'font-weight':600},t).textContent=yf(e.v)+' ';el('tspan',{fill:ink2},t).textContent=cfg.series[e.i].short||cfg.series[e.i].name})}
+  ev.forEach(e=>{const cy=14+e.row*22;const gg=el('g',{'data-tip':xtip(e.t)+'\n'+e.n+'. '+e.label,tabindex:0},svg);el('circle',{cx:e.px,cy,r:9,fill:ink,stroke:bg,'stroke-width':2},gg);el('text',{x:e.px,y:cy+4,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:bg},gg).textContent=e.n});
+  const cross=el('line',{y1:pt,y2:pt+ph,stroke:ink2,'stroke-width':1,visibility:'hidden'},svg);
+  const dots=cfg.series.map((s,i)=>el('circle',{r:4.5,fill:cols[i],stroke:bg,'stroke-width':2,visibility:'hidden'},svg));
+  const hit=el('rect',{x:pl,y:pt,width:plotW,height:ph,fill:'transparent','pointer-events':'all'},svg);
+  let cur=-1;
+  function at(j,cx,cy){cur=j;const x=X(xs[j]);cross.setAttribute('x1',x);cross.setAttribute('x2',x);cross.setAttribute('visibility','visible');
+    let txt=xtip(xs[j]);
+    cfg.series.forEach((s,i)=>{const v=s.values[j];if(v==null){dots[i].setAttribute('visibility','hidden');return}dots[i].setAttribute('cx',x);dots[i].setAttribute('cy',Y(v));dots[i].setAttribute('visibility','visible');txt+='\n'+yf(v)+'  '+(s.short||s.name)});
+    if(cfg.series.length>1&&cfg.sum)txt+='\n'+yf(cfg.series.reduce((a,s)=>a+(s.values[j]||0),0))+'  total';
+    showTip(txt,cx,cy)}
+  function nearest(px){const r=svg.getBoundingClientRect();const x=(px-r.left)*(W/r.width);let b=0,bd=1e9;xs.forEach((t,j)=>{const d=Math.abs(X(t)-x);if(d<bd){bd=d;b=j}});return b}
+  const off2=()=>{cross.setAttribute('visibility','hidden');dots.forEach(d=>d.setAttribute('visibility','hidden'));hideTip()};
+  hit.addEventListener('pointermove',e=>at(nearest(e.clientX),e.clientX,e.clientY));
+  hit.addEventListener('pointerdown',e=>at(nearest(e.clientX),e.clientX,e.clientY));
+  hit.addEventListener('pointerleave',off2);
+  if(ev.length&&cfg.key!==false){const ul=document.createElement('ul');ul.className='elist';ul.dataset.auto='';
+    ev.forEach(e=>{const li=document.createElement('li'),b=document.createElement('b'),sp=document.createElement('span');b.textContent=e.n;sp.textContent=(isCat?String(cfg.x[e.t]):isTime?(span>2*864e5?day(e.t)+' ':'')+hhmm(e.t):FMT.num(e.t))+' · '+e.label;li.append(b,sp);ul.append(li)});host.append(ul)}
+  host.tabIndex=0;
+  host.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const j=Math.max(0,Math.min(xs.length-1,(cur<0?0:cur)+(e.key==='ArrowRight'?1:-1)));const r=svg.getBoundingClientRect();at(j,r.left+X(xs[j])*(r.width/W),r.top+20)}};
+  host.onblur=off2;
+}
+const charts=$$('.chart').map(h=>{const s=h.querySelector('script[type="application/json"]');if(!s)return null;try{return[h,JSON.parse(s.textContent)]}catch(err){h.textContent='chart config error: '+err.message;return null}}).filter(Boolean);
+function drawAll(){charts.forEach(([h,c])=>draw(h,c))}
+drawAll();
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(drawAll,80)});
+window.ReportChart={draw};
+})();
+</script>  </div>   <footer class="post-foot" data-astro-cid-zm77yjld> <a href="/blog" data-astro-cid-zm77yjld>← All entries</a> </footer> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var a=(s,i,o)=>{let r=async()=>{await(await s())()},t=typeof i.value=="object"?i.value:void 0,c={rootMargin:t==null?void 0:t.rootMargin},n=new IntersectionObserver(e=>{for(let l of e)if(l.isIntersecting){n.disconnect(),r();break}},c);for(let e of o.children)n.observe(e)};(self.Astro||(self.Astro={})).visible=a;window.dispatchEvent(new Event("astro:visible"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z2jR0NV" prefix="r1" component-url="/_astro/Comments.CR5PRbin.js" component-export="default" renderer-url="/_astro/client.CTDoNXH3.js" props="{&quot;data-astro-cid-zm77yjld&quot;:[0,true]}" ssr client="visible" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:true}" await-children><div class="mt-16 border-t border-dashed border-rule pt-8"></div><!--astro:end--></astro-island> </div> </div> </article>  </main> <footer class="site-footer" data-astro-cid-pnrjdgm4> <div class="inner" data-astro-cid-pnrjdgm4> <div class="top" data-astro-cid-pnrjdgm4> <div class="brand" data-astro-cid-pnrjdgm4> <p class="name" data-astro-cid-pnrjdgm4>Harith</p> <p class="line" data-astro-cid-pnrjdgm4>AI engineer, entrepreneur, founder of DagangNow.</p> <ul class="icons" aria-label="Elsewhere" data-astro-cid-pnrjdgm4> <li data-astro-cid-pnrjdgm4> <a href="https://x.com/rithbennet" aria-label="X" rel="me noopener" target="_blank" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"/></svg> </a> </li><li data-astro-cid-pnrjdgm4> <a href="https://www.instagram.com/rithbn_/" aria-label="Instagram" rel="me noopener" target="_blank" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><path fill="currentColor" d="M7.03.084c-1.277.06-2.149.264-2.91.563a5.9 5.9 0 0 0-2.124 1.388a5.9 5.9 0 0 0-1.38 2.127C.321 4.926.12 5.8.064 7.076s-.069 1.688-.063 4.947s.021 3.667.083 4.947c.061 1.277.264 2.149.563 2.911c.308.789.72 1.457 1.388 2.123a5.9 5.9 0 0 0 2.129 1.38c.763.295 1.636.496 2.913.552c1.278.056 1.689.069 4.947.063s3.668-.021 4.947-.082c1.28-.06 2.147-.265 2.91-.563a5.9 5.9 0 0 0 2.123-1.388a5.9 5.9 0 0 0 1.38-2.129c.295-.763.496-1.636.551-2.912c.056-1.28.07-1.69.063-4.948c-.006-3.258-.02-3.667-.081-4.947c-.06-1.28-.264-2.148-.564-2.911a5.9 5.9 0 0 0-1.387-2.123a5.9 5.9 0 0 0-2.128-1.38c-.764-.294-1.636-.496-2.914-.55C15.647.009 15.236-.006 11.977 0S8.31.021 7.03.084m.14 21.693c-1.17-.05-1.805-.245-2.228-.408a3.7 3.7 0 0 1-1.382-.895a3.7 3.7 0 0 1-.9-1.378c-.165-.423-.363-1.058-.417-2.228c-.06-1.264-.072-1.644-.08-4.848c-.006-3.204.006-3.583.061-4.848c.05-1.169.246-1.805.408-2.228c.216-.561.477-.96.895-1.382a3.7 3.7 0 0 1 1.379-.9c.423-.165 1.057-.361 2.227-.417c1.265-.06 1.644-.072 4.848-.08c3.203-.006 3.583.006 4.85.062c1.168.05 1.804.244 2.227.408c.56.216.96.475 1.382.895s.681.817.9 1.378c.165.422.362 1.056.417 2.227c.06 1.265.074 1.645.08 4.848c.005 3.203-.006 3.583-.061 4.848c-.051 1.17-.245 1.805-.408 2.23c-.216.56-.477.96-.896 1.38a3.7 3.7 0 0 1-1.378.9c-.422.165-1.058.362-2.226.418c-1.266.06-1.645.072-4.85.079s-3.582-.006-4.848-.06m9.783-16.192a1.44 1.44 0 1 0 1.437-1.442a1.44 1.44 0 0 0-1.437 1.442M5.839 12.012a6.161 6.161 0 1 0 12.323-.024a6.162 6.162 0 0 0-12.323.024M8 12.008A4 4 0 1 1 12.008 16A4 4 0 0 1 8 12.008"/></svg> </a> </li><li data-astro-cid-pnrjdgm4> <a href="https://www.tiktok.com/@rithbennet" aria-label="TikTok" rel="me noopener" target="_blank" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><path fill="currentColor" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93c-.01 2.92.01 5.84-.02 8.75c-.08 1.4-.54 2.79-1.35 3.94c-1.31 1.92-3.58 3.17-5.91 3.21c-1.43.08-2.86-.31-4.08-1.03c-2.02-1.19-3.44-3.37-3.65-5.71c-.02-.5-.03-1-.01-1.49c.18-1.9 1.12-3.72 2.58-4.96c1.66-1.44 3.98-2.13 6.15-1.72c.02 1.48-.04 2.96-.04 4.44c-.99-.32-2.15-.23-3.02.37c-.63.41-1.11 1.04-1.36 1.75c-.21.51-.15 1.07-.14 1.61c.24 1.64 1.82 3.02 3.5 2.87c1.12-.01 2.19-.66 2.77-1.61c.19-.33.4-.67.41-1.06c.1-1.79.06-3.57.07-5.36c.01-4.03-.01-8.05.02-12.07"/></svg> </a> </li><li data-astro-cid-pnrjdgm4> <a href="https://www.linkedin.com/in/harith-bennet/" aria-label="LinkedIn" rel="me noopener" target="_blank" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z"/></svg> </a> </li><li data-astro-cid-pnrjdgm4> <a href="https://github.com/rithbennet" aria-label="GitHub" rel="me noopener" target="_blank" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a10.9 10.9 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg> </a> </li> <li data-astro-cid-pnrjdgm4> <a href="mailto:harith.bennett@gmail.com" aria-label="Email" data-astro-cid-pnrjdgm4> <svg viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-pnrjdgm4><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m22 7l-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect width="20" height="16" x="2" y="4" rx="2"/></g></svg> </a> </li> </ul> </div> <div data-astro-cid-pnrjdgm4> <h2 class="title" data-astro-cid-pnrjdgm4>Site</h2> <ul class="links" data-astro-cid-pnrjdgm4> <li data-astro-cid-pnrjdgm4> <a href="/about" data-astro-cid-pnrjdgm4>About</a> </li><li data-astro-cid-pnrjdgm4> <a href="/work" data-astro-cid-pnrjdgm4>Work</a> </li><li data-astro-cid-pnrjdgm4> <a href="/gallery" data-astro-cid-pnrjdgm4>Gallery</a> </li> </ul> </div><div data-astro-cid-pnrjdgm4> <h2 class="title" data-astro-cid-pnrjdgm4>Writing</h2> <ul class="links" data-astro-cid-pnrjdgm4> <li data-astro-cid-pnrjdgm4> <a href="/blog" data-astro-cid-pnrjdgm4>Diary</a> </li><li data-astro-cid-pnrjdgm4> <a href="/blog#reports" data-astro-cid-pnrjdgm4>AI reports</a> </li><li data-astro-cid-pnrjdgm4> <a href="/rss.xml" data-astro-cid-pnrjdgm4>RSS</a> </li> </ul> </div><div data-astro-cid-pnrjdgm4> <h2 class="title" data-astro-cid-pnrjdgm4>Elsewhere</h2> <ul class="links" data-astro-cid-pnrjdgm4> <li data-astro-cid-pnrjdgm4> <a href="https://dagangnow.com" target="_blank" rel="noopener" data-astro-cid-pnrjdgm4> DagangNow </a> </li><li data-astro-cid-pnrjdgm4> <a href="https://www.instagram.com/rith_bennet/" target="_blank" rel="noopener" data-astro-cid-pnrjdgm4> Photography </a> </li><li data-astro-cid-pnrjdgm4> <a href="mailto:harith.bennett@gmail.com" data-astro-cid-pnrjdgm4>Email</a> </li> </ul> </div> </div> <div class="bottom" data-astro-cid-pnrjdgm4> <p data-astro-cid-pnrjdgm4>© 2026 Harith Bennet</p> <a href="https://github.com/rithbennet/rithfolio" target="_blank" rel="noopener" data-astro-cid-pnrjdgm4>View source code</a> </div> </div> </footer>  </body></html> <script type="module">const a=[...document.querySelectorAll("#entry-tree a")],s=document.getElementById("entry-prose"),c=document.getElementById("entry-prog"),l=document.getElementById("rail-title"),d=document.querySelector(".entry-title"),u=20;let i=!1;function p(){if(i=!1,s&&c){const e=s.getBoundingClientRect(),n=Math.min(1,Math.max(0,(innerHeight-e.top)/Math.max(1,e.height))),r=Math.round(n*u);c.querySelector("b").textContent="█".repeat(r),c.querySelector(".tr").textContent="░".repeat(u-r),c.querySelector(".pct").textContent=`${String(Math.round(n*100)).padStart(2,"0")}%`}l&&d&&l.classList.toggle("on",d.getBoundingClientRect().bottom<0);const o=Math.min(innerHeight*.3,240);let t=-1;a.forEach((e,n)=>{const r=document.getElementById(decodeURIComponent(e.hash.slice(1)));r&&r.getBoundingClientRect().top<=o&&(t=n)}),a.forEach((e,n)=>e.classList.toggle("on",n===t))}const m=()=>{i||(i=!0,requestAnimationFrame(p))};addEventListener("scroll",m,{passive:!0});addEventListener("resize",m);p();new MutationObserver(()=>dispatchEvent(new Event("resize"))).observe(document.documentElement,{attributes:!0,attributeFilter:["data-theme"]});document.querySelectorAll("[data-rehype-pretty-code-figure]").forEach(o=>{const t=document.createElement("button");t.type="button",t.className="copy-code",t.textContent="Copy",t.addEventListener("click",async()=>{const e=o.querySelector('pre:not([style*="display: none"])')??o.querySelector("pre");await navigator.clipboard.writeText(e?.textContent??""),t.textContent="Copied",setTimeout(()=>t.textContent="Copy",1600)}),o.appendChild(t)});</script>  

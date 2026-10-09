@@ -53,6 +53,10 @@
           "type": "boolean",
           "default": false
         },
+        "archived": {
+          "type": "boolean",
+          "default": false
+        },
         "order": {
           "type": "number",
           "default": 100
