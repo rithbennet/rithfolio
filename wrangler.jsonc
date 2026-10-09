@@ -4,7 +4,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rithfolio",
   "account_id": "584717a5616edba9bb2c915d52c691e5",
-  "compatibility_date": "2026-10-10",
+  "compatibility_date": "2026-10-09",
   "assets": {
     "directory": "./dist",
     // /about/ redirects to /about, matching trailingSlash: "never" in astro.config.mjs
