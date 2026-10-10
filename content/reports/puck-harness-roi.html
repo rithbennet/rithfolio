@@ -1,0 +1,655 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Puck harness is worth it: 48 tasks for $1,348 of API-priced work inside a $300 plan, with a quarter to trim</title><meta name="color-scheme" content="dark"><style>/* report kit: claude.dev blog layout (hero, TREE rail, mono labels) on the Dracula palette used by T3 Code.
+   Colours come from T3 Code's bundled Dracula theme JSON. Chart colours are those hues re-stepped into the
+   dark-mode lightness band and checked with the dataviz validator. Don't hand-pick new ones. */
+:root{color-scheme:dark;
+--bg:#282A36;--bg-raised:#21222C;--bg-deep:#191A21;--bg-panel:#343746;--sel:#44475A;
+--ink:#F8F8F2;--ink-2:#C9CBDA;--ink-3:#9EA3C4;--ink-4:#6272A4;
+--line:#44475A;--line-soft:#363848;
+--purple:#BD93F9;--pink:#FF79C6;--cyan:#8BE9FD;--green:#50FA7B;--orange:#FFB86C;--yellow:#F1FA8C;--red:#FF5555;
+--accent:var(--purple);
+/* categorical series, fixed order, never cycled: purple, orange, cyan, green, pink */
+--c1:#A876E9;--c2:#C8822C;--c3:#02A6BE;--c4:#32AF53;--c5:#DB62A8;
+/* ordinal / severity ramp (P1 brightest) */
+--seq1:#FE97CF;--seq2:#D564A5;--seq3:#9C4578;
+/* status: reserved, always with icon + label */
+--good:#50FA7B;--warn:#F1FA8C;--bad:#FF5555;
+--neutral:#6272A4;--grid:#363848;--axis:#4B4F66;
+--mono:"Anthropic Mono",ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+--sans:"Anthropic Sans",-apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue","Segoe UI",Roboto,sans-serif;
+--ease-out:cubic-bezier(.19,1,.22,1);--gutter:2rem}
+*{box-sizing:border-box}
+html{font-size:112.5%;-webkit-text-size-adjust:100%;scrollbar-color:var(--ink-4) var(--bg);overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased}
+::selection{background:var(--purple);color:var(--bg)}
+:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+a{color:var(--cyan)}
+code,kbd{font-family:var(--mono);font-size:.84em;color:var(--ink);background:rgba(248,248,242,.05);border:1px solid var(--line-soft);padding:.0625em .3em;overflow-wrap:break-word}
+.mono{font-family:var(--mono)}
+/* full-bleed like the blog: the rail hugs the left edge, prose starts at column 5 */
+.wrap{padding:0 var(--gutter)}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));padding:4rem 0;position:relative}
+.hero::after{content:"";position:absolute;bottom:0;left:50%;width:100vw;height:1px;background:var(--line-soft);transform:translateX(-50%)}
+.hero .hd{grid-column:5/13;min-width:0}
+.pxg{display:block;width:64px;height:auto;fill:var(--accent);margin-bottom:1.5rem;shape-rendering:crispEdges;overflow:visible}
+.chip{display:inline-block;font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;color:var(--ink-3);border:1px solid var(--line);padding:2px 8px;margin-bottom:14px}
+.hero h1{font-family:var(--sans);font-weight:500;font-size:clamp(1.5rem,1.1rem + 1vw,2rem);line-height:1.3;margin:0;max-width:760px;text-wrap:balance}
+.standfirst{font-size:1rem;line-height:1.6;color:var(--ink-2);margin:.75rem 0 0;max-width:720px;text-wrap:pretty}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:30px;max-width:900px}
+.meta>div{min-width:0;overflow-wrap:anywhere;padding-right:1rem}
+.meta .lb{font-family:var(--mono);font-size:.75rem;letter-spacing:.02em;color:var(--ink-3);margin-bottom:7px;text-transform:uppercase}
+.meta .vv{font-size:14px;color:var(--ink);padding-left:1.2em;text-indent:-1.2em}
+.meta .vv::before{content:"└ ";font-family:var(--mono);color:var(--ink-4);display:inline-block;width:1.2em;text-indent:0}
+
+/* ---------- body grid + TREE rail ---------- */
+.body-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));padding:4rem 0 6rem}
+.rail{grid-column:1/5;align-self:start;position:sticky;top:2rem;margin-right:32px;margin-top:-2px;font-family:var(--mono);max-height:calc(100dvh - 4rem);overflow-y:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail-title{font-family:var(--sans);font-weight:500;font-size:1rem;line-height:1.5;max-width:40ch;text-wrap:balance;opacity:0;max-height:0;overflow:hidden;transform:translateY(8px);transition:opacity .4s ease,transform .4s var(--ease-out),max-height .4s ease,margin .4s ease}
+.rail-title.on{opacity:1;max-height:240px;margin-bottom:24px;transform:none}
+.rail .th{font-size:.75rem;letter-spacing:.02em;color:var(--ink-3);margin-bottom:12px}
+.tree a{display:block;width:fit-content;max-width:100%;font-size:.75rem;line-height:1.45;color:var(--ink-2);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;transition:color .15s}
+.tree a:hover,.tree a.on{color:var(--ink)}
+.tree a .br{color:var(--ink-4);margin-right:10px;transition:color .15s}
+.tree a.on .br{color:var(--accent)}
+.tree a.sub{padding-left:18px;color:var(--ink-3)}
+.tree a.sub:hover,.tree a.sub.on{color:var(--ink)}
+.tree .subs{display:grid;grid-template-rows:0fr;visibility:hidden}
+.tree .subs.open,.tree .subs:has(:focus-visible){grid-template-rows:1fr;visibility:visible}
+.tree .subs>div{min-height:0;overflow:hidden;margin:-3px;padding:3px}
+@media (prefers-reduced-motion:no-preference){.tree .subs{transition:grid-template-rows .3s var(--ease-out),visibility .3s}}
+.prog{font-size:.75rem;color:var(--ink-4);white-space:nowrap;margin-top:26px;overflow:hidden}
+.prog b{color:var(--accent);font-weight:400}
+.prog .pct{color:var(--ink-2);margin-left:8px}
+.hint{font-size:.75rem;letter-spacing:.02em;color:var(--ink-3);margin-top:12px}
+.hint .arr{font-family:var(--sans)}
+
+/* ---------- prose ---------- */
+.prose{grid-column:5/13;min-width:0;max-width:920px}
+.prose h2{font-family:var(--mono);font-weight:500;font-size:.875rem;letter-spacing:.02em;color:var(--ink);margin:4.5rem 0 20px;padding-top:1.25rem;border-top:1px solid var(--line-soft);scroll-margin-top:2rem}
+.prose>h2:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.prose h2 .no{color:var(--accent);margin-right:.9em}
+.prose h3{font-family:var(--sans);font-weight:500;font-size:1rem;line-height:1.4;color:var(--ink);margin:2rem 0 8px;scroll-margin-top:2rem}
+.prose h4{font-family:var(--mono);font-weight:500;font-size:.75rem;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-3);margin:1.75rem 0 10px}
+.prose p,.prose>ul,.prose>ol,.prose .card ul,.prose .card ol{color:var(--ink-2);line-height:1.7}
+.prose p{margin:0 0 14px;max-width:700px}
+.prose>ul,.prose>ol{padding-left:1.25rem;margin:0 0 14px;max-width:700px}
+.prose li+li{margin-top:6px}
+.prose b,.prose strong{color:var(--ink);font-weight:600}
+.prose a{color:var(--cyan);text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:rgba(139,233,253,.35);text-underline-offset:.2em}
+.prose a:hover{text-decoration-color:transparent}
+.lede{color:var(--ink-2);margin:0 0 18px}
+.small{font-size:.8125rem;line-height:1.55;color:var(--ink-3)}
+.prose p.small{margin:8px 0 0}
+.ft{margin-top:4rem;padding-top:1.25rem;border-top:1px solid var(--line-soft);color:var(--ink-3);font-size:.8125rem}
+hr{border:0;border-top:1px solid var(--line-soft);margin:2.5rem 0}
+
+/* ---------- summary / key points ---------- */
+.prose .summary{counter-reset:k;list-style:none;margin:0 0 14px;padding:0;max-width:none;border-top:1px solid var(--line-soft)}
+.summary>li{counter-increment:k;position:relative;padding:14px 0 14px 2.6rem;border-bottom:1px solid var(--line-soft);color:var(--ink-2);line-height:1.65}
+.summary>li::before{content:counter(k,decimal-leading-zero);position:absolute;left:0;top:14px;font-family:var(--mono);font-size:.75rem;line-height:1.65rem;color:var(--accent)}
+.prose .summary>li+li{margin:0}
+
+/* ---------- cards / figures ---------- */
+.card{position:relative;border:1px solid var(--line);padding:16px;margin:24px 0;min-width:0;background:transparent}
+.card::before,.card::after{content:"";position:absolute;width:5px;height:5px;background:var(--bg)}
+.card::before{top:-1px;left:-1px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.card::after{bottom:-1px;right:-1px;border-left:1px solid var(--line);border-top:1px solid var(--line)}
+.card>h3:first-child,.card>.fh:first-child h3{margin-top:0}
+.card h3{margin:0 0 4px}
+.card>.small:nth-child(2){margin-bottom:12px}
+.card ul{margin:8px 0 0;padding-left:1.1rem;font-size:.9rem}
+.card li{margin:8px 0}
+figure.card{margin:24px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:0 16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:0 16px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:0 16px}
+.grid2>*,.grid3>*,.cols>*{align-self:start}
+details.tv{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:10px}
+details.tv summary{cursor:pointer;font-family:var(--mono);font-size:.6875rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);list-style:none}
+details.tv summary::-webkit-details-marker{display:none}
+details.tv summary::before{content:"▸ ";color:var(--ink-4)}
+details.tv[open] summary::before{content:"▾ "}
+details.tv summary:hover{color:var(--ink)}
+details.tv[open] summary{margin-bottom:8px}
+.card>details.tv:first-child{margin-top:0;border-top:0;padding-top:0}
+
+/* ---------- notes ---------- */
+.note{border-left:1px solid var(--line);padding:2px 0 2px 1.25rem;margin:18px 0;color:var(--ink-2);font-size:.875rem;line-height:1.65}
+.note.key{border-left-color:var(--purple)}
+.note.warn{border-left-color:var(--yellow)}
+.note.bad{border-left-color:var(--red)}
+.card .note{margin:14px 0 0}
+.est{display:inline-block;font-family:var(--mono);font-size:.625rem;letter-spacing:.03em;text-transform:uppercase;color:var(--yellow);border:1px solid rgba(241,250,140,.35);padding:0 5px;margin-left:4px;vertical-align:2px;line-height:1.6}
+
+/* ---------- KPI tiles ---------- */
+.kpis{display:grid;grid-template-columns:repeat(var(--kpi-cols,4),minmax(0,1fr));gap:1px;margin:20px 0 24px;padding:1px}
+.tile{outline:1px solid var(--line);padding:14px 16px 16px;min-width:0}
+.tile .k{font-family:var(--mono);font-size:.6875rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
+.tile .v{font-size:1.6rem;font-weight:500;line-height:1.15;letter-spacing:-.01em;margin:10px 0 6px;color:var(--ink);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.tile .s{font-size:.75rem;line-height:1.5;color:var(--ink-3)}
+
+/* ---------- legends, bar rows ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.75rem;color:var(--ink-2);margin:8px 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+.legend i.ln{height:2px;width:16px;border-radius:1px}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:minmax(120px,34%) 1fr auto;align-items:center;gap:6px 14px}
+.row .lab{font-size:.8125rem;line-height:1.3;overflow-wrap:anywhere;color:var(--ink)}
+.row .lab small{display:block;color:var(--ink-3);font-size:.6875rem;margin-top:2px}
+.row .track{display:flex;gap:2px;height:14px;min-width:0}
+.row .bar,.row .seg{height:14px;min-width:2px;width:var(--v,auto);background:var(--fill,var(--c1))}
+.row .bar:last-child,.row .seg:last-child{border-radius:0 4px 4px 0}
+.row .val{font-family:var(--mono);font-size:.75rem;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink)}
+.row .val small{color:var(--ink-3);font-size:.6875rem}
+.row [data-tip]{cursor:default}
+.row [data-tip]:hover{filter:brightness(1.18)}
+.row2{display:grid;grid-template-columns:minmax(110px,30%) 1fr 1fr;gap:6px 14px;align-items:center}
+.row2 .cell{display:flex;align-items:center;gap:8px;min-width:0}
+.row2 .cell .bar{height:12px;border-radius:0 4px 4px 0;min-width:2px;flex:none}
+.row2 .cell span{font-family:var(--mono);font-size:.6875rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.row2.hd{font-family:var(--mono);font-size:.625rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
+.meter{display:flex;gap:2px;height:14px;background:var(--sel);border-radius:0 4px 4px 0;overflow:hidden;margin:12px 0 4px}
+.meter i{display:block;height:100%}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto}
+.prose>.tw{margin:16px 0 24px}
+table{width:100%;border-collapse:collapse;font-size:.8125rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th:first-child,td:first-child{padding-left:0}th:last-child,td:last-child{padding-right:0}
+th{font-family:var(--mono);font-weight:400;font-size:.625rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);border-bottom-color:var(--line)}
+td{color:var(--ink-2)}
+td:first-child{color:var(--ink)}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.tot td{color:var(--ink);font-weight:600;border-top:1px solid var(--line);border-bottom:0}
+tbody tr:hover td{background:rgba(248,248,242,.025)}
+.c{min-width:0}
+.nb{white-space:nowrap}
+
+/* ---------- status pills, severity ---------- */
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.6875rem;padding:1px 7px;border:1px solid var(--line);white-space:nowrap;color:var(--ink-2)}
+.pill svg{width:11px;height:11px;flex:none}
+.st-fixed svg,.st-good svg{color:var(--good)}.st-partial svg,.st-warn svg{color:var(--warn)}.st-open svg,.st-bad svg{color:var(--bad)}
+.sev{display:inline-block;font-family:var(--mono);font-size:.6875rem;padding:0 6px;color:var(--bg);font-weight:600}
+.sev.p1{background:var(--seq1)}.sev.p2{background:var(--seq2)}.sev.p3{background:var(--seq3);color:var(--ink)}
+
+/* ---------- findings ---------- */
+.finding{border-top:1px solid var(--line-soft);padding:18px 0 4px}
+.finding:last-of-type{border-bottom:1px solid var(--line-soft);padding-bottom:18px}
+.finding .fhd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:8px}
+.finding .fid{font-family:var(--mono);font-size:.75rem;color:var(--ink-3)}
+.finding h3{margin:0;flex-basis:100%}
+.finding p{font-size:.9rem;margin:0 0 8px}
+.finding .ev{font-family:var(--mono);font-size:.6875rem;color:var(--ink-3)}
+
+/* ---------- numbered recommendations ---------- */
+.prose .recs{counter-reset:r;list-style:none;padding:0;margin:12px 0;max-width:none;border-top:1px solid var(--line-soft)}
+.recs li{counter-increment:r;position:relative;padding:16px 0 16px 2.6rem;border-bottom:1px solid var(--line-soft);color:var(--ink-2);font-size:.9rem;line-height:1.65}
+.prose .recs li+li{margin:0}
+.recs li::before{content:counter(r,decimal-leading-zero);position:absolute;left:0;top:16px;font-family:var(--mono);font-size:.75rem;line-height:1.65rem;color:var(--accent)}
+.recs b.t{display:block;margin-bottom:4px;color:var(--ink);font-weight:500;font-size:1rem}
+
+/* ---------- code block ---------- */
+pre{font-family:var(--mono);font-size:.75rem;line-height:1.75;background:var(--bg-raised);border:1px solid var(--line);padding:16px;overflow-x:auto;color:var(--ink-2);margin:24px 0}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+
+/* ---------- charts + tooltip ---------- */
+.chart{width:100%;position:relative;touch-action:pan-y;margin-top:4px}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{font-family:var(--mono)}
+.chart:focus-visible{outline-offset:6px}
+.elist{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:4px 18px;margin:12px 0 0;padding:0;list-style:none;font-size:.75rem;color:var(--ink-2)}
+.elist li{display:flex;gap:8px;align-items:flex-start}
+.elist b{flex:none;width:18px;height:18px;border-radius:50%;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:.625rem;display:flex;align-items:center;justify-content:center;margin-top:1px}
+#tip{position:fixed;z-index:50;pointer-events:none;display:none;background:var(--bg-deep);color:var(--ink-2);border:1px solid var(--line);padding:8px 11px;font-size:.75rem;max-width:300px;line-height:1.5;white-space:pre-line;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+#tip b{color:var(--ink);font-weight:600}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){.rail{margin-right:24px}}
+@media (max-width:900px){
+ .hero .hd{grid-column:1/-1}
+ .pxg{width:48px}
+ .body-grid{display:flex;flex-direction:column;padding-top:2.5rem}
+ .rail{position:static;align-self:stretch;max-height:none;overflow:visible;min-width:0;margin:0 0 2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line-soft)}
+ .rail-title,.prog,.hint{display:none}
+ .tree .subs{display:none}
+ .prose{max-width:none}}
+@media (max-width:700px){.kpis{--kpi-cols:2}}
+@media (max-width:640px){
+ :root{--gutter:1.25rem}
+ html{font-size:100%}
+ .hero{padding:2.5rem 0}
+ .meta{grid-template-columns:1fr 1fr}
+ .row{grid-template-columns:1fr auto}.row .track{grid-column:1/-1;order:3}
+ .row2{grid-template-columns:1fr 1fr}.row2 .lab{grid-column:1/-1}.row2.hd>:first-child{display:none}
+ .summary>li,.recs li{padding-left:2rem}}
+@media (max-width:680px){
+ table.stack thead{display:none}
+ table.stack,table.stack tbody,table.stack tr{display:block;width:100%}
+ table.stack tr{padding:10px 0;border-bottom:1px solid var(--line)}
+ table.stack td{display:grid;grid-template-columns:minmax(84px,34%) 1fr;gap:10px;border:0;padding:2px 0;text-align:left}
+ table.stack td::before{content:attr(data-l);font-family:var(--mono);font-size:.625rem;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-3);padding-top:.2em}
+ table.stack td:first-child{display:block;font-weight:600;padding-bottom:4px}
+ table.stack td:first-child::before{display:none}
+ table.stack td.n{white-space:normal;text-align:left;padding-left:0}
+ table.stack td:last-child{padding-right:0}
+ table.stack td>:is(span,code,b,a){justify-self:start}}
+@media print{.rail{display:none}.prose{grid-column:1/-1}.hero::after{display:none}}
+@media (forced-colors:active){.bar,.seg{forced-color-adjust:none;border:1px solid CanvasText}}
+</style></head>
+<body><div class="wrap">
+<header class="hero"><div class="hd"><svg class="pxg" viewBox="0 0 16 10" aria-hidden="true" focusable="false"><path d="M5 0h1v1h-1zM10 0h1v1h-1zM5 1h6v1h-6zM0 2h1v1h-1zM5 2h1v1h-1zM7 2h2v1h-2zM10 2h1v1h-1zM15 2h1v1h-1zM0 3h2v1h-2zM5 3h6v1h-6zM14 3h2v1h-2zM0 4h3v1h-3zM4 4h8v1h-8zM13 4h3v1h-3zM0 5h16v1h-16zM0 6h16v1h-16zM1 7h14v1h-14zM2 8h2v1h-2zM5 8h6v1h-6zM12 8h2v1h-2zM3 9h1v1h-1zM6 9h1v1h-1zM9 9h1v1h-1zM12 9h1v1h-1z"/></svg><span class="chip">Findings</span><h1>The Puck harness is worth it: 48 tasks for $1,348 of API-priced work inside a $300 plan, with a quarter to trim</h1><p class="standfirst">What the store builder&#x27;s orchestration harness cost in tokens, time and checking from Release 1 to the start of Release 5 (6 to 10 October 2026), what the checking caught, and whether plain Claude Code would have been cheaper.</p><div class="meta"><div><div class="lb">Author</div><div class="vv">Claude Opus 5.5</div></div><div><div class="lb">Published</div><div class="vv">Oct 10, 2026</div></div><div><div class="lb">Reading time</div><div class="vv">18 min</div></div><div><div class="lb">Scope</div><div class="vv">Puck store builder, R1 to R5 · 6–10 Oct 2026</div></div></div></div></header>
+<div class="body-grid">
+<aside class="rail" aria-label="Contents"><div class="rail-title" id="railTitle" aria-hidden="true">The Puck harness is worth it: 48 tasks for $1,348 of API-priced work inside a $300 plan, with a quarter to trim</div><div class="th">TREE</div><nav class="tree" id="tree"><a href="#bottom-line" class="top"><span class="br">└</span>Bottom line</a><a href="#what-it-built-and-what-that-cost" class="top"><span class="br">└</span>What it built, and what that cost</a><div class="subs"><div><a href="#where-the-1-348-went" class="sub"><span class="br">└</span>Where the $1,348 went</a><a href="#cost-by-agent" class="sub"><span class="br">└</span>Cost by agent</a></div></div><a href="#output-per-dollar-version-by-version" class="top"><span class="br">└</span>Output per dollar, version by version</a><div class="subs"><div><a href="#rows-closed-against-dollars-spent" class="sub"><span class="br">└</span>Rows closed against dollars spent</a><a href="#the-five-eras" class="sub"><span class="br">└</span>The five eras</a><a href="#by-release" class="sub"><span class="br">└</span>By release</a></div></div><a href="#where-the-time-went" class="top"><span class="br">└</span>Where the time went</a><div class="subs"><div><a href="#agents-running-over-time" class="sub"><span class="br">└</span>Agents running over time</a><a href="#one-task-median" class="sub"><span class="br">└</span>One task, median</a><a href="#all-tasks-summed" class="sub"><span class="br">└</span>All tasks, summed</a><a href="#how-much-you-had-to-step-in" class="sub"><span class="br">└</span>How much you had to step in</a></div></div><a href="#what-the-checking-caught" class="top"><span class="br">└</span>What the checking caught</a><div class="subs"><div><a href="#verdicts" class="sub"><span class="br">└</span>Verdicts</a><a href="#serious-findings-blocker-or-major" class="sub"><span class="br">└</span>Serious findings (blocker or major)</a><a href="#six-of-the-severe-ones" class="sub"><span class="br">└</span>Six of the severe ones</a><a href="#what-got-past-the-checks" class="sub"><span class="br">└</span>What got past the checks</a></div></div><a href="#would-it-be-cheaper-without-the-harness" class="top"><span class="br">└</span>Would it be cheaper without the harness?</a><div class="subs"><div><a href="#the-same-48-rows-five-ways" class="sub"><span class="br">└</span>The same 48 rows, five ways</a></div></div><a href="#what-your-plans-buy" class="top"><span class="br">└</span>What your plans buy</a><div class="subs"><div><a href="#weekly-allowance-in-api-dollars" class="sub"><span class="br">└</span>Weekly allowance in API dollars</a><a href="#days-of-v3-pace-running-per-week" class="sub"><span class="br">└</span>Days of v3-pace running per week</a></div></div><a href="#where-to-trim" class="top"><span class="br">└</span>Where to trim</a><a href="#method-and-caveats" class="top"><span class="br">└</span>Method and caveats</a></nav>
+<div class="prog" id="prog" aria-hidden="true"><b></b><span class="tr">░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span><span class="pct">00%</span></div>
+<div class="hint" aria-hidden="true">PRESS <span class="arr">↑</span> / <span class="arr">↓</span> TO SCROLL</div></aside>
+<main class="prose" id="body">
+<style>@media (min-width:800px){table.eras th:first-child,table.eras td:first-child{min-width:14rem}}</style>
+
+<h2 id="bottom-line">Bottom line</h2>
+<ol class="summary">
+<li><b>Yes, it is worth it.</b> The harness closed 48 ledger rows in 4.4 days: Releases 1 to 4, the pilot store's new look and the end-result report, now on staging with 9,050 unit tests green. At API list prices that is $1,348. You paid for it with flat plans, Claude Max 20x and ChatGPT Pro, about $300 a month, so those 4.4 days used about $44 of subscription time <span class="est">estimate</span>.</li>
+<li><b>Each harness version got cheaper and faster.</b> Cost per closed row fell from $43 in R1 to $24 in R2 and $18 in R3+R4. R3+R4's 21 rows took 10 hours; R1's 10 took 59. Harness v3 closed 1.8 rows per orchestrator hour against 0.24 on night 1, and no agent hit the Claude limit, where v2's agents hit it 18 times.</li>
+<li><b>The checking is the part that earns its keep.</b> Astra and Sol cost $364 (27%) and caught about 86 serious code defects before merge <span class="est">estimate</span>, roughly $4.25 each. About 27 were severe: published photo grids that returned HTTP 500, a Publish that reported success while leaving pages as drafts, a hero conversion that threw away seller images. Astra failed 25 of 32 first reviews.</li>
+<li><b>The waste is in the managing.</b> The Fable orchestrator threads cost $446, a third of the total and the largest single line, mostly for bookkeeping. The same tokens on Opus 5.5 would cost $225. Sol's broken-environment runs (rate limits, sign-in, store state) and limit stops lost about 16 agent-hours.</li>
+<li><b>Skipping the harness would cut the API bill, not what you pay or the work you do.</b> Builders alone come to about $351 <span class="est">estimate</span>. But the plans cost the same either way, you would be the orchestrator for 48 tasks, and the 86 or so defects would reach staging for you to find. The real limit now is Codex: ChatGPT Pro's weekly Codex allowance lasts about 1.1 days at v3's pace.</li>
+</ol>
+
+<h2 id="what-it-built-and-what-that-cost"><span class="no">01</span>What it built, and what that cost</h2>
+<p class="lede">48 rows closed, 46,280 lines of product code and 41,451 lines of tests, for $1,348 at API prices. Building is only 23% of that; managing and checking are 61%.</p>
+<div class="kpis">
+<div class="tile"><div class="k">API-equivalent cost</div><div class="v">$1,348</div><div class="s">Claude $983 · Codex $365</div></div>
+<div class="tile"><div class="k">Plan time used</div><div class="v">≈$44</div><div class="s">4.4 days at $300/month <span class="est">estimate</span></div></div>
+<div class="tile"><div class="k">Ledger rows closed</div><div class="v">48</div><div class="s">45 of 48 R1–R4 rows · F-01 to F-03</div></div>
+<div class="tile"><div class="k">Cost per closed row</div><div class="v">$28</div><div class="s">R1 $43 → R3+R4 $18</div></div>
+<div class="tile"><div class="k">Product code</div><div class="v">46.3k lines</div><div class="s">+ 41.5k lines of tests · 4 migrations</div></div>
+<div class="tile"><div class="k">Serious defects caught</div><div class="v">≈86</div><div class="s">≈27 severe · before merge <span class="est">estimate</span></div></div>
+<div class="tile"><div class="k">Output tokens</div><div class="v">13.6M</div><div class="s">Claude 10.9M · Codex 2.7M</div></div>
+<div class="tile"><div class="k">Your messages</div><div class="v">71</div><div class="s">19 spec · 29 harness · 23 to orchestrators</div></div>
+</div>
+
+<figure class="card"><h3 id="where-the-1-348-went">Where the $1,348 went</h3><div class="small">API list prices, 6–10 Oct. Hover a bar for the exact figure.</div>
+<div class="legend"><span><i style="background:var(--c1)"></i>Building</span><span><i style="background:var(--c2)"></i>Fixing</span><span><i style="background:var(--c3)"></i>Checking</span><span><i style="background:var(--c4)"></i>Managing</span><span><i style="background:var(--c5)"></i>Harness engineering</span><span><i style="background:var(--neutral)"></i>Research and spec</span></div>
+<div class="rows" style="margin-bottom:1.5rem"><div class="row"><div class="lab">All work<small>one bar, by job</small></div><div class="track"><div class="seg" style="--v:22.9%;--fill:var(--c1)" data-tip="Building&#10;$308.50 · 22.9%" tabindex="0"></div><div class="seg" style="--v:8.6%;--fill:var(--c2)" data-tip="Fixing&#10;$115.76 · 8.6%" tabindex="0"></div><div class="seg" style="--v:27.0%;--fill:var(--c3)" data-tip="Checking&#10;$363.99 · 27.0%" tabindex="0"></div><div class="seg" style="--v:34.0%;--fill:var(--c4)" data-tip="Managing&#10;$457.74 · 34.0%" tabindex="0"></div><div class="seg" style="--v:4.4%;--fill:var(--c5)" data-tip="Harness engineering&#10;$58.81 · 4.4%" tabindex="0"></div><div class="seg" style="--v:3.2%;--fill:var(--neutral)" data-tip="Research and spec&#10;$42.88 · 3.2%" tabindex="0"></div></div><div class="val">$1,348</div></div></div>
+<div class="rows">
+<div class="row"><div class="lab">Managing<small>the Fable orchestrator threads and their task-drafting helpers</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--c4)" data-tip="Managing
+$457.74 · 34.0% of the total" tabindex="0"></div></div><div class="val">$458 <small>34%</small></div></div>
+<div class="row"><div class="lab">Checking<small>GPT-6-Astra code reviews and GPT-6.1-Sol live verification</small></div><div class="track"><div class="bar" style="--v:79.5%;--fill:var(--c3)" data-tip="Checking
+$363.99 · 27.0% of the total" tabindex="0"></div></div><div class="val">$364 <small>27%</small></div></div>
+<div class="row"><div class="lab">Building<small>builders writing the code, plus the store-content apply and the end report</small></div><div class="track"><div class="bar" style="--v:67.4%;--fill:var(--c1)" data-tip="Building
+$308.50 · 22.9% of the total" tabindex="0"></div></div><div class="val">$308 <small>23%</small></div></div>
+<div class="row"><div class="lab">Fixing<small>fix agents answering review findings</small></div><div class="track"><div class="bar" style="--v:25.3%;--fill:var(--c2)" data-tip="Fixing
+$115.76 · 8.6% of the total" tabindex="0"></div></div><div class="val">$116 <small>9%</small></div></div>
+<div class="row"><div class="lab">Harness engineering<small>postmortems, the night-1 report and building harness v1-v3</small></div><div class="track"><div class="bar" style="--v:12.8%;--fill:var(--c5)" data-tip="Harness engineering
+$58.81 · 4.4% of the total" tabindex="0"></div></div><div class="val">$59 <small>4%</small></div></div>
+<div class="row"><div class="lab">Research and spec<small>the page-builder research and the spec, before any harness</small></div><div class="track"><div class="bar" style="--v:9.4%;--fill:var(--neutral)" data-tip="Research and spec
+$42.88 · 3.2% of the total" tabindex="0"></div></div><div class="val">$43 <small>3%</small></div></div>
+</div>
+<div class="note">For every dollar of building there were about 4.4 dollars in total. The managing dollar is the one that buys least: it is the Fable orchestrator reading command output and keeping the ledger.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Job</th><th>What it covers</th><th class="n">Cost</th><th class="n">Share</th></tr></thead><tbody><tr><td data-l="Job">Building</td><td data-l="What it covers">builders writing the code, plus the store-content apply and the end report</td><td data-l="Cost" class="n">$308.50</td><td data-l="Share" class="n">22.9%</td></tr><tr><td data-l="Job">Fixing</td><td data-l="What it covers">fix agents answering review findings</td><td data-l="Cost" class="n">$115.76</td><td data-l="Share" class="n">8.6%</td></tr><tr><td data-l="Job">Checking</td><td data-l="What it covers">GPT-6-Astra code reviews and GPT-6.1-Sol live verification</td><td data-l="Cost" class="n">$363.99</td><td data-l="Share" class="n">27.0%</td></tr><tr><td data-l="Job">Managing</td><td data-l="What it covers">the Fable orchestrator threads and their task-drafting helpers</td><td data-l="Cost" class="n">$457.74</td><td data-l="Share" class="n">34.0%</td></tr><tr><td data-l="Job">Harness engineering</td><td data-l="What it covers">postmortems, the night-1 report and building harness v1-v3</td><td data-l="Cost" class="n">$58.81</td><td data-l="Share" class="n">4.4%</td></tr><tr><td data-l="Job">Research and spec</td><td data-l="What it covers">the page-builder research and the spec, before any harness</td><td data-l="Cost" class="n">$42.88</td><td data-l="Share" class="n">3.2%</td></tr></tbody></table></div></details>
+</figure>
+
+<figure class="card"><h3 id="cost-by-agent">Cost by agent</h3><div class="small">Same total, split by who spent it. Colours follow the job above.</div>
+<div class="rows">
+<div class="row"><div class="lab">Fable orchestrators<small>Claude Fable 5.1 · 21 threads</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--c4)" data-tip="Fable orchestrators
+$445.58 · 33.1%" tabindex="0"></div></div><div class="val">$446 <small>33%</small></div></div>
+<div class="row"><div class="lab">Builders<small>Claude Opus 5.5, some Sonnet 5.5</small></div><div class="track"><div class="bar" style="--v:65.0%;--fill:var(--c1)" data-tip="Builders
+$289.71 · 21.5%" tabindex="0"></div></div><div class="val">$290 <small>21%</small></div></div>
+<div class="row"><div class="lab">GPT-6-Astra reviews<small>117 runs · median $2.30</small></div><div class="track"><div class="bar" style="--v:62.9%;--fill:var(--c3)" data-tip="GPT-6-Astra reviews
+$280.27 · 20.8%" tabindex="0"></div></div><div class="val">$280 <small>21%</small></div></div>
+<div class="row"><div class="lab">Fix agents<small>64 runs · median $1.17</small></div><div class="track"><div class="bar" style="--v:26.0%;--fill:var(--c2)" data-tip="Fix agents
+$115.76 · 8.6%" tabindex="0"></div></div><div class="val">$116 <small>9%</small></div></div>
+<div class="row"><div class="lab">GPT-6.1-Sol verifies<small>88 runs · median $0.83</small></div><div class="track"><div class="bar" style="--v:18.6%;--fill:var(--c3)" data-tip="GPT-6.1-Sol verifies
+$82.80 · 6.1%" tabindex="0"></div></div><div class="val">$83 <small>6%</small></div></div>
+<div class="row"><div class="lab">Harness engineering<small>Opus 5.5 + one Codex postmortem</small></div><div class="track"><div class="bar" style="--v:9.7%;--fill:var(--c5)" data-tip="Harness engineering
+$43.40 · 3.2%" tabindex="0"></div></div><div class="val">$43 <small>3%</small></div></div>
+<div class="row"><div class="lab">Research and spec<small>Opus and Sonnet, 6 Oct</small></div><div class="track"><div class="bar" style="--v:9.6%;--fill:var(--neutral)" data-tip="Research and spec
+$42.88 · 3.2%" tabindex="0"></div></div><div class="val">$43 <small>3%</small></div></div>
+<div class="row"><div class="lab">Helpers<small>task drafting, store content, F-03 writer</small></div><div class="track"><div class="bar" style="--v:6.9%;--fill:var(--c4)" data-tip="Helpers
+$30.88 · 2.3%" tabindex="0"></div></div><div class="val">$31 <small>2%</small></div></div>
+<div class="row"><div class="lab">Night-1 report<small>Opus 5.5, 7 Oct</small></div><div class="track"><div class="bar" style="--v:3.5%;--fill:var(--c5)" data-tip="Night-1 report
+$15.41 · 1.1%" tabindex="0"></div></div><div class="val">$15 <small>1%</small></div></div>
+</div>
+<div class="note">The two most expensive lines are the two most expensive models: Fable 5.1 ($10/$50 per million tokens) as orchestrator, and GPT-6-Astra ($10/$50) as reviewer. The builders run on Opus 5.5 at $4/$20.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Agent</th><th>Detail</th><th class="n">Cost</th><th class="n">Share</th></tr></thead><tbody><tr><td data-l="Agent">Fable orchestrators</td><td data-l="Detail">Claude Fable 5.1 · 21 threads</td><td data-l="Cost" class="n">$445.58</td><td data-l="Share" class="n">33.1%</td></tr><tr><td data-l="Agent">Builders</td><td data-l="Detail">Claude Opus 5.5, some Sonnet 5.5</td><td data-l="Cost" class="n">$289.71</td><td data-l="Share" class="n">21.5%</td></tr><tr><td data-l="Agent">GPT-6-Astra reviews</td><td data-l="Detail">117 runs · median $2.30</td><td data-l="Cost" class="n">$280.27</td><td data-l="Share" class="n">20.8%</td></tr><tr><td data-l="Agent">Fix agents</td><td data-l="Detail">64 runs · median $1.17</td><td data-l="Cost" class="n">$115.76</td><td data-l="Share" class="n">8.6%</td></tr><tr><td data-l="Agent">GPT-6.1-Sol verifies</td><td data-l="Detail">88 runs · median $0.83</td><td data-l="Cost" class="n">$82.80</td><td data-l="Share" class="n">6.1%</td></tr><tr><td data-l="Agent">Harness engineering</td><td data-l="Detail">Opus 5.5 + one Codex postmortem</td><td data-l="Cost" class="n">$43.40</td><td data-l="Share" class="n">3.2%</td></tr><tr><td data-l="Agent">Research and spec</td><td data-l="Detail">Opus and Sonnet, 6 Oct</td><td data-l="Cost" class="n">$42.88</td><td data-l="Share" class="n">3.2%</td></tr><tr><td data-l="Agent">Helpers</td><td data-l="Detail">task drafting, store content, F-03 writer</td><td data-l="Cost" class="n">$30.88</td><td data-l="Share" class="n">2.3%</td></tr><tr><td data-l="Agent">Night-1 report</td><td data-l="Detail">Opus 5.5, 7 Oct</td><td data-l="Cost" class="n">$15.41</td><td data-l="Share" class="n">1.1%</td></tr><tr><td data-l="Agent">Relay agents (night 1)</td><td data-l="Detail"></td><td data-l="Cost" class="n">$0.92</td><td data-l="Share" class="n">0.1%</td></tr><tr><td data-l="Agent">Codex smoke test</td><td data-l="Detail"></td><td data-l="Cost" class="n">$0.05</td><td data-l="Share" class="n">0.0%</td></tr></tbody></table></div></details>
+</figure>
+
+<h2 id="output-per-dollar-version-by-version"><span class="no">02</span>Output per dollar, version by version</h2>
+<p class="lede">Every harness change bent the curve upward: v3 closed 31 rows for $542, while night 1 closed 3 for $277. Part of that is smaller tasks, but the overhead per row also halved.</p>
+<figure class="card"><h3 id="rows-closed-against-dollars-spent">Rows closed against dollars spent</h3><div class="small">Each step is a ledger row merged. The steeper the line, the more output per dollar. Numbered markers are harness changes.</div>
+<div class="chart"><script type="application/json">{"title":"Ledger rows closed against API-equivalent dollars spent","xtype":"num","x":[14.16,26.83,44.03,72.4,95.16,109.58,148.45,176.74,204.55,208.75,250.71,300.88,314.2,319.4,321.77,328.84,332.32,334.81,375.23,421.85,425.06,429.66,430.81,445.06,454.82,459.93,496.47,500.74,513.6,535.05,542.0,552.93,581.0,612.49,613.51,650.8,661.23,692.0,710.57,735.3,759.75,791.2,798.08,808.85,839.79,866.14,887.36,946.41,1006.4,1068.7,1079.39,1105.12,1131.89,1150.69,1167.36,1193.97,1224.32,1240.63,1258.41,1283.44,1347.68],"yfmt":"int","step":true,"height":300,"labels":true,"series":[{"name":"Rows closed","short":"48 rows","color":"c1","values":[0,0,0,0,1,1,1,2,2,3,3,3,3,3,3,3,3,3,5,6,6,6,6,8,8,8,8,8,9,9,10,10,12,13,13,15,16,16,16,17,17,17,17,17,19,22,24,26,29,30,34,38,38,41,41,42,44,46,47,48,48]}],"events":[{"x":375.23,"label":"8 Oct takeover thread"},{"x":459.93,"label":"Harness v1: one fix round, builder receipts"},{"x":581.0,"label":"Harness v2: stamped scripts, merge gate, event log"},{"x":808.85,"label":"Harness v3 relay on Max 20x"}],"xfmt":"usd"}</script></div>
+<div class="note">The first $581 bought 10 rows; the last $539 bought 31. The flat stretch at the start is night 1 and the 8 Oct takeover, when builders ran at xhigh effort and every review round restarted from scratch.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th class="n">Dollars spent (cumulative)</th><th class="n">Rows closed</th></tr></thead><tbody><tr><td data-l="Dollars spent (cumulative)" class="n">$14.16</td><td data-l="Rows closed" class="n">0</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$26.83</td><td data-l="Rows closed" class="n">0</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$44.03</td><td data-l="Rows closed" class="n">0</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$72.40</td><td data-l="Rows closed" class="n">0</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$95.16</td><td data-l="Rows closed" class="n">1</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$109.58</td><td data-l="Rows closed" class="n">1</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$148.45</td><td data-l="Rows closed" class="n">1</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$176.74</td><td data-l="Rows closed" class="n">2</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$204.55</td><td data-l="Rows closed" class="n">2</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$208.75</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$250.71</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$300.88</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$314.20</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$319.40</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$321.77</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$328.84</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$332.32</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$334.81</td><td data-l="Rows closed" class="n">3</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$375.23</td><td data-l="Rows closed" class="n">5</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$421.85</td><td data-l="Rows closed" class="n">6</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$425.06</td><td data-l="Rows closed" class="n">6</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$429.66</td><td data-l="Rows closed" class="n">6</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$430.81</td><td data-l="Rows closed" class="n">6</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$445.06</td><td data-l="Rows closed" class="n">8</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$454.82</td><td data-l="Rows closed" class="n">8</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$459.93</td><td data-l="Rows closed" class="n">8</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$496.47</td><td data-l="Rows closed" class="n">8</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$500.74</td><td data-l="Rows closed" class="n">8</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$513.60</td><td data-l="Rows closed" class="n">9</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$535.05</td><td data-l="Rows closed" class="n">9</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$542.00</td><td data-l="Rows closed" class="n">10</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$552.93</td><td data-l="Rows closed" class="n">10</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$581.00</td><td data-l="Rows closed" class="n">12</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$612.49</td><td data-l="Rows closed" class="n">13</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$613.51</td><td data-l="Rows closed" class="n">13</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$650.80</td><td data-l="Rows closed" class="n">15</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$661.23</td><td data-l="Rows closed" class="n">16</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$692.00</td><td data-l="Rows closed" class="n">16</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$710.57</td><td data-l="Rows closed" class="n">16</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$735.30</td><td data-l="Rows closed" class="n">17</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$759.75</td><td data-l="Rows closed" class="n">17</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$791.20</td><td data-l="Rows closed" class="n">17</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$798.08</td><td data-l="Rows closed" class="n">17</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$808.85</td><td data-l="Rows closed" class="n">17</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$839.79</td><td data-l="Rows closed" class="n">19</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$866.14</td><td data-l="Rows closed" class="n">22</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$887.36</td><td data-l="Rows closed" class="n">24</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$946.41</td><td data-l="Rows closed" class="n">26</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,006.40</td><td data-l="Rows closed" class="n">29</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,068.70</td><td data-l="Rows closed" class="n">30</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,079.39</td><td data-l="Rows closed" class="n">34</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,105.12</td><td data-l="Rows closed" class="n">38</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,131.89</td><td data-l="Rows closed" class="n">38</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,150.69</td><td data-l="Rows closed" class="n">41</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,167.36</td><td data-l="Rows closed" class="n">41</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,193.97</td><td data-l="Rows closed" class="n">42</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,224.32</td><td data-l="Rows closed" class="n">44</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,240.63</td><td data-l="Rows closed" class="n">46</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,258.41</td><td data-l="Rows closed" class="n">47</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,283.44</td><td data-l="Rows closed" class="n">48</td></tr><tr><td data-l="Dollars spent (cumulative)" class="n">$1,347.68</td><td data-l="Rows closed" class="n">48</td></tr></tbody></table></div></details>
+</figure>
+<figure class="card"><h3 id="the-five-eras">The five eras</h3><div class="small">Eras split at each harness change. Costs include the Codex reviews that ran in each window.</div>
+<div class="tw"><table class="stack eras"><thead><tr><th>Era</th><th class="n">Cost</th><th class="n">Rows closed</th><th class="n">Cost per row</th><th class="n">Rows per orch. hour</th><th class="n">Limit hits</th></tr></thead><tbody><tr><td data-l="Era"><b>Night 1</b><br><small>no harness yet: one Fable thread, briefs in prose</small></td><td data-l="Cost" class="n">$277</td><td data-l="Rows closed" class="n">3</td><td data-l="Cost per row" class="n">$92</td><td data-l="Rows per orch. hour" class="n">0.24</td><td data-l="Limit hits" class="n">9</td></tr><tr><td data-l="Era"><b>8 Oct</b><br><small>takeover thread, same loose method</small></td><td data-l="Cost" class="n">$114</td><td data-l="Rows closed" class="n">5</td><td data-l="Cost per row" class="n">$23</td><td data-l="Rows per orch. hour" class="n">0.72</td><td data-l="Limit hits" class="n">6</td></tr><tr><td data-l="Era"><b>Harness v1</b><br><small>one fix round, builder receipts, Astra for risky work</small></td><td data-l="Cost" class="n">$83</td><td data-l="Rows closed" class="n">2</td><td data-l="Cost per row" class="n">$41</td><td data-l="Rows per orch. hour" class="n">0.29</td><td data-l="Limit hits" class="n">3</td></tr><tr><td data-l="Era"><b>Harness v2</b><br><small>stamped harness, merge gate, event log; one long thread</small></td><td data-l="Cost" class="n">$231</td><td data-l="Rows closed" class="n">7</td><td data-l="Cost per row" class="n">$33</td><td data-l="Rows per orch. hour" class="n">0.62</td><td data-l="Limit hits" class="n">18</td></tr><tr><td data-l="Era"><b>Harness v3</b><br><small>puck-next, relay at 200k, watchers, Max 20x</small></td><td data-l="Cost" class="n">$542</td><td data-l="Rows closed" class="n">31</td><td data-l="Cost per row" class="n">$17</td><td data-l="Rows per orch. hour" class="n">1.82</td><td data-l="Limit hits" class="n">0</td></tr></tbody></table></div>
+<div class="note">Rows closed in an era include work started earlier: R1-04 to R1-07 were built on night 1 and merged on 8 Oct, which is why night 1 looks worse and 8 Oct better than the work they did.</div>
+</figure>
+
+<figure class="card"><h3 id="by-release">By release</h3><div class="small">Building, fixing and checking are charged to the task they served. Each era's managing cost is shared out by that era's direct cost.</div>
+<div class="tw"><table class="stack"><thead><tr><th>Release</th><th>Rows closed</th><th class="n">Building</th><th class="n">Fixing</th><th class="n">Checking</th><th class="n">Managing</th><th class="n">Total</th><th class="n">Per row</th><th class="n">First launch to last merge</th></tr></thead><tbody><tr><td data-l="Release">R1</td><td data-l="Rows closed">10</td><td data-l="Building" class="n">$132</td><td data-l="Fixing" class="n">$44</td><td data-l="Checking" class="n">$112</td><td data-l="Managing" class="n">$140</td><td data-l="Total" class="n">$427</td><td data-l="Per row" class="n">$43</td><td data-l="First launch to last merge" class="n">58.7 h</td></tr><tr><td data-l="Release">R2</td><td data-l="Rows closed">14</td><td data-l="Building" class="n">$57</td><td data-l="Fixing" class="n">$35</td><td data-l="Checking" class="n">$95</td><td data-l="Managing" class="n">$154</td><td data-l="Total" class="n">$339</td><td data-l="Per row" class="n">$24</td><td data-l="First launch to last merge" class="n">37.8 h</td></tr><tr><td data-l="Release">R3+R4</td><td data-l="Rows closed">21</td><td data-l="Building" class="n">$81</td><td data-l="Fixing" class="n">$33</td><td data-l="Checking" class="n">$127</td><td data-l="Managing" class="n">$129</td><td data-l="Total" class="n">$369</td><td data-l="Per row" class="n">$18</td><td data-l="First launch to last merge" class="n">10.2 h</td></tr><tr><td data-l="Release">Final</td><td data-l="Rows closed">3</td><td data-l="Building" class="n">$19</td><td data-l="Fixing" class="n">$0</td><td data-l="Checking" class="n">$2</td><td data-l="Managing" class="n">$11</td><td data-l="Total" class="n">$33</td><td data-l="Per row" class="n">$11</td><td data-l="First launch to last merge" class="n">2.9 h</td></tr><tr><td data-l="Release">R5</td><td data-l="Rows closed">0 (in review)</td><td data-l="Building" class="n">$21</td><td data-l="Fixing" class="n">$4</td><td data-l="Checking" class="n">$21</td><td data-l="Managing" class="n">$24</td><td data-l="Total" class="n">$70</td><td data-l="Per row" class="n">–</td><td data-l="First launch to last merge" class="n">running</td></tr></tbody></table></div>
+<div class="note">Builder cost per row fell from $13.15 in R1 to $3.85 in R3+R4: R1's rows (the contract, the migration, the backfill, the new editor) were about three times heavier than the blocks of R2 to R4. The overhead per row (managing plus checking) fell too, from $25.16 to $12.16, and that part is the harness. R1's 59 hours include a full day stopped on the Claude limit on 7 Oct.</div>
+</figure>
+
+<h2 id="where-the-time-went"><span class="no">03</span>Where the time went</h2>
+<p class="lede">Reviews, not building, set the pace: a median task spent 18 minutes with its builder and 23 with reviewers, inside 85 minutes of wall-clock. The harness's real win on time is that it ran unattended: 24 rows merged in 11 hours, overnight and into the morning, while you sent no messages.</p>
+<figure class="card"><h3 id="agents-running-over-time">Agents running over time</h3><div class="small">Average number of agents at work in each hour, MYT. The shaded band is the day nothing ran.</div>
+<div class="legend"><span><i class="ln" style="background:var(--c1)"></i>Claude builders and fix agents</span><span><i class="ln" style="background:var(--c3)"></i>Codex reviewers (Astra and Sol)</span></div>
+<div class="chart"><script type="application/json">{"title":"Agents running, hourly average","xtype":"time","tz":8,"x":["2026-10-06T13:00:00Z","2026-10-06T14:00:00Z","2026-10-06T15:00:00Z","2026-10-06T16:00:00Z","2026-10-06T17:00:00Z","2026-10-06T18:00:00Z","2026-10-06T19:00:00Z","2026-10-06T20:00:00Z","2026-10-06T21:00:00Z","2026-10-06T22:00:00Z","2026-10-06T23:00:00Z","2026-10-07T00:00:00Z","2026-10-07T01:00:00Z","2026-10-07T02:00:00Z","2026-10-07T03:00:00Z","2026-10-07T04:00:00Z","2026-10-07T05:00:00Z","2026-10-07T06:00:00Z","2026-10-07T07:00:00Z","2026-10-07T08:00:00Z","2026-10-07T09:00:00Z","2026-10-07T10:00:00Z","2026-10-07T11:00:00Z","2026-10-07T12:00:00Z","2026-10-07T13:00:00Z","2026-10-07T14:00:00Z","2026-10-07T15:00:00Z","2026-10-07T16:00:00Z","2026-10-07T17:00:00Z","2026-10-07T18:00:00Z","2026-10-07T19:00:00Z","2026-10-07T20:00:00Z","2026-10-07T21:00:00Z","2026-10-07T22:00:00Z","2026-10-07T23:00:00Z","2026-10-08T00:00:00Z","2026-10-08T01:00:00Z","2026-10-08T02:00:00Z","2026-10-08T03:00:00Z","2026-10-08T04:00:00Z","2026-10-08T05:00:00Z","2026-10-08T06:00:00Z","2026-10-08T07:00:00Z","2026-10-08T08:00:00Z","2026-10-08T09:00:00Z","2026-10-08T10:00:00Z","2026-10-08T11:00:00Z","2026-10-08T12:00:00Z","2026-10-08T13:00:00Z","2026-10-08T14:00:00Z","2026-10-08T15:00:00Z","2026-10-08T16:00:00Z","2026-10-08T17:00:00Z","2026-10-08T18:00:00Z","2026-10-08T19:00:00Z","2026-10-08T20:00:00Z","2026-10-08T21:00:00Z","2026-10-08T22:00:00Z","2026-10-08T23:00:00Z","2026-10-09T00:00:00Z","2026-10-09T01:00:00Z","2026-10-09T02:00:00Z","2026-10-09T03:00:00Z","2026-10-09T04:00:00Z","2026-10-09T05:00:00Z","2026-10-09T06:00:00Z","2026-10-09T07:00:00Z","2026-10-09T08:00:00Z","2026-10-09T09:00:00Z","2026-10-09T10:00:00Z","2026-10-09T11:00:00Z","2026-10-09T12:00:00Z","2026-10-09T13:00:00Z","2026-10-09T14:00:00Z","2026-10-09T15:00:00Z","2026-10-09T16:00:00Z","2026-10-09T17:00:00Z","2026-10-09T18:00:00Z","2026-10-09T19:00:00Z","2026-10-09T20:00:00Z","2026-10-09T21:00:00Z","2026-10-09T22:00:00Z","2026-10-09T23:00:00Z","2026-10-10T00:00:00Z","2026-10-10T01:00:00Z","2026-10-10T02:00:00Z","2026-10-10T03:00:00Z","2026-10-10T04:00:00Z","2026-10-10T05:00:00Z","2026-10-10T06:00:00Z","2026-10-10T07:00:00Z","2026-10-10T08:00:00Z","2026-10-10T09:00:00Z"],"yfmt":"num","height":260,"labels":true,"area":true,"areaOpacity":0.18,"brk":["2026-10-07T04:00:00Z","2026-10-08T04:00:00Z"],"brkLabel":"Claude limit","brkTip":"7 Oct 12:00 to 8 Oct 12:00 MYT\nnothing ran: the night-1 thread had stopped on the Claude limit","series":[{"name":"Claude builders and fix agents","short":"Claude","color":"c1","values":[2.75,1.25,1.0,0.0,0.0,1.0,1.25,1.0,1.0,0.0,0.0,2.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.75,2.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.75,0.0,0.0,0.0,0.25,0.75,0.0,0.0,0.0,1.5,1.5,0.0,0.0,0.75,1.0,1.25,0.75,1.0,0.0,0.5,1.25,0.0,0.0,0.5,1.5,2.0,1.0,4.0,3.5,4.0,0.0,1.5,1.5,0.75,0.5,0.5,1.0,0.25,0.25,1.25,4.25]},{"name":"Codex reviewers (Astra and Sol)","short":"Codex","color":"c3","values":[0.75,1.75,0.0,0.0,0.0,1.5,1.5,3.0,0.5,0.0,0.0,0.0,0.0,2.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3.75,4.0,1.25,1.0,0.0,0.25,0.0,0.0,0.0,0.0,0.0,0.0,1.25,0.5,0.0,0.0,0.0,1.75,1.25,0.0,0.0,0.25,1.75,0.25,0.0,2.25,0.5,2.75,1.0,1.0,0.0,0.0,2.0,0.0,0.0,0.25,2.25,2.5,1.75,3.0,3.25,4.75,2.25,2.5,2.75,2.0,0.75,2.0,2.0,1.0,1.5,0.25,4.0]}],"events":[{"x":"2026-10-08T16:59:00Z","label":"Harness v1"},{"x":"2026-10-09T02:07:00Z","label":"Harness v2"},{"x":"2026-10-09T16:54:00Z","label":"Harness v3 relay"}]}</script></div>
+<div class="note">On night 1, Claude workers and Codex reviewers were both busy in 39% of the active 15-minute windows; mostly one side waited for the other. In v3 they overlapped in 64%, and Claude averaged up to 4.2 agents in an hour.</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Hour (UTC)</th><th class="n">Claude agents</th><th class="n">Codex agents</th></tr></thead><tbody><tr><td data-l="Hour (UTC)">10-06 13:00</td><td data-l="Claude agents" class="n">2.75</td><td data-l="Codex agents" class="n">0.75</td></tr><tr><td data-l="Hour (UTC)">10-06 14:00</td><td data-l="Claude agents" class="n">1.25</td><td data-l="Codex agents" class="n">1.75</td></tr><tr><td data-l="Hour (UTC)">10-06 15:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">0.00</td></tr><tr><td data-l="Hour (UTC)">10-06 18:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">1.50</td></tr><tr><td data-l="Hour (UTC)">10-06 19:00</td><td data-l="Claude agents" class="n">1.25</td><td data-l="Codex agents" class="n">1.50</td></tr><tr><td data-l="Hour (UTC)">10-06 20:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">3.00</td></tr><tr><td data-l="Hour (UTC)">10-06 21:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">0.50</td></tr><tr><td data-l="Hour (UTC)">10-07 00:00</td><td data-l="Claude agents" class="n">2.00</td><td data-l="Codex agents" class="n">0.00</td></tr><tr><td data-l="Hour (UTC)">10-07 01:00</td><td data-l="Claude agents" class="n">2.00</td><td data-l="Codex agents" class="n">0.00</td></tr><tr><td data-l="Hour (UTC)">10-07 02:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-07 03:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-08 05:00</td><td data-l="Claude agents" class="n">2.75</td><td data-l="Codex agents" class="n">3.75</td></tr><tr><td data-l="Hour (UTC)">10-08 06:00</td><td data-l="Claude agents" class="n">2.50</td><td data-l="Codex agents" class="n">4.00</td></tr><tr><td data-l="Hour (UTC)">10-08 07:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">1.25</td></tr><tr><td data-l="Hour (UTC)">10-08 08:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">1.00</td></tr><tr><td data-l="Hour (UTC)">10-08 10:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">0.25</td></tr><tr><td data-l="Hour (UTC)">10-08 17:00</td><td data-l="Claude agents" class="n">0.75</td><td data-l="Codex agents" class="n">1.25</td></tr><tr><td data-l="Hour (UTC)">10-08 18:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">0.50</td></tr><tr><td data-l="Hour (UTC)">10-08 21:00</td><td data-l="Claude agents" class="n">0.25</td><td data-l="Codex agents" class="n">0.00</td></tr><tr><td data-l="Hour (UTC)">10-08 22:00</td><td data-l="Claude agents" class="n">0.75</td><td data-l="Codex agents" class="n">1.75</td></tr><tr><td data-l="Hour (UTC)">10-08 23:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">1.25</td></tr><tr><td data-l="Hour (UTC)">10-09 02:00</td><td data-l="Claude agents" class="n">1.50</td><td data-l="Codex agents" class="n">0.25</td></tr><tr><td data-l="Hour (UTC)">10-09 03:00</td><td data-l="Claude agents" class="n">1.50</td><td data-l="Codex agents" class="n">1.75</td></tr><tr><td data-l="Hour (UTC)">10-09 04:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">0.25</td></tr><tr><td data-l="Hour (UTC)">10-09 06:00</td><td data-l="Claude agents" class="n">0.75</td><td data-l="Codex agents" class="n">2.25</td></tr><tr><td data-l="Hour (UTC)">10-09 07:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">0.50</td></tr><tr><td data-l="Hour (UTC)">10-09 08:00</td><td data-l="Claude agents" class="n">1.25</td><td data-l="Codex agents" class="n">2.75</td></tr><tr><td data-l="Hour (UTC)">10-09 09:00</td><td data-l="Claude agents" class="n">0.75</td><td data-l="Codex agents" class="n">1.00</td></tr><tr><td data-l="Hour (UTC)">10-09 10:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">1.00</td></tr><tr><td data-l="Hour (UTC)">10-09 12:00</td><td data-l="Claude agents" class="n">0.50</td><td data-l="Codex agents" class="n">0.00</td></tr><tr><td data-l="Hour (UTC)">10-09 13:00</td><td data-l="Claude agents" class="n">1.25</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-09 16:00</td><td data-l="Claude agents" class="n">0.50</td><td data-l="Codex agents" class="n">0.25</td></tr><tr><td data-l="Hour (UTC)">10-09 17:00</td><td data-l="Claude agents" class="n">1.50</td><td data-l="Codex agents" class="n">2.25</td></tr><tr><td data-l="Hour (UTC)">10-09 18:00</td><td data-l="Claude agents" class="n">2.00</td><td data-l="Codex agents" class="n">2.50</td></tr><tr><td data-l="Hour (UTC)">10-09 19:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">1.75</td></tr><tr><td data-l="Hour (UTC)">10-09 20:00</td><td data-l="Claude agents" class="n">4.00</td><td data-l="Codex agents" class="n">3.00</td></tr><tr><td data-l="Hour (UTC)">10-09 21:00</td><td data-l="Claude agents" class="n">3.50</td><td data-l="Codex agents" class="n">3.25</td></tr><tr><td data-l="Hour (UTC)">10-09 22:00</td><td data-l="Claude agents" class="n">4.00</td><td data-l="Codex agents" class="n">4.75</td></tr><tr><td data-l="Hour (UTC)">10-09 23:00</td><td data-l="Claude agents" class="n">0.00</td><td data-l="Codex agents" class="n">2.25</td></tr><tr><td data-l="Hour (UTC)">10-10 00:00</td><td data-l="Claude agents" class="n">1.50</td><td data-l="Codex agents" class="n">2.50</td></tr><tr><td data-l="Hour (UTC)">10-10 01:00</td><td data-l="Claude agents" class="n">1.50</td><td data-l="Codex agents" class="n">2.75</td></tr><tr><td data-l="Hour (UTC)">10-10 02:00</td><td data-l="Claude agents" class="n">0.75</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-10 03:00</td><td data-l="Claude agents" class="n">0.50</td><td data-l="Codex agents" class="n">0.75</td></tr><tr><td data-l="Hour (UTC)">10-10 04:00</td><td data-l="Claude agents" class="n">0.50</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-10 05:00</td><td data-l="Claude agents" class="n">1.00</td><td data-l="Codex agents" class="n">2.00</td></tr><tr><td data-l="Hour (UTC)">10-10 06:00</td><td data-l="Claude agents" class="n">0.25</td><td data-l="Codex agents" class="n">1.00</td></tr><tr><td data-l="Hour (UTC)">10-10 07:00</td><td data-l="Claude agents" class="n">0.25</td><td data-l="Codex agents" class="n">1.50</td></tr><tr><td data-l="Hour (UTC)">10-10 08:00</td><td data-l="Claude agents" class="n">1.25</td><td data-l="Codex agents" class="n">0.25</td></tr><tr><td data-l="Hour (UTC)">10-10 09:00</td><td data-l="Claude agents" class="n">4.25</td><td data-l="Codex agents" class="n">4.00</td></tr></tbody></table></div></details>
+</figure>
+
+<div class="grid2">
+<figure class="card"><h3 id="one-task-median">One task, median</h3><div class="small">From the harness event log (puck-metrics), merged tasks from R2 onward.</div>
+<div class="rows">
+<div class="row"><div class="lab">Builder<small>median per merged task, R2 onward</small></div><div class="track"><div class="bar" style="--v:20.7%;--fill:var(--c1)" data-tip="Builder
+median 17.7 min per task (n=36)" tabindex="0"></div></div><div class="val">18 min</div></div>
+<div class="row"><div class="lab">Reviewers<small>median per merged task: Astra + Sol</small></div><div class="track"><div class="bar" style="--v:26.6%;--fill:var(--c3)" data-tip="Reviewers
+median 22.6 min per task (n=36)" tabindex="0"></div></div><div class="val">23 min</div></div>
+<div class="row"><div class="lab">Wall-clock<small>median first launch to merge</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--neutral)" data-tip="Wall-clock
+median 85 min, mean 160 min (n=36)" tabindex="0"></div></div><div class="val">85 min</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Stage</th><th class="n">Minutes</th></tr></thead><tbody><tr><td data-l="Stage">Builder</td><td data-l="Minutes" class="n">17.7</td></tr><tr><td data-l="Stage">Reviewers</td><td data-l="Minutes" class="n">22.6</td></tr><tr><td data-l="Stage">Wall-clock</td><td data-l="Minutes" class="n">85.1</td></tr></tbody></table></div></details>
+</figure>
+<figure class="card"><h3 id="all-tasks-summed">All tasks, summed</h3><div class="small">Agent-minutes, not wall-clock: tasks ran in parallel.</div>
+<div class="rows">
+<div class="row"><div class="lab">Builders<small>36 merged tasks, R2 onward</small></div><div class="track"><div class="bar" style="--v:48.7%;--fill:var(--c1)" data-tip="Builders
+724 agent-minutes" tabindex="0"></div></div><div class="val">12.1 h</div></div>
+<div class="row"><div class="lab">Reviewers<small>Astra and Sol</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--c3)" data-tip="Reviewers
+1,488 agent-minutes" tabindex="0"></div></div><div class="val">24.8 h</div></div>
+<div class="row"><div class="lab">Lost to the environment<small>19 BLOCKED or BAD_TEST verdicts, limit stops</small></div><div class="track"><div class="bar" style="--v:64.1%;--fill:var(--neutral)" data-tip="Lost
+955 agent-minutes: 19 non-code verdicts and blocked spans" tabindex="0"></div></div><div class="val">15.9 h</div></div>
+<div class="row"><div class="lab">Waiting for you<small>18 questions, with defaults</small></div><div class="track"><div class="bar" style="--v:30.9%;--fill:var(--neutral)" data-tip="Owner waits
+460 minutes over 18 questions; work went on around them" tabindex="0"></div></div><div class="val">7.7 h</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Where</th><th class="n">Minutes</th></tr></thead><tbody><tr><td data-l="Where">Builders</td><td data-l="Minutes" class="n">724</td></tr><tr><td data-l="Where">Reviewers</td><td data-l="Minutes" class="n">1,488</td></tr><tr><td data-l="Where">Lost to the environment</td><td data-l="Minutes" class="n">955</td></tr><tr><td data-l="Where">Waiting for you</td><td data-l="Minutes" class="n">460</td></tr></tbody></table></div></details>
+</figure>
+</div>
+<div class="note warn">The lost time is mostly Sol's: 13 BLOCKED and 6 BAD_TEST verdicts, where the code was never judged because the test store hit its rate limit, a sign-in failed, the preview browser dropped or the store was in the wrong state. A Sol run holds the test store for 15 to 25 minutes, so every wasted one held up the queue behind it.</div>
+<h3 id="how-much-you-had-to-step-in">How much you had to step in</h3>
+<p>You sent 71 messages in all: 19 while researching the spec on 6 Oct, 29 while redesigning the harness on 8 and 9 Oct, and 23 to the orchestrator threads. Of those 23, the last 10 were new product direction (the design gallery, Publish all, the shop page, Release 6), not unblocking. The orchestrators asked 18 questions through the harness, each with a default, and carried on with independent work while they waited.</p>
+<p>Context management costs time too. Harness v3 hands off to a fresh thread at about 200k tokens: 17 threads in 17 hours, each rebuilding its context from the ledger and the start file. That rebuild is $64 of cache writes, 36% of v3's orchestrator cost. It is still cheaper than one long thread: 9 Oct's single thread grew to 963k tokens and cost $15.36 of orchestration per row; v3 cost $5.66.</p>
+
+<h2 id="what-the-checking-caught"><span class="no">04</span>What the checking caught</h2>
+<p class="lede">Reviews found real defects most of the time: Astra failed 25 of 32 first reviews, and about 86 of its and Sol's serious findings were genuine code defects. The builders' own receipts (tests, typecheck, lint, one self-review) did not catch them.</p>
+<div class="grid2">
+<figure class="card"><h3 id="verdicts">Verdicts</h3><div class="small">One verdict file per review or verify run.</div>
+<div class="tw"><table class=""><thead><tr><th>Reviewer</th><th class="n">Pass</th><th class="n">Fail</th><th class="n">Blocked</th><th class="n">Bad test</th></tr></thead><tbody><tr><td data-l="Reviewer">GPT-6-Astra (code review)</td><td data-l="Pass" class="n">35</td><td data-l="Fail" class="n">37</td><td data-l="Blocked" class="n">–</td><td data-l="Bad test" class="n">–</td></tr><tr><td data-l="Reviewer">GPT-6.1-Sol (live verify)</td><td data-l="Pass" class="n">33</td><td data-l="Fail" class="n">11</td><td data-l="Blocked" class="n">13</td><td data-l="Bad test" class="n">6</td></tr></tbody></table></div>
+</figure>
+<figure class="card"><h3 id="serious-findings-blocker-or-major">Serious findings (blocker or major)</h3><div class="small">Counted from the verdict files; minors never held a merge.</div>
+<div class="rows">
+<div class="row"><div class="lab">Astra, in code reviews<small>in FAIL verdicts</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--c3)" data-tip="Astra\n75 blocker or major findings" tabindex="0"></div></div><div class="val">75</div></div>
+<div class="row"><div class="lab">Sol, on the code<small>in FAIL verdicts</small></div><div class="track"><div class="bar" style="--v:21.3%;--fill:var(--c3)" data-tip="Sol\n16 findings on the code" tabindex="0"></div></div><div class="val">16</div></div>
+<div class="row"><div class="lab">Sol, on the environment<small>in BLOCKED or BAD_TEST verdicts</small></div><div class="track"><div class="bar" style="--v:29.3%;--fill:var(--neutral)" data-tip="Sol\n22 findings about the test setup, not the code" tabindex="0"></div></div><div class="val">22</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Source</th><th class="n">Findings</th></tr></thead><tbody><tr><td data-l="Source">Astra, code</td><td data-l="Findings" class="n">75</td></tr><tr><td data-l="Source">Sol, code</td><td data-l="Findings" class="n">16</td></tr><tr><td data-l="Source">Sol, environment</td><td data-l="Findings" class="n">22</td></tr></tbody></table></div></details>
+</figure>
+</div>
+<p>To judge how many findings were real, I read a random sample of 25 serious findings. Astra's were genuine defects 13 times in 14 (the other asked for evidence that was missing). Sol's were genuine 6 times in 11; the rest were rate limits, a missing rebase and a snapshot timeout. Scaled up, that is about 86 real defects caught before merge <span class="est">estimate</span>, of which 63 came from first reviews alone. In the sample, a third of the real ones were severe and another third were race-window edge cases a small store may never hit.</p>
+<h3 id="six-of-the-severe-ones">Six of the severe ones</h3>
+<div class="finding"><div class="fhd"><span class="sev p1">P1</span><span class="fid">R3-01 · Sol r2</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>Published photo grids returned HTTP 500,</b> with the lightbox on or off, because the server render called a client-only image loader. A seller adding a photo grid would have broken their live page.</p><div class="ev">photo-grid.tsx:78 · R3-01-sol-r2-verdict.json</div></div>
+<div class="finding"><div class="fhd"><span class="sev p1">P1</span><span class="fid">R3-04c · Astra r1</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>Change kit, then Publish, reported success and left About and Contact unpublished,</b> because the editor reloaded tracking only Home and the site document.</p><div class="ev">R3-04c-astra-r1-verdict.json</div></div>
+<div class="finding"><div class="fhd"><span class="sev p1">P1</span><span class="fid">R2-07 · Astra r1</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>"Break apart" on a single-slide hero discarded the seller's stored image variants</b> and banner fields.</p><div class="ev">R2-07-astra-r1-verdict.json</div></div>
+<div class="finding"><div class="fhd"><span class="sev p1">P1</span><span class="fid">R2-05 · Astra r1</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>Switching pages saved the outgoing page fire-and-forget,</b> so a failed or conflicting save was silently lost while the editor moved on.</p><div class="ev">R2-05-astra-r1-verdict.json</div></div>
+<div class="finding"><div class="fhd"><span class="sev p1">P1</span><span class="fid">R2 release review</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>A block dropped where the registry forbids it made the page unsavable:</b> the editor allowed a Heading at page root, the strict parser refused the page, and page switching was blocked. No single task's review saw it; the release review across tasks did (fixed as R2-11).</p><div class="ev">R2-astra-r1-verdict.json · ledger R2-11</div></div>
+<div class="finding"><div class="fhd"><span class="sev p2">P2</span><span class="fid">R4-05b · Astra r1</span><span class="pill st-fixed"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.5" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" fill="none" stroke="#282A36" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fixed before merge</span></div>
+<p><b>A phone number typed into a block request title leaked into the public GitHub issue</b> through the title-derived key, after the title itself had been redacted.</p><div class="ev">R4-05b-astra-r1-verdict.json</div></div>
+<h3 id="what-got-past-the-checks">What got past the checks</h3>
+<p>Reviewers check the code against the spec. They did not catch what the spec got wrong, and a few things slipped to staging:</p>
+<ul>
+<li><b>Two layout gaps on the pilot store,</b> found by Sol's staging verification (F-02 round 4): a doubled heading on lookbook pages and the Contact form in the wrong place. Both are rows in R5 now. <span class="pill st-open"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Open</span></li>
+<li><b>Product sense.</b> You found that kits and templates were two menus for one idea, that their previews were text only, and that an apply could not be undone. No reviewer flagged these; they became R5's design gallery and Undo apply.</li>
+<li><b>Seams between tasks,</b> caught only by the per-release final review: R2-11 and R2-12, R3-04d, R3-05b and R4-05c were all opened by it. Keep that pass.</li>
+</ul>
+
+<h2 id="would-it-be-cheaper-without-the-harness"><span class="no">05</span>Would it be cheaper without the harness?</h2>
+<p class="lede">In API dollars, yes: builders alone come to about $351, a quarter of what the harness spent. In what you actually pay, no: the plans are flat. The trade is roughly $480 of reviews and fix rounds against about 86 defects you would otherwise find yourself.</p>
+<figure class="card"><h3 id="the-same-48-rows-five-ways">The same 48 rows, five ways</h3><div class="small">API-equivalent dollars, split by job with the colours of section 1. Only the first row was measured; the others reprice or remove measured lines.</div>
+<div class="legend"><span><i style="background:var(--c1)"></i>Building</span><span><i style="background:var(--c2)"></i>Fixing</span><span><i style="background:var(--c3)"></i>Checking</span><span><i style="background:var(--c4)"></i>Managing</span><span><i style="background:var(--c5)"></i>Harness engineering</span><span><i style="background:var(--neutral)"></i>Research and spec</span></div>
+<div class="rows">
+<div class="row"><div class="lab">As run<small>harness v1 to v3, Fable orchestrator, Astra on most tasks</small></div><div class="track"><div class="seg" style="--v:22.89%;--fill:var(--c1)" data-tip="As run&#10;Building: $308" tabindex="0"></div><div class="seg" style="--v:8.59%;--fill:var(--c2)" data-tip="As run&#10;Fixing: $116" tabindex="0"></div><div class="seg" style="--v:27.01%;--fill:var(--c3)" data-tip="As run&#10;Checking: $364" tabindex="0"></div><div class="seg" style="--v:33.97%;--fill:var(--c4)" data-tip="As run&#10;Managing: $458" tabindex="0"></div><div class="seg" style="--v:4.36%;--fill:var(--c5)" data-tip="As run&#10;Harness engineering: $59" tabindex="0"></div><div class="seg" style="--v:3.18%;--fill:var(--neutral)" data-tip="As run&#10;Research and spec: $43" tabindex="0"></div></div><div class="val">$1,348 <small>100%</small></div></div>
+<div class="row"><div class="lab">Opus 5.5 orchestrator<small>same harness, orchestrator tokens repriced</small></div><div class="track"><div class="seg" style="--v:22.89%;--fill:var(--c1)" data-tip="Opus 5.5 orchestrator&#10;Building: $308" tabindex="0"></div><div class="seg" style="--v:8.59%;--fill:var(--c2)" data-tip="Opus 5.5 orchestrator&#10;Fixing: $116" tabindex="0"></div><div class="seg" style="--v:27.01%;--fill:var(--c3)" data-tip="Opus 5.5 orchestrator&#10;Checking: $364" tabindex="0"></div><div class="seg" style="--v:17.59%;--fill:var(--c4)" data-tip="Opus 5.5 orchestrator&#10;Managing: $237" tabindex="0"></div><div class="seg" style="--v:4.36%;--fill:var(--c5)" data-tip="Opus 5.5 orchestrator&#10;Harness engineering: $59" tabindex="0"></div><div class="seg" style="--v:3.18%;--fill:var(--neutral)" data-tip="Opus 5.5 orchestrator&#10;Research and spec: $43" tabindex="0"></div></div><div class="val">$1,127 <small>84%</small></div></div>
+<div class="row"><div class="lab">Opus orchestrator + Astra only on risky rows<small>Sol-priced review on about 60% of rows</small></div><div class="track"><div class="seg" style="--v:22.89%;--fill:var(--c1)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Building: $308" tabindex="0"></div><div class="seg" style="--v:8.59%;--fill:var(--c2)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Fixing: $116" tabindex="0"></div><div class="seg" style="--v:17.03%;--fill:var(--c3)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Checking: $229" tabindex="0"></div><div class="seg" style="--v:17.59%;--fill:var(--c4)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Managing: $237" tabindex="0"></div><div class="seg" style="--v:4.36%;--fill:var(--c5)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Harness engineering: $59" tabindex="0"></div><div class="seg" style="--v:3.18%;--fill:var(--neutral)" data-tip="Opus orchestrator + Astra only on risky rows&#10;Research and spec: $43" tabindex="0"></div></div><div class="val">$992 <small>74%</small></div></div>
+<div class="row"><div class="lab">No checking<small>builders and orchestrator, no reviews, no fix rounds</small></div><div class="track"><div class="seg" style="--v:22.89%;--fill:var(--c1)" data-tip="No checking&#10;Building: $308" tabindex="0"></div><div class="seg" style="--v:33.97%;--fill:var(--c4)" data-tip="No checking&#10;Managing: $458" tabindex="0"></div><div class="seg" style="--v:4.36%;--fill:var(--c5)" data-tip="No checking&#10;Harness engineering: $59" tabindex="0"></div><div class="seg" style="--v:3.18%;--fill:var(--neutral)" data-tip="No checking&#10;Research and spec: $43" tabindex="0"></div></div><div class="val">$868 <small>64%</small></div></div>
+<div class="row"><div class="lab">No harness<small>you brief and merge each task in plain Claude Code</small></div><div class="track"><div class="seg" style="--v:22.89%;--fill:var(--c1)" data-tip="No harness&#10;Building: $308" tabindex="0"></div><div class="seg" style="--v:3.18%;--fill:var(--neutral)" data-tip="No harness&#10;Research and spec: $43" tabindex="0"></div></div><div class="val">$351 <small>26%</small></div></div>
+</div>
+<div style="margin-top:1.5rem"><div class="tw"><table class="stack"><thead><tr><th>Scenario</th><th class="n">API-equivalent</th><th>Serious defects</th><th>Your time</th></tr></thead><tbody><tr><td data-l="Scenario"><b>As run</b><br><small>harness v1 to v3, Fable orchestrator, Astra on most tasks</small></td><td data-l="API-equivalent" class="n">$1,348</td><td data-l="Serious defects">≈86 caught before merge</td><td data-l="Your time">23 messages to orchestrators</td></tr><tr><td data-l="Scenario"><b>Opus 5.5 orchestrator</b><br><small>same harness, orchestrator tokens repriced</small></td><td data-l="API-equivalent" class="n">$1,127</td><td data-l="Serious defects">same, if Opus orchestrates as well</td><td data-l="Your time">same</td></tr><tr><td data-l="Scenario"><b>Opus orchestrator + Astra only on risky rows</b><br><small>Sol-priced review on about 60% of rows</small></td><td data-l="API-equivalent" class="n">$992</td><td data-l="Serious defects">about the same; Sol may miss more on contracts</td><td data-l="Your time">same</td></tr><tr><td data-l="Scenario"><b>No checking</b><br><small>builders and orchestrator, no reviews, no fix rounds</small></td><td data-l="API-equivalent" class="n">$868</td><td data-l="Serious defects">≈86 reach staging, ≈27 severe</td><td data-l="Your time">you test everything</td></tr><tr><td data-l="Scenario"><b>No harness</b><br><small>you brief and merge each task in plain Claude Code</small></td><td data-l="API-equivalent" class="n">$351</td><td data-l="Serious defects">≈86 reach staging</td><td data-l="Your time">≈12 h of briefing and merging, then the testing</td></tr></tbody></table></div></div>
+<div class="note">Rows 2 to 5 are modelled, not measured <span class="est">estimate</span>. Row 2 reprices the orchestrator's measured tokens at Opus 5.5 rates. Row 3 also moves 60% of Astra's spend to Sol's prices. Row 4 drops the measured checking and fixing; row 5 also drops managing and the harness work. Twelve hours for row 5 is 48 tasks at about 15 minutes each to brief, check and merge.</div>
+</figure>
+<p>What the numbers leave out is where the harness pays for itself:</p>
+<ul>
+<li><b>A defect caught in the loop costs about $8:</b> $4.25 of checking, a $1.17 fix agent and a $2.30 re-review, with the context still loaded. The same defect found on staging costs a cold session, your time to reproduce it and, for the severe third, a broken store for a seller.</li>
+<li><b>Your hours are the scarce resource, not tokens.</b> On a flat plan the marginal token is free until the weekly cap. What the harness buys is that the 24 rows merged in that overnight stretch needed nothing from you.</li>
+<li><b>The harness itself cost $59 to build</b> (postmortems, the night-1 report, v1 to v3) plus your 29 messages. That is paid once, and R5, R6 and a later general harness reuse it.</li>
+</ul>
+
+<h2 id="what-your-plans-buy"><span class="no">06</span>What your plans buy</h2>
+<p class="lede">Your $300 a month buys about $2,887 of API-priced work a week, roughly 40 times its price. At v3's pace that runs Claude for about 5.6 days a week but Codex for only 1.1, so Codex is now the limit.</p>
+<div class="grid2">
+<figure class="card"><h3 id="weekly-allowance-in-api-dollars">Weekly allowance in API dollars</h3><div class="small">Calibrated from your plan meters against the logs.</div>
+<div class="rows">
+<div class="row"><div class="lab">Claude Max 5x<small>$100 a month, what you had until 9 Oct</small></div><div class="track"><div class="bar" style="--v:25.4%;--fill:var(--neutral)" data-tip="Max 5x
+about $659 of API-priced Claude Code a week" tabindex="0"></div></div><div class="val">$659 <small>/week</small></div></div>
+<div class="row"><div class="lab">Claude Max 20x<small>$200 a month, since 9 Oct</small></div><div class="track"><div class="bar" style="--v:100.0%;--fill:var(--neutral)" data-tip="Max 20x
+about $2,596 a week; Fable capped at about $1,110" tabindex="0"></div></div><div class="val">$2,596 <small>/week</small></div></div>
+<div class="row"><div class="lab">ChatGPT Pro (Codex)<small>$100 a month tier ('prolite')</small></div><div class="track"><div class="bar" style="--v:11.2%;--fill:var(--c3)" data-tip="ChatGPT Pro
+about $291 of API-priced Codex a week" tabindex="0"></div></div><div class="val">$291 <small>/week</small></div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Plan</th><th>Price</th><th class="n">Allowance per week (API $)</th></tr></thead><tbody><tr><td data-l="Plan">Claude Max 5x</td><td data-l="Price">$100/month</td><td data-l="Allowance per week (API $)" class="n">$659</td></tr><tr><td data-l="Plan">Claude Max 20x</td><td data-l="Price">$200/month</td><td data-l="Allowance per week (API $)" class="n">$2,596</td></tr><tr><td data-l="Plan">ChatGPT Pro (Codex)</td><td data-l="Price">$100/month</td><td data-l="Allowance per week (API $)" class="n">$291</td></tr></tbody></table></div></details>
+</figure>
+<figure class="card"><h3 id="days-of-v3-pace-running-per-week">Days of v3-pace running per week</h3><div class="small">Weekly allowance divided by v3's daily spend.</div>
+<div class="rows">
+<div class="row"><div class="lab">Claude, all models<small>Max 20x at v3's pace</small></div><div class="track"><div class="bar" style="--v:79.8%;--fill:var(--neutral)" data-tip="Claude
+$2,596 a week / $465 a day" tabindex="0"></div></div><div class="val">5.6 days</div></div>
+<div class="row"><div class="lab">Claude, Fable only<small>Fable cap at v3's pace</small></div><div class="track"><div class="bar" style="--v:70.1%;--fill:var(--neutral)" data-tip="Fable
+$1,110 cap / $226 a day" tabindex="0"></div></div><div class="val">4.9 days</div></div>
+<div class="row"><div class="lab">Codex<small>ChatGPT Pro at v3's pace</small></div><div class="track"><div class="bar" style="--v:16.2%;--fill:var(--c3)" data-tip="Codex
+$291 a week / $256 a day" tabindex="0"></div></div><div class="val">1.1 days</div></div>
+</div>
+<details class="tv"><summary>Table view</summary><div class="tw"><table class=""><thead><tr><th>Limit</th><th class="n">Days per week</th></tr></thead><tbody><tr><td data-l="Limit">Claude, all models</td><td data-l="Days per week" class="n">5.6</td></tr><tr><td data-l="Limit">Claude, Fable only</td><td data-l="Days per week" class="n">4.9</td></tr><tr><td data-l="Limit">Codex</td><td data-l="Days per week" class="n">1.1</td></tr></tbody></table></div></details>
+</figure>
+</div>
+<p><b>The upgrade to Max 20x paid off at once.</b> On 9 Oct, still on Max 5x, the orchestrator and builders hit the Claude session limit 18 times; in v3 on Max 20x, not once. On Max 5x the Puck run alone would have used 102% of the weekly allowance since 8 Oct; on Max 20x it is 26%.</p>
+<p><b>Codex ran out on 10 Oct at 15:17 MYT</b> after about $270 of reviews in two days (7% to 100% of the week). The meter restarted 7 minutes later, but the arithmetic stands: Astra alone is 77% of Codex spend, priced like Fable at $10/$50 per million tokens.</p>
+
+<h2 id="where-to-trim"><span class="no">07</span>Where to trim</h2>
+<p class="lede">Three changes would cut about a quarter of the spend without dropping a check, and one would stretch Codex.</p>
+<ol class="recs">
+<li><b class="t">Run the orchestrator on Opus 5.5, not Fable 5.1.</b>The orchestrator is 33% of all spend and its job is now mostly running puck-next and recording events. Opus would cost $225 for the same tokens, saving $221, and frees Fable's separate weekly cap. Keep Fable for writing a release's contract or the end report.</li>
+<li><b class="t">Hold Astra to the rule you already wrote: risky rows only.</b>Astra reviewed 27 of the 36 tasks merged since R2, though the ledger reserves it for auth, money, concurrent writes, data changes and contracts. Routine block tasks can go to Sol at a fifth of Astra's token price, saving about $135 <span class="est">estimate</span> and making Codex last about 1.6 times as long.</li>
+<li><b class="t">Fix Sol's environment once, not per run.</b>19 verdicts and 955 agent-minutes went to rate limits, sign-ins, a missing rebase and store state. A test brand exempt from the rate limit, a session file that preflight proves, and a rebase check in puck-ready would remove most of them.</li>
+<li><b class="t">Keep the release review and the 200k relay.</b>The release review caught the drop-zone bug that made pages unsavable, and the relay cut orchestration per row from $15.36 to $5.66.</li>
+<li><b class="t">Size Codex to the work, or move some reviews to Claude.</b>Codex lasts about 1.1 days a week at this pace against Claude's 5.6. Either the $200 ChatGPT Pro tier, four times this allowance, or an Opus reviewer for routine rows on the larger Claude allowance.</li>
+</ol>
+
+<h2 id="method-and-caveats"><span class="no">08</span>Method and caveats</h2>
+<ul>
+<li><b>Sources.</b> Claude Code transcripts of every Puck session (the orchestrator threads, their workflow builders, fix agents and helpers, the spec session, the harness-engineering session and the night-1 report session), Codex rollouts of every Astra and Sol run plus the Codex postmortem, the harness event log (<code>~/.dagangnow-qa/puck/events.jsonl</code>), the reviewer verdict files in <code>/tmp/puck-qa</code>, the ledger and the <code>feat/puck-store-editor</code> history from <code>16acac775</code> to <code>90baaffb3</code>. Cut-off: 10 Oct 09:51Z (17:51 MYT), when this report was requested.</li>
+<li><b>Prices.</b> Claude at list prices from the claude-api skill (Fable 5.1 $10/$50, Opus 5.5 $4/$20, Sonnet 5.5 $2/$10 per million input/output tokens; cache reads $0.25, $0.20, $0.20; cache writes 1.25× input for 5 minutes and 2× for 1 hour). GPT-6-Astra ($10 input, $1 cached, $50 output) and GPT-6.1-Sol ($2, $0.10, $10) from T3 Code's model-rate table, Standard tier; no request crossed the 272k long-context threshold. Claude messages are de-duplicated by message id. 98% of Claude's input tokens were cache reads.</li>
+<li><b>API-equivalent is not a bill.</b> Everything ran on subscriptions. The plan allowances are calibrated from Claude Code's cached plan meters (49% of Max 5x at $322.88 of usage on 9 Oct; 27% of Max 20x at $701.03 on 10 Oct; the two agree to within 2% of the 4× ratio) and from Codex's rate-limit records (7% to 100% for $270.28). Anthropic and OpenAI do not publish how meters map to dollars, so treat these as estimates.</li>
+<li><b>Rows closed</b> are ledger rows whose "done" commit falls before the cut-off; F-01 and F-02 are counted at their recorded completion. Tasks differ in size, so cost per row mixes harness gains with task size; section 2 separates the two with builder cost per row.</li>
+<li><b>Defect counts</b> come from verdict files. A finding repeated in a later round counts again; the first-round-only count, 63, is the floor. Real-versus-not rates come from one hand-labelled sample of 25, so the 86 carries maybe ±15.</li>
+<li><b>Counterfactuals</b> reprice or remove measured lines. They do not model second-order effects: an orchestrator on Opus may judge grants and blocked rows differently, and a team without reviews would ship different code.</li>
+<li><b>Not counted:</b> your own time (only message counts are known), anything run outside this Mac, the earlier phase-1 trial on 6 Oct, and work after the cut-off. R5 is in progress and its $70 is included in the total but closes no rows yet.</li>
+</ul>
+<p class="ft">Generated by Claude Opus 5.5 from local logs, stdlib only, no network. Re-run: <code>python3 -I analyze.py &amp;&amp; python3 -I compute.py &amp;&amp; python3 -I gen_body.py</code> in <code>~/dev/experiments/harness-roi</code>.</p>
+</main></div></div>
+<div id="tip" role="tooltip"></div><script>/* report kit runtime: TREE scroll-spy, progress meter, up/down heading nav, tooltips, line charts. No dependencies. */
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const root=document.documentElement;
+
+/* ---------- tooltip: any element with data-tip="Title\nline\nline" ---------- */
+const tip=$('#tip')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'tip',role:'tooltip'}));
+function placeTip(x,y){const w=tip.offsetWidth,h=tip.offsetHeight;let l=x+14,t=y+14;if(l+w>innerWidth-8)l=x-w-14;if(l<8)l=8;if(t+h>innerHeight-8)t=y-h-14;if(t<8)t=8;tip.style.left=l+'px';tip.style.top=t+'px'}
+function showTip(text,x,y){tip.textContent='';const parts=String(text).split('\n');const b=document.createElement('b');b.textContent=parts[0];tip.appendChild(b);if(parts.length>1)tip.appendChild(document.createTextNode('\n'+parts.slice(1).join('\n')));tip.style.display='block';placeTip(x,y)}
+function hideTip(){tip.style.display='none'}
+document.addEventListener('pointermove',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(t)showTip(t.getAttribute('data-tip'),e.clientX,e.clientY);else if(!e.target.closest||!e.target.closest('.chart'))hideTip()});
+document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(t){const r=t.getBoundingClientRect();showTip(t.getAttribute('data-tip'),r.left+r.width/2,r.top)}});
+document.addEventListener('focusout',hideTip);
+window.ReportTip={show:showTip,hide:hideTip};
+
+/* ---------- TREE rail: active section, sub-tree, progress, rail title ---------- */
+const tree=$('#tree');
+const tops=tree?$$('a.top',tree):[];
+const all=tree?$$('a',tree):[];
+const target=a=>document.getElementById(decodeURIComponent(a.hash.slice(1)));
+const prog=$('#prog'),N=28;
+const railTitle=$('#railTitle'),h1=$('.hero h1');
+let ticking=false;
+function update(){
+  ticking=false;
+  const H=root.scrollHeight-innerHeight,p=H>0?Math.min(1,Math.max(0,scrollY/H)):0;
+  if(prog){const k=Math.round(p*N);prog.querySelector('b').textContent='█'.repeat(k);prog.querySelector('.tr').textContent='░'.repeat(N-k);prog.querySelector('.pct').textContent=String(Math.round(p*100)).padStart(2,'0')+'%'}
+  if(railTitle&&h1)railTitle.classList.toggle('on',h1.getBoundingClientRect().bottom<0);
+  if(!tops.length)return;
+  const line=Math.min(innerHeight*0.3,240),atEnd=H>0&&scrollY>=H-2;
+  let ti=-1;tops.forEach((a,i)=>{const h=target(a);if(h&&h.getBoundingClientRect().top<=line)ti=i});
+  if(atEnd)ti=tops.length-1;
+  let subOn=null;
+  tops.forEach((a,i)=>{
+    a.classList.toggle('on',i===ti);
+    const subs=a.nextElementSibling&&a.nextElementSibling.classList.contains('subs')?a.nextElementSibling:null;
+    if(!subs)return;
+    subs.classList.toggle('open',i===ti);
+    const sl=$$('a',subs);let si=-1;
+    let best=-1e9;/* side-by-side cards share a top: keep the first (left) one */
+    if(i===ti)sl.forEach((s,j)=>{const h=target(s);const t=h?h.getBoundingClientRect().top:1e9;if(t<=line&&t>best+4){si=j;best=t}});
+    sl.forEach((s,j)=>s.classList.toggle('on',j===si));
+    if(si>=0)subOn=sl[si];
+  });
+}
+function req(){if(!ticking){ticking=true;requestAnimationFrame(update)}}
+addEventListener('scroll',req,{passive:true});addEventListener('resize',req);update();
+
+/* ---------- up/down steps through headings (h2 + h3) ---------- */
+const smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+const heads=()=>$$('.prose h2[id], .prose h3[id]').filter(h=>h.offsetParent!==null);
+addEventListener('keydown',e=>{
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||e.defaultPrevented)return;
+  const a=document.activeElement;
+  if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.closest('.chart')))return;
+  const hs=heads();if(!hs.length)return;
+  const pad=parseFloat(getComputedStyle(hs[0]).scrollMarginTop)||32;
+  let t;
+  if(e.key==='ArrowDown')t=hs.find(h=>h.getBoundingClientRect().top>pad+4);
+  else t=hs.slice().reverse().find(h=>h.getBoundingClientRect().top<pad-4);
+  if(e.key==='ArrowUp'&&!t){e.preventDefault();scrollTo({top:0,behavior:smooth});return}
+  if(!t)return;
+  e.preventDefault();t.scrollIntoView({behavior:smooth,block:'start'});
+});
+
+/* ---------- line charts: a div.chart holding one script[type="application/json"] with cfg ----------
+   cfg: {x:[...], xtype:"time"|"num"|"cat", tz:<hours offset for time labels, default local>,
+         series:[{name, short?, color:"c1".."c5"|"ink"|"#hex", values:[...]}],
+         yfmt:"num"|"int"|"usd"|"pct"|"tok"|"dur", xfmt? (same set, for xtype num), ymin?, ymax?, height?, area?, step?, labels?, sum?,
+         events?:[{x, label}] (numbered markers + a key under the chart; key:false hides the key),
+         brk?:[x0, x1] (compress an idle stretch to a narrow band; brkLabel?, brkTip?), title} */
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(root).getPropertyValue(n).trim();
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+const FMT={
+  num:v=>Math.abs(v)>=1000?v.toLocaleString('en-US',{maximumFractionDigits:0}):(+v.toFixed(2)).toString(),
+  int:v=>Math.round(v).toLocaleString('en-US'),
+  usd:v=>(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',Number.isInteger(+(+v).toFixed(2))?{maximumFractionDigits:0}:{minimumFractionDigits:2,maximumFractionDigits:2}),
+  pct:v=>(+v.toFixed(1))+'%',
+  tok:v=>v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'k':''+Math.round(v),
+  dur:v=>v>=60?Math.floor(v/60)+'h '+String(Math.round(v%60)).padStart(2,'0')+'m':Math.round(v)+'m'};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function nice(span,n){const raw=span/n||1,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+function color(c){if(!c)return css('--c1');if(c[0]==='#')return c;return css(c.startsWith('--')?c:'--'+c)}
+function draw(host,cfg){
+  host.querySelectorAll('svg,.elist[data-auto]').forEach(s=>s.remove());
+  const isTime=cfg.xtype==='time'||(cfg.xtype!=='num'&&cfg.xtype!=='cat'&&typeof cfg.x[0]==='string'&&!isNaN(Date.parse(cfg.x[0])));
+  const isCat=cfg.xtype==='cat';
+  const xs=cfg.x.map((v,i)=>isCat?i:isTime?(typeof v==='number'?v:Date.parse(v)):+v);
+  const off=cfg.tz!=null?cfg.tz*36e5:null;
+  const loc=t=>off==null?new Date(t):new Date(t+off);
+  const g=(d,k)=>off==null?d['get'+k]():d['getUTC'+k]();
+  const hhmm=t=>{const d=loc(t);return String(g(d,'Hours')).padStart(2,'0')+':'+String(g(d,'Minutes')).padStart(2,'0')};
+  const day=t=>{const d=loc(t);return g(d,'Date')+' '+MON[g(d,'Month')]};
+  const span=xs[xs.length-1]-xs[0];
+  const midnight=t=>{const d=loc(t);return g(d,'Hours')===0&&g(d,'Minutes')===0};
+  const xnf=FMT[cfg.xfmt]||FMT.num;const xlab=t=>isCat?String(cfg.x[t]):isTime?(span>2*864e5||midnight(t)?day(t):hhmm(t)):xnf(t);
+  const xtip=t=>isCat?String(cfg.x[t]):isTime?hhmm(t)+' · '+day(t):xnf(t);
+  const W=Math.max(host.clientWidth,260),narrow=W<520;
+  const ink=css('--ink'),ink2=css('--ink-2'),muted=css('--ink-3'),grid=css('--grid'),axis=css('--axis'),bg=css('--bg');
+  const yf=FMT[cfg.yfmt||'num'];
+  const pl=narrow?44:56,pr=(cfg.labels&&!narrow)?150:12,pb=26;
+  const ev=(cfg.events||[]).map((e,i)=>({...e,n:e.n||i+1}));
+  const x0=xs[0],x1=xs[xs.length-1]===x0?x0+1:xs[xs.length-1],plotW=W-pl-pr;
+  const bk=cfg.brk?cfg.brk.map(v=>isTime&&typeof v==='string'?Date.parse(v):+v):null,bw=bk?22:0;
+  const act=bk?(bk[0]-x0)+(x1-bk[1]):(x1-x0),kx=(plotW-bw)/act;
+  const X=t=>!bk||t<=bk[0]?pl+(t-x0)*kx:t>=bk[1]?pl+(bk[0]-x0)*kx+bw+(t-bk[1])*kx:pl+(bk[0]-x0)*kx+bw*(t-bk[0])/(bk[1]-bk[0]);
+  let rows=0;const last=[];
+  ev.forEach(e=>{e.t=isCat?e.x:isTime&&typeof e.x==='string'?Date.parse(e.x):+e.x;e.px=X(e.t);let r=0;while(last[r]!==undefined&&e.px-last[r]<22)r++;e.row=r;last[r]=e.px;rows=Math.max(rows,r+1)});
+  const pt=ev.length?14+rows*22:14,H=cfg.height||(narrow?220:280),ph=H-pt-pb;
+  const vals=cfg.series.flatMap(s=>s.values.filter(v=>v!=null));
+  let ymin=cfg.ymin!=null?cfg.ymin:Math.min(0,...vals),ymax=cfg.ymax!=null?cfg.ymax:Math.max(...vals);
+  if(cfg.ymax==null){const st=nice((ymax-ymin)*1.04,4);ymax=Math.ceil((ymax-ymin)/st)*st+ymin}
+  let step=nice(ymax-ymin,4);if(cfg.yfmt==='int'&&step%1)step=Math.ceil(step);
+  const Y=v=>pt+ph-(v-ymin)/(ymax-ymin||1)*ph;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,height:H,role:'img','aria-label':cfg.title||''},host);
+  for(let v=ymin;v<=ymax+1e-9;v+=step){el('line',{x1:pl,x2:W-pr,y1:Y(v),y2:Y(v),stroke:v===ymin?axis:grid,'stroke-width':1},svg);el('text',{x:pl-8,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:muted},svg).textContent=yf(v)}
+  /* x ticks */
+  const nt=Math.max(2,Math.floor(plotW/(isTime&&span<=2*864e5?70:90)));
+  let ticks=[];
+  if(isCat){const every=Math.ceil(xs.length/nt);ticks=xs.filter((_,i)=>i%every===0)}
+  else if(isTime&&span<=2*864e5){const mins=[5,10,15,30,60,120,180,240,360,720].find(m=>act/(m*6e4)<=nt)||1440;const sm=mins*6e4,o=off==null?-new Date(x0).getTimezoneOffset()*6e4:off;for(let t=Math.ceil((x0+o)/sm)*sm-o;t<=x1;t+=sm)ticks.push(t)}
+  else if(isTime){const d=864e5,days=Math.max(1,Math.ceil(span/d/nt));for(let t=Math.ceil(x0/d)*d;t<=x1;t+=days*d)ticks.push(t)}
+  else{const st=nice(x1-x0,nt);for(let t=Math.ceil(x0/st)*st;t<=x1+1e-9;t+=st)ticks.push(t)}
+  ticks.forEach(t=>{const x=X(t);if(x<pl-1||x>W-pr+1)return;if(bk&&t>bk[0]-.03*act&&t<bk[1]+.03*act)return;el('line',{x1:x,x2:x,y1:pt+ph,y2:pt+ph+4,stroke:axis},svg);el('text',{x,y:pt+ph+18,'text-anchor':'middle','font-size':11,fill:muted},svg).textContent=xlab(t)});
+  if(bk){const a=X(bk[0]),b=X(bk[1]),cx=(a+b)/2,cy=pt+ph*.25;el('rect',{x:a,y:pt,width:b-a,height:ph,fill:grid,'data-tip':cfg.brkTip||'Nothing ran here\nthe time axis is compressed',tabindex:0},svg);el('text',{x:cx,y:cy,'text-anchor':'middle','font-size':10.5,fill:muted,transform:`rotate(-90 ${cx} ${cy})`,'pointer-events':'none'},svg).textContent=cfg.brkLabel||'idle'}
+  ev.forEach(e=>el('line',{x1:e.px,x2:e.px,y1:14+e.row*22,y2:pt+ph,stroke:axis,'stroke-width':1,'stroke-dasharray':'2 3'},svg));
+  const cols=cfg.series.map(s=>color(s.color));
+  cfg.series.forEach((s,i)=>{
+    let d='',first=true,prevY=null;
+    xs.forEach((t,j)=>{const v=s.values[j];if(v==null)return;const x=X(t),y=Y(v);if(first){d+=`M${x},${y}`;first=false}else if(cfg.step)d+=`L${x},${prevY}L${x},${y}`;else d+=`L${x},${y}`;prevY=y});
+    if(cfg.area)el('path',{d:d+`L${X(xs[xs.length-1])},${Y(ymin)}L${X(xs[0])},${Y(ymin)}Z`,fill:cols[i],opacity:cfg.areaOpacity||.12},svg);
+    el('path',{d,fill:'none',stroke:cols[i],'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+  });
+  const ends=cfg.series.map((s,i)=>{let j=s.values.length-1;while(j>0&&s.values[j]==null)j--;return{i,x:X(xs[j]),y:Y(s.values[j]),v:s.values[j]}});
+  ends.forEach(e=>el('circle',{cx:e.x,cy:e.y,r:4,fill:cols[e.i],stroke:bg,'stroke-width':2},svg));
+  if(cfg.labels&&!narrow){
+    const L=ends.slice().sort((a,b)=>a.y-b.y);let prev=-1e9;L.forEach(e=>{e.ly=Math.max(e.y,prev+17);prev=e.ly});
+    const over=L[L.length-1].ly-(pt+ph);if(over>0)L.forEach(e=>e.ly-=over);
+    L.forEach(e=>{const lx=W-pr+14;el('polyline',{points:`${e.x+5},${e.y} ${W-pr+6},${e.y} ${lx-4},${e.ly}`,fill:'none',stroke:axis,'stroke-width':1},svg);const t=el('text',{x:lx,y:e.ly+4,'font-size':11.5,fill:ink},svg);el('tspan',{'font-weight':600},t).textContent=yf(e.v)+' ';el('tspan',{fill:ink2},t).textContent=cfg.series[e.i].short||cfg.series[e.i].name})}
+  ev.forEach(e=>{const cy=14+e.row*22;const gg=el('g',{'data-tip':xtip(e.t)+'\n'+e.n+'. '+e.label,tabindex:0},svg);el('circle',{cx:e.px,cy,r:9,fill:ink,stroke:bg,'stroke-width':2},gg);el('text',{x:e.px,y:cy+4,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:bg},gg).textContent=e.n});
+  const cross=el('line',{y1:pt,y2:pt+ph,stroke:ink2,'stroke-width':1,visibility:'hidden'},svg);
+  const dots=cfg.series.map((s,i)=>el('circle',{r:4.5,fill:cols[i],stroke:bg,'stroke-width':2,visibility:'hidden'},svg));
+  const hit=el('rect',{x:pl,y:pt,width:plotW,height:ph,fill:'transparent','pointer-events':'all'},svg);
+  let cur=-1;
+  function at(j,cx,cy){cur=j;const x=X(xs[j]);cross.setAttribute('x1',x);cross.setAttribute('x2',x);cross.setAttribute('visibility','visible');
+    let txt=xtip(xs[j]);
+    cfg.series.forEach((s,i)=>{const v=s.values[j];if(v==null){dots[i].setAttribute('visibility','hidden');return}dots[i].setAttribute('cx',x);dots[i].setAttribute('cy',Y(v));dots[i].setAttribute('visibility','visible');txt+='\n'+yf(v)+'  '+(s.short||s.name)});
+    if(cfg.series.length>1&&cfg.sum)txt+='\n'+yf(cfg.series.reduce((a,s)=>a+(s.values[j]||0),0))+'  total';
+    showTip(txt,cx,cy)}
+  function nearest(px){const r=svg.getBoundingClientRect();const x=(px-r.left)*(W/r.width);let b=0,bd=1e9;xs.forEach((t,j)=>{const d=Math.abs(X(t)-x);if(d<bd){bd=d;b=j}});return b}
+  const off2=()=>{cross.setAttribute('visibility','hidden');dots.forEach(d=>d.setAttribute('visibility','hidden'));hideTip()};
+  hit.addEventListener('pointermove',e=>at(nearest(e.clientX),e.clientX,e.clientY));
+  hit.addEventListener('pointerdown',e=>at(nearest(e.clientX),e.clientX,e.clientY));
+  hit.addEventListener('pointerleave',off2);
+  if(ev.length&&cfg.key!==false){const ul=document.createElement('ul');ul.className='elist';ul.dataset.auto='';
+    ev.forEach(e=>{const li=document.createElement('li'),b=document.createElement('b'),sp=document.createElement('span');b.textContent=e.n;sp.textContent=(isCat?String(cfg.x[e.t]):isTime?(span>2*864e5?day(e.t)+' ':'')+hhmm(e.t):xnf(e.t))+' · '+e.label;li.append(b,sp);ul.append(li)});host.append(ul)}
+  host.tabIndex=0;
+  host.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const j=Math.max(0,Math.min(xs.length-1,(cur<0?0:cur)+(e.key==='ArrowRight'?1:-1)));const r=svg.getBoundingClientRect();at(j,r.left+X(xs[j])*(r.width/W),r.top+20)}};
+  host.onblur=off2;
+}
+const charts=$$('.chart').map(h=>{const s=h.querySelector('script[type="application/json"]');if(!s)return null;try{return[h,JSON.parse(s.textContent)]}catch(err){h.textContent='chart config error: '+err.message;return null}}).filter(Boolean);
+function drawAll(){charts.forEach(([h,c])=>draw(h,c))}
+drawAll();
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(drawAll,80)});
+window.ReportChart={draw};
+})();
+</script></body></html>
